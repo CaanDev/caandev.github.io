@@ -1,0 +1,502 @@
+/**
+ * Стили для магазина
+ */
+
+#shop-ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 500;
+  animation: fadeInPause 0.3s ease forwards;
+}
+
+.shop-overlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.shop-content {
+  background: var(--color-ui-panel);
+  background: var(--gradient-panel-orange);
+  border: 1.5px solid var(--color-border-orange);
+  border-radius: 16px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  color: var(--color-text-primary);
+  font-family: 'Courier New', Courier, monospace;
+  box-shadow: 
+    0 0 80px rgba(211, 84, 0, 0.12),
+    0 0 40px rgba(211, 84, 0, 0.08),
+    inset 0 0 60px rgba(211, 84, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: pauseSlideIn 0.3s ease forwards;
+  position: relative;
+  padding: 24px 0 0 0;
+}
+
+.shop-content::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 30px;
+  height: 30px;
+  border-top: 2px solid var(--color-border-orange);
+  border-left: 2px solid var(--color-border-orange);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.shop-content::after {
+  content: '';
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-bottom: 2px solid var(--color-border-orange);
+  border-right: 2px solid var(--color-border-orange);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.shop-header {
+  flex-shrink: 0;
+  padding: 0 24px 16px;
+  border-bottom: 1px solid rgba(211, 84, 0, 0.15);
+}
+
+.shop-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.shopkeeper {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  flex: 1;
+}
+
+.shopkeeper-info {
+  display: flex;
+  flex-direction: column;
+  padding-top: 2px;
+  flex: 1;
+}
+
+.shopkeeper-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--color-text-gold);
+  letter-spacing: 1px;
+}
+
+/* ===== БЛОК С РЕЧЬЮ ===== */
+.shopkeeper-speech {
+  font-size: 13px;
+  color: var(--color-text-light);
+  font-style: italic;
+  margin-top: 4px;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  min-height: 48px;
+  max-height: 60px;
+  max-width: 400px;
+  line-height: 1.5;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.shopkeeper-speech::before {
+  content: '"';
+  margin-right: 4px;
+  font-size: 18px;
+  color: var(--color-text-gold);
+  opacity: 0.4;
+}
+
+.shop-close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-dark);
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 4px 8px;
+  border-radius: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.shop-close-btn:hover {
+  color: var(--color-text-red);
+  background: rgba(231, 76, 60, 0.1);
+  transform: rotate(90deg);
+}
+
+.shop-gold-display {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(241, 196, 15, 0.08);
+  border-radius: 8px;
+  border: 1px solid rgba(241, 196, 15, 0.15);
+  margin-top: 10px;
+}
+
+.shop-gold-label {
+  font-size: 13px;
+  color: var(--color-text-dark);
+}
+
+.shop-gold-amount {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--color-text-gold);
+}
+
+.shop-gold-icon {
+  font-size: 18px;
+}
+
+/* ===== ВКЛАДКИ ===== */
+.shop-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 24px 0;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(211, 84, 0, 0.1);
+}
+
+.shop-tab {
+  padding: 8px 16px;
+  border-radius: 6px 6px 0 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-dark);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.shop-tab:hover {
+  color: var(--color-text-light);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.shop-tab.active {
+  color: var(--color-text-gold);
+  background: rgba(241, 196, 15, 0.08);
+}
+
+.shop-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: var(--color-text-gold);
+  border-radius: 2px;
+}
+
+.shop-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 24px 20px;
+}
+
+.shop-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.shop-body::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.shop-body::-webkit-scrollbar-thumb {
+  background: rgba(211, 84, 0, 0.3);
+  border-radius: 2px;
+}
+
+.shop-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(211, 84, 0, 0.5);
+}
+
+/* Содержимое вкладок */
+.shop-tab-content {
+  display: none;
+  animation: fadeInText 0.3s ease forwards;
+}
+
+.shop-tab-content.active {
+  display: block;
+}
+
+/* ===== СЕКЦИИ ===== */
+.shop-section {
+  margin-bottom: 16px;
+}
+
+.shop-section:last-child {
+  margin-bottom: 0;
+}
+
+.shop-section-title {
+  font-size: 13px;
+  color: var(--color-text-dark);
+  margin: 0 0 8px 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding-bottom: 4px;
+}
+
+/* ===== СЕТКА ТОВАРОВ ===== */
+.shop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ===== КАРТОЧКА ТОВАРА ===== */
+.shop-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: 'Courier New', Courier, monospace;
+  position: relative;
+  min-height: 52px;
+}
+
+.shop-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.shop-item:active {
+  transform: scale(0.98);
+}
+
+/* Состояния */
+.shop-item.active {
+  border-color: #2ecc71;
+  background: rgba(46, 204, 113, 0.08);
+}
+
+.shop-item.active:hover {
+  background: rgba(46, 204, 113, 0.12);
+}
+
+.shop-item.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.shop-item.locked:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.shop-item.no-gold {
+  opacity: 0.6;
+  border-color: rgba(231, 76, 60, 0.3);
+}
+
+.shop-item .shop-icon {
+  font-size: 24px;
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.shop-item .shop-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.shop-item .shop-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-text-light);
+}
+
+.shop-item .shop-desc {
+  font-size: 11px;
+  color: var(--color-text-dark);
+  margin-top: 1px;
+}
+
+.shop-item .shop-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  gap: 2px;
+  justify-content: center;
+  min-height: 40px;
+}
+
+.shop-item .shop-price {
+  font-size: 13px;
+  color: var(--color-text-gold);
+  font-weight: bold;
+}
+
+.shop-item .shop-status {
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+  display: inline-block;
+  min-width: 60px;
+}
+
+.shop-item .shop-status.buy {
+  background: rgba(46, 204, 113, 0.15);
+  color: #2ecc71;
+}
+
+.shop-item .shop-status.active {
+  background: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+}
+
+.shop-item .shop-status.owned {
+  background: rgba(241, 196, 15, 0.15);
+  color: var(--color-text-gold);
+}
+
+.shop-item .shop-status.locked {
+  background: rgba(231, 76, 60, 0.15);
+  color: #e74c3c;
+}
+
+.shop-item .shop-status.no-gold {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+/* ===== АДАПТАЦИЯ ===== */
+@media (max-width: 600px) {
+  .shop-content {
+    max-height: 95vh;
+    border-radius: 12px;
+    padding: 16px 0 0 0;
+  }
+  
+  .shop-header {
+    padding: 0 16px 12px;
+  }
+  
+  .shop-tabs {
+    padding: 8px 16px 0;
+  }
+  
+  .shop-tab {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .shop-body {
+    padding: 12px 16px 16px;
+  }
+  
+  .shop-item {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  
+  .shop-item .shop-icon {
+    font-size: 20px;
+    width: 30px;
+  }
+  
+  .shop-item .shop-name {
+    font-size: 13px;
+  }
+  
+  .shop-item .shop-price {
+    font-size: 12px;
+  }
+  
+  .shopkeeper-speech {
+    font-size: 12px;
+    padding: 6px 12px;
+    max-width: 200px;
+    min-height: 40px;
+    max-height: 52px;
+  }
+  
+  .shop-gold-amount {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 400px) {
+  .shop-content::before,
+  .shop-content::after {
+    display: none;
+  }
+  
+  .shop-item .shop-desc {
+    font-size: 10px;
+  }
+  
+  .shop-item .shop-status {
+    font-size: 9px;
+    padding: 1px 6px;
+  }
+  
+  .shop-tab {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  
+  .shopkeeper-speech {
+    font-size: 11px;
+    max-width: 150px;
+    min-height: 36px;
+    max-height: 48px;
+    padding: 4px 10px;
+  }
+}

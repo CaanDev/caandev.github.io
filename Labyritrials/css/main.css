@@ -1,0 +1,52 @@
+/**
+ * Главный файл стилей
+ * Собирает все части CSS в правильном порядке
+ */
+
+/* Тема (CSS-переменные) */
+@import url('theme.css');
+
+/* Базовые стили */
+@import url('base.css');
+
+/* Анимации */
+@import url('animations.css');
+
+/* Заставка */
+@import url('intro.css');
+
+/* Главное меню */
+@import url('menu.css');
+
+/* Игровой интерфейс */
+@import url('gameUI.css');
+
+/* Экран смерти */
+@import url('gameOver.css');
+
+/* Окно перехода уровня */
+@import url('levelUp.css');
+
+/* Меню паузы */
+@import url('pause.css');
+
+/* Финальный экран */
+@import url('final.css');
+
+/* Прелоадер */
+@import url('loader.css');
+
+/* Настройки */
+@import url('settings.css');
+
+/* Достижения */
+@import url('achievements.css');
+
+/* Записки */
+@import url('notes.css');
+
+/* Лавка торговца */
+@import url('shop.css');
+
+/* Библиотека (полки с книгами) */
+@import url('bookshelf.css');

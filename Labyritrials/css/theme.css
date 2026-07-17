@@ -1,0 +1,144 @@
+/**
+ * Все цвета из JS доступны в CSS для единой цветовой схемы
+ */
+
+:root {
+  /* ============ ОСНОВНЫЕ ЦВЕТА ФОНА ============ */
+  --color-bg-main: #050508;
+  --color-bg-dark: #000000;
+  --color-bg-overlay: rgba(0, 0, 0, 0.85);
+
+  /* ============ ТУМАН ВОЙНЫ И ЛАБИРИНТ ============ */
+  --color-maze-floor: #0b0d13;
+  --color-maze-wall: #14191f;
+  --color-maze-wall-border: #0a0d10;
+  --color-maze-crack: #242d38;
+
+  /* ============ КОЛОННЫ ============ */
+  --color-pillar-light: #b0b0c0;
+  --color-pillar-mid: #8888a0;
+  --color-pillar-dark: #5a5a6a;
+  --color-pillar-darker: #3a3a4a;
+
+  /* ============ ТЕНИ ============ */
+  --color-shadow-strong: rgba(0, 0, 0, 0.5);
+  --color-shadow-medium: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.15);
+  --color-shadow-pillar: rgba(60, 60, 80, 0.3);
+  --color-shadow-magic: rgba(150, 120, 255, 0.06);
+  --color-shadow-magic-inner: rgba(200, 180, 255, 0.02);
+
+  /* ============ ТУМАН ВОЙНЫ ============ */
+  --color-fog-center: rgba(0, 0, 0, 0);
+  --color-fog-inner: rgba(0, 0, 0, 0.02);
+  --color-fog-mid: rgba(0, 0, 0, 0.08);
+  --color-fog-outer: rgba(0, 0, 0, 0.20);
+  --color-fog-far: rgba(0, 0, 0, 0.45);
+  --color-fog-farther: rgba(0, 0, 0, 0.70);
+  --color-fog-edge: rgba(0, 0, 0, 0.88);
+  --color-fog-full: rgba(0, 0, 0, 0.97);
+  --color-fog-memory: rgba(5, 5, 15, 0.6);
+
+  /* ============ UI ============ */
+  --color-text-primary: #c8c0d0;
+  --color-text-dark: #8899aa;
+  --color-text-light: #f0e8f8;
+  --color-text-gold: #f1c40f;
+  --color-text-red: #e07080;
+  --color-text-green: #2ecc71;
+
+  --color-ui-panel: rgba(8, 6, 12, 0.92);
+  --color-ui-panel-light: rgba(10, 10, 15, 0.85);
+  --color-ui-panel-dark: rgba(6, 4, 10, 0.95);
+
+  /* ============ КНОПКИ ============ */
+  --color-btn-primary: #8e44ad;
+  --color-btn-primary-hover: #9b59b6;
+  --color-btn-primary-border: rgba(142, 68, 173, 0.8);
+  --color-btn-success: #2ecc71;
+  --color-btn-success-hover: #27ae60;
+  --color-btn-danger: #e74c3c;
+  --color-btn-danger-hover: #c0392b;
+  --color-btn-warning: #f39c12;
+  --color-btn-warning-hover: #e67e22;
+  --color-btn-disabled: #1e272e;
+
+  /* ============ ЭФФЕКТЫ ============ */
+  --color-effect-fire: #ff8800;
+  --color-effect-fire-glow: #ff6600;
+  --color-effect-ice: #4488ff;
+  --color-effect-ice-glow: #2266cc;
+  --color-effect-lightning: #f1c40f;
+  --color-effect-poison: #2ecc71;
+  --color-effect-blood: #8b0000;
+  --color-effect-vampire: #c0392b;
+  --color-effect-stun: #3498db;
+  --color-effect-magic: #9b59b6;
+  --color-effect-blessing: #f1c40f;
+
+  /* ============ ПОРТАЛЫ ============ */
+  --color-portal-treasure: #f39c12;
+  --color-portal-treasure-exit: #2ecc71;
+  --color-portal-shrine: #9b59b6;
+  --color-portal-shrine-exit: #2ecc71;
+  --color-portal-exit: #8e44ad;
+  --color-portal-secret: #f39c12;
+  --color-portal-normal: #8e44ad;
+
+  /* ============ ЗДОРОВЬЕ ============ */
+  --color-health-bg: #2c3e50;
+  --color-health-fill: #e74c3c;
+  --color-health-fill-good: #2ecc71;
+  --color-health-fill-warning: #f39c12;
+  --color-health-fill-danger: #e74c3c;
+  --color-health-boss: #c0392b;
+  --color-health-boss-bg: #2c3e50;
+  --color-health-boss-mind: #9b59b6;
+  --color-health-boss-mind-bg: #2a1a3a;
+
+  /* ============ МАГАЗИН ============ */
+  --color-shop-bg: #d35400;
+  --color-shop-border: #e67e22;
+  --color-shop-text: #e67e22;
+
+  /* ============ МИНИКАРТА ============ */
+  --color-minimap-bg: rgba(10, 10, 15, 0.85);
+  --color-minimap-border: #3d4a5d;
+  --color-minimap-wall: #1c2530;
+  --color-minimap-floor: #0f141c;
+  --color-minimap-shop: #d35400;
+  --color-minimap-portal: #8e44ad;
+  --color-minimap-player: #e74c3c;
+  --color-minimap-pillar: #1c2530;
+  --color-minimap-pillar-border: rgba(60, 60, 80, 0.3);
+
+  /* ============ ИНДИКАТОРЫ ============ */
+  --color-indicator-bg: rgba(0, 0, 0, 0.75);
+  --color-indicator-border: #f1c40f;
+  --color-indicator-text: #ffffff;
+  --color-indicator-subtext: #aaaaaa;
+  --color-indicator-adaptation-bg: rgba(10, 10, 15, 0.85);
+  --color-indicator-adaptation-border: #e74c3c;
+
+  /* ============ ГЛАЗА ============ */
+  --color-eye-red: #ff0000;
+  --color-eye-blue: #00aaff;
+
+  /* ============ СВЕЧЕНИЯ ============ */
+  --color-glow-red: rgba(255, 0, 0, 0.8);
+  --color-glow-blue: rgba(0, 170, 255, 0.4);
+  --color-glow-magic: rgba(140, 80, 180, 0.3);
+  --color-glow-gold: rgba(241, 196, 15, 0.4);
+
+  /* ============ БОРДЕРЫ ============ */
+  --color-border-primary: rgba(142, 68, 173, 0.8);
+  --color-border-gold: rgba(241, 196, 15, 0.8);
+  --color-border-red: rgba(192, 57, 43, 0.8);
+  --color-border-orange: rgba(211, 84, 0, 0.8);
+
+  /* ============ ГРАДИЕНТЫ ============ */
+  --gradient-panel: linear-gradient(135deg, rgba(142, 68, 173, 0.25) 0%, transparent 30%, transparent 70%, rgba(142, 68, 173, 0.25) 100%), rgba(8, 6, 12, 0.92);
+  --gradient-panel-gold: linear-gradient(135deg, rgba(241, 196, 15, 0.2) 0%, transparent 30%, transparent 70%, rgba(241, 196, 15, 0.2) 100%), rgba(8, 6, 12, 0.92);
+  --gradient-panel-red: linear-gradient(135deg, rgba(180, 30, 30, 0.25) 0%, transparent 30%, transparent 70%, rgba(180, 30, 30, 0.25) 100%), rgba(8, 6, 12, 0.92);
+  --gradient-panel-orange: linear-gradient(135deg, rgba(211, 84, 0, 0.25) 0%, transparent 30%, transparent 70%, rgba(211, 84, 0, 0.25) 100%), rgba(8, 6, 12, 0.92);
+}

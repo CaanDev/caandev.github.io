@@ -1,0 +1,38 @@
+/**
+ * Базовые стили
+ */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--color-bg-main);
+  font-family: 'Courier New', Courier, monospace;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+canvas {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+/* Настройка Emoji через CSS контент */
+.monster-emoji-1::before { content: "👻"; }
+.monster-emoji-2::before { content: "🎃"; }
+.monster-emoji-3::before { content: "💀"; }
+.monster-emoji-4::before { content: "😈"; }
+.player-emoji::before    { content: "🧙"; }
+
+/* Анимация плавного растворения стартового экрана */
+.fade-out-screen {
+  animation: fadeOutEffect 1.5s ease-in-out forwards;
+  pointer-events: none;
+}

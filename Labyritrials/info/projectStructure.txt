@@ -1,0 +1,325 @@
+Labyritrials/
+│
+├── index.html
+│
+├── css/
+│   ├── achievements.css
+│   ├── animations.css
+│   ├── base.css
+│   ├── bookshelf.css
+│   ├── final.css
+│   ├── gameOver.css
+│   ├── gameUI.css
+│   ├── intro.css
+│   ├── levelUp.css
+│   ├── loader.css
+│   ├── main.css
+│   ├── menu.css
+│   ├── notes.css
+│   ├── pause.css
+│   ├── settings.css
+│   ├── shop.css
+│   └── theme.css
+│
+├── html/
+│   ├── achievements.html
+│   ├── bookshelf.html
+│   ├── final.html
+│   ├── gameOver.html
+│   ├── intro.html
+│   ├── levelUp.html
+│   ├── menu.html
+│   ├── noteWindow.html
+│   ├── pause.html
+│   ├── settings.html
+│   ├── shop.html
+│   └── ui.html
+│
+├── icons/
+│   ├── apple-touch-icon.png
+│   ├── favicon.ico
+│   └── favicon.svg
+│
+├── music/
+│   ├── sounds/
+│   │   ├── achievementCompleted.ogg
+│   │   ├── dodge.ogg
+│   │   ├── monsterDeath.ogg
+│   │   ├── playerStep.ogg
+│   │   ├── portalActivate.ogg
+│   │   ├── shopBuyItem.ogg
+│   │   ├── torchActivate.ogg
+│   │   ├── trapIceActivate.ogg
+│   │   ├── trapIceFinish.ogg
+│   │   ├── trapLightningActivate.ogg
+│   │   ├── trapLightningEffect.ogg
+│   │   ├── trapSpikeActivate.ogg
+│   │   └── wallDestroy.ogg
+│   │
+│   └── themes/
+│       ├── gameBackground.ogg
+│       ├── mainMenu.ogg
+│       └── safeRoom.ogg
+│
+└── src/
+    ├── emojis.js
+    ├── main.js
+    │
+    ├── audio/
+    │   ├── audioManager.js
+    │   ├── index.js
+    │   ├── musicManager.js
+    │   └── soundManager.js
+    │
+    ├── core/
+    │   ├── game.js
+    │   ├── gameInit.js
+    │   ├── gameLoop.js
+    │   ├── index.js
+    │   └── renderer.js
+    │   │
+    │   └── config/
+    │       ├── colors.js
+    │       ├── constants.js
+    │       ├── functions.js
+    │       ├── index.js
+    │       ├── player.js
+    │       └── state.js
+    │
+    ├── data/
+    │   └── notes.js
+    │
+    ├── entities/
+    │   │
+    │   ├── monsters/
+    │   │   ├── ai.js
+    │   │   ├── combat.js
+    │   │   ├── death.js
+    │   │   ├── drop.js
+    │   │   ├── effects.js
+    │   │   ├── fireballUpdater.js
+    │   │   ├── index.js
+    │   │   └── trapInteraction.js
+    │   │   │
+    │   │   ├── adaptations/
+    │   │   │   ├── checker.js
+    │   │   │   ├── config.js
+    │   │   │   ├── counter.js
+    │   │   │   ├── helpers.js
+    │   │   │   └── index.js
+    │   │   │
+    │   │   └── bosses/
+    │   │       ├── ai.js
+    │   │       ├── attacks.js
+    │   │       ├── config.js
+    │   │       ├── index.js
+    │   │       └── logic.js
+    │   │       │
+    │   │       └── abilities/
+    │   │           ├── base.js
+    │   │           ├── buff.js
+    │   │           ├── config.js
+    │   │           ├── helpers.js
+    │   │           ├── index.js
+    │   │           ├── projectile.js
+    │   │           ├── special.js
+    │   │           └── summon.js
+    │   │
+    │   ├── objects/
+    │   │   ├── clearRoomEffects.js
+    │   │   ├── explosion.js
+    │   │   ├── firefly.js
+    │   │   ├── fly.js
+    │   │   ├── index.js
+    │   │   ├── playerTrails.js
+    │   │   └── sparks.js
+    │   │   │
+    │   │   ├── spawners/
+    │   │   │   ├── chestSpawner.js
+    │   │   │   ├── monsterSpawner.js
+    │   │   │   ├── runeSpawner.js
+    │   │   │   ├── torchSpawner.js
+    │   │   │   └── trapSpawner.js
+    │   │   │
+    │   │   └── utils/
+    │   │       ├── bloodSystem.js
+    │   │       └── spawnUtils.js
+    │   │
+    │   └── player/
+    │       ├── animation.js
+    │       ├── combat.js
+    │       ├── effects.js
+    │       ├── gameOver.js
+    │       ├── index.js
+    │       ├── interaction.js
+    │       ├── loot.js
+    │       ├── movement.js
+    │       ├── player.js
+    │       ├── portals.js
+    │       ├── shrines.js
+    │       └── traps.js
+    │
+    ├── game/
+    │   ├── finalScreen.js
+    │   ├── index.js
+    │   ├── levelTransition.js
+    │   ├── pauseMenu.js
+    │   └── playTimeTracker.js
+    │
+    ├── save/
+    │   ├── index.js
+    │   ├── notesStorage.js
+    │   ├── saveCollectors.js
+    │   ├── saveRestorers.js
+    │   ├── saveStorage.js
+    │   ├── saveSystem.js
+    │   └── timeFormatter.js
+    │
+    ├── systems/
+    │   │
+    │   ├── achievements/
+    │   │   ├── config.js
+    │   │   ├── index.js
+    │   │   ├── manager.js
+    │   │   └── ui.js
+    │   │
+    │   ├── events/
+    │   │   ├── bonuses.js
+    │   │   ├── config.js
+    │   │   ├── generator.js
+    │   │   ├── index.js
+    │   │   ├── messaging.js
+    │   │   ├── monsterVampirism.js
+    │   │   └── ui.js
+    │   │
+    │   ├── fog/
+    │   │   ├── fogCore.js
+    │   │   ├── fogEvents.js
+    │   │   ├── fogHealth.js
+    │   │   ├── fogLight.js
+    │   │   ├── fogOptimizer.js
+    │   │   ├── fogRenderer.js
+    │   │   ├── fogUtils.js
+    │   │   └── index.js
+    │   │
+    │   ├── input/
+    │   │   ├── fireball.js
+    │   │   ├── index.js
+    │   │   ├── keyboard.js
+    │   │   └── mouse.js
+    │   │
+    │   ├── notes/
+    │   │   ├── index.js
+    │   │   └── noteSpawner.js
+    │   │
+    │   ├── particles/
+    │   │   ├── artifactParticles.js
+    │   │   ├── bossExplosion.js
+    │   │   ├── explosion.js
+    │   │   ├── goldParticles.js
+    │   │   ├── index.js
+    │   │   ├── particlePool.js
+    │   │   └── potionParticles.js
+    │   │
+    │   ├── rendering/
+    │   │   ├── batchRenderer.js
+    │   │   ├── bloodRenderer.js
+    │   │   ├── chestRenderer.js
+    │   │   ├── index.js
+    │   │   ├── mazeRenderer.js
+    │   │   ├── monsterRenderer.js
+    │   │   ├── particleRenderer.js
+    │   │   ├── portalRenderer.js
+    │   │   ├── projectileRenderer.js
+    │   │   ├── realityShiftRenderer.js
+    │   │   ├── shrineRenderer.js
+    │   │   ├── torchRenderer.js
+    │   │   ├── trapRenderer.js
+    │   │   ├── uiRenderer.js
+    │   │   └── visibilityUtils.js
+    │   │   │
+    │   │   ├── maze/
+    │   │   │   ├── background.js
+    │   │   │   ├── bossLightFade.js
+    │   │   │   ├── bossSummonCircle.js
+    │   │   │   ├── index.js
+    │   │   │   ├── pillars.js
+    │   │   │   └── runes.js
+    │   │   │   │
+    │   │   │   ├── floors/
+    │   │   │   │   ├── features.js
+    │   │   │   │   ├── floorConfig.js
+    │   │   │   │   ├── floorRenderer.js
+    │   │   │   │   ├── index.js
+    │   │   │   │   └── patterns.js
+    │   │   │   │
+    │   │   │   └── walls/
+    │   │   │       ├── crackTemplates.js
+    │   │   │       ├── index.js
+    │   │   │       ├── wallConfig.js
+    │   │   │       ├── wallFeatures.js
+    │   │   │       └── wallRenderer.js
+    │   │   │
+    │   │   ├── player/
+    │   │   │   ├── attackRenderer.js
+    │   │   │   ├── effectRenderer.js
+    │   │   │   ├── index.js
+    │   │   │   ├── particleSpawner.js
+    │   │   │   ├── playerRenderer.js
+    │   │   │   ├── statusEffects.js
+    │   │   │   └── trailManager.js
+    │   │   │
+    │   │   └── ui/
+    │   │       ├── adaptationIndicator.js
+    │   │       ├── bossHealthBar.js
+    │   │       ├── eventIndicator.js
+    │   │       ├── index.js
+    │   │       ├── miniMap.js
+    │   │       ├── roomLabel.js
+    │   │       └── utils.js
+    │   │
+    │   └── ui/
+    │       ├── bookshelfUI.js
+    │       ├── controlButtons.js
+    │       ├── index.js
+    │       └── statsUpdater.js
+    │       │
+    │       ├── settings/
+    │       │   ├── index.js
+    │       │   ├── settingsControls.js
+    │       │   ├── settingsData.js
+    │       │   ├── settingsFps.js
+    │       │   ├── settingsManager.js
+    │       │   └── settingsUI.js
+    │       │
+    │       └── shop/
+    │           ├── index.js
+    │           ├── shopHandlers.js
+    │           ├── shopSpeech.js
+    │           ├── shopStatus.js
+    │           └── shopUI.js
+    │
+    ├── utils/
+    │   ├── cache.js
+    │   ├── exitToMainMenu.js
+    │   ├── gameLoader.js
+    │   ├── htmlLoader.js
+    │   └── index.js
+    │
+    └── world/
+        ├── index.js
+        ├── maze.js
+        ├── mazeGenerator.js
+        └── physics.js
+        │
+        ├── arena/
+        │   └── bossArena.js
+        │
+        ├── cells/
+        │   └── cell.js
+        │
+        └── rooms/
+            ├── safeRoom.js
+            ├── shrineRoom.js
+            ├── trapRoom.js
+            └── treasureRoom.js

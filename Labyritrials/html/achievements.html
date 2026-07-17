@@ -1,0 +1,39 @@
+<!-- Окно достижений -->
+<div id="achievements-ui" style="display: none;">
+  <div class="achievements-content">
+    <div class="achievements-header">
+      <h2>🏆 ДОСТИЖЕНИЯ</h2>
+      <button id="achievements-close-btn" class="achievements-close-btn">✕</button>
+    </div>
+    
+    <div class="achievements-tabs">
+      <button class="achievements-tab active" data-category="all">📋 Все</button>
+      <button class="achievements-tab" data-category="combat">🗡️ Боевые</button>
+      <button class="achievements-tab" data-category="exploration">🗺️ Исследовательские</button>
+      <button class="achievements-tab" data-category="collection">💰 Коллекционные</button>
+      <button class="achievements-tab" data-category="survival">🛡️ Выживание</button>
+      <button class="achievements-tab" data-category="secret">✨ Скрытые</button>
+    </div>
+    
+    <div class="achievements-stats">
+      <span id="achievements-unlocked-count">0</span> / <span id="achievements-total-count">0</span> разблокировано
+    </div>
+    
+    <div id="achievements-list" class="achievements-list">
+      <!-- Список достижений рендерится через JS -->
+    </div>
+    
+    <div class="achievements-footer">
+      <button id="achievements-reset-btn" class="achievements-reset-btn">🗑️ Сбросить все достижения</button>
+    </div>
+  </div>
+</div>
+
+<!-- Уведомление о разблокировке -->
+<div id="achievement-notification" class="achievement-notification" style="display: none;">
+  <div class="notification-icon">🏆</div>
+  <div class="notification-content">
+    <div class="notification-title">ДОСТИЖЕНИЕ РАЗБЛОКИРОВАНО!</div>
+    <div class="notification-name" id="notification-achievement-name">Первый удар</div>
+  </div>
+</div>

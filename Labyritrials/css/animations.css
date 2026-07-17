@@ -1,0 +1,86 @@
+/**
+ * Все анимации и ключевые кадры
+ */
+
+@keyframes mistPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+@keyframes floatEyes {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  25% { transform: translateY(-6px) translateX(4px); }
+  50% { transform: translateY(0px) translateX(-3px); }
+  75% { transform: translateY(-4px) translateX(3px); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    box-shadow: 0 0 30px var(--color-glow-magic),
+                0 0 60px rgba(142, 68, 173, 0.2),
+                0 0 90px rgba(142, 68, 173, 0.1);
+    border-color: var(--color-border-primary);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(155, 89, 182, 0.7),
+                0 0 80px rgba(155, 89, 182, 0.4),
+                0 0 120px rgba(155, 89, 182, 0.15);
+    border-color: var(--color-btn-primary-hover);
+  }
+}
+
+@keyframes fadeInText {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOutIntro {
+  0% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+@keyframes fadeOutEffect {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Анимации для меню паузы */
+@keyframes fadeInPause {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes pauseSlideIn {
+  0% { transform: scale(0.92) translateY(-20px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes borderPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Анимации для финального экрана */
+@keyframes finalGlow {
+  0%, 100% {
+    box-shadow: 0 0 40px var(--color-glow-gold),
+                0 0 80px rgba(241, 196, 15, 0.1);
+    border-color: var(--color-text-gold);
+  }
+  50% {
+    box-shadow: 0 0 60px rgba(241, 196, 15, 0.5),
+                0 0 120px rgba(241, 196, 15, 0.2);
+    border-color: var(--color-btn-warning);
+  }
+}

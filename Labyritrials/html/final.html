@@ -1,0 +1,149 @@
+<!-- Финальный экран (после 15 уровня) -->
+<div id="final-screen-ui" style="display: none;">
+  <div class="final-screen-content">
+    <div class="title-container">
+      <h1>ЛАБИРИНТ ПОКОРЁН!</h1>
+      <p class="subtitle">Вы прошли все уровни испытаний!</p>
+    </div>
+    
+    <div class="final-stats-box">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-icon">⏱️</span>
+          <span class="stat-label">Время прохождения</span>
+          <span class="stat-value" id="final-play-time">00:00:00</span>
+        </div>
+      </div>
+
+      <h3>📊 СТАТИСТИКА ГЕРОЯ</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-icon">❤️</span>
+          <span class="stat-label">HP</span>
+          <span class="stat-value" id="final-maxhp">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">❤️‍</span>
+          <span class="stat-label">Осталось HP</span>
+          <span class="stat-value" id="final-hp-remaining">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">⚔️</span>
+          <span class="stat-label">Урон</span>
+          <span class="stat-value" id="final-damage">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">💰</span>
+          <span class="stat-label">Собрано золота</span>
+          <span class="stat-value" id="final-gold-collected">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">💸</span>
+          <span class="stat-label">Потрачено золота</span>
+          <span class="stat-value" id="final-gold-spent">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">👑</span>
+          <span class="stat-label">Собрано артефактов</span>
+          <span class="stat-value" id="final-artifacts-collected">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🏛️</span>
+          <span class="stat-label">Всего артефактов</span>
+          <span class="stat-value" id="final-artifacts-total">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">💀</span>
+          <span class="stat-label">Убито монстров</span>
+          <span class="stat-value" id="final-monsters-killed">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">👹</span>
+          <span class="stat-label">Всего боссов</span>
+          <span class="stat-value" id="final-bosses-total">0</span>
+        </div>
+      </div>
+      
+      <h3>🗡️ СТАТИСТИКА ОРУЖИЯ</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-icon">🧙</span>
+          <span class="stat-label">Обычный посох</span>
+          <span class="stat-value" id="final-weapon-default">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">⚡</span>
+          <span class="stat-label">Громовой посох</span>
+          <span class="stat-value" id="final-weapon-stun">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🦇</span>
+          <span class="stat-label">Посох Вампира</span>
+          <span class="stat-value" id="final-weapon-vampire">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🔥</span>
+          <span class="stat-label">Огненный шар</span>
+          <span class="stat-value" id="final-weapon-fireball">0</span>
+        </div>
+        <div class="stat-item" style="border-bottom: none; margin-top: 4px;">
+          <span class="stat-icon">⭐</span>
+          <span class="stat-label">Любимое оружие</span>
+          <span class="stat-value" id="final-favorite-weapon" style="color: #f1c40f;">Обычный посох</span>
+        </div>
+      </div>
+      
+      <h3>🔮 ТАЙНЫЕ КОМНАТЫ</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-icon">🚪</span>
+          <span class="stat-label">Посещено комнат</span>
+          <span class="stat-value" id="final-rooms-visited">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🗺️</span>
+          <span class="stat-label">Всего сгенерировано</span>
+          <span class="stat-value" id="final-rooms-generated">0</span>
+        </div>
+      </div>
+      
+      <h3>⚠️ ЛОВУШКИ И МИМИКИ</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-icon">💥</span>
+          <span class="stat-label">Взрывные</span>
+          <span class="stat-value" id="final-trap-spike">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">❄️</span>
+          <span class="stat-label">Ледяные</span>
+          <span class="stat-value" id="final-trap-ice">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🧪</span>
+          <span class="stat-label">Кислотные</span>
+          <span class="stat-value" id="final-trap-acid">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">⚡</span>
+          <span class="stat-label">Электрические</span>
+          <span class="stat-value" id="final-trap-lightning">0</span>
+        </div>
+        <div class="stat-item" style="border-bottom: none; margin-top: 4px;">
+          <span class="stat-icon">😈</span>
+          <span class="stat-label">Укусы мимиков</span>
+          <span class="stat-value" id="final-mimic-bites" style="color: #e74c3c;">0</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="final-message-box">
+      <p class="final-message">Вы доказали, что достойны звания Мастера Лабиринта!</p>
+      <p class="final-submessage">Лабиритрия сохранит ваше имя в анналах истории...</p>
+    </div>
+    
+    <div class="final-buttons">
+      <button id="final-menu-btn">В главное меню</button>
+    </div>
+  </div>
+</div>
