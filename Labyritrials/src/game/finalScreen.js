@@ -10,19 +10,15 @@ import { state, player } from '../core/config/index.js';
 import { Game } from '../core/game.js';
 import { resetGameFull } from '../core/config/functions.js';
 import { formatPlayTime } from '../save/timeFormatter.js';
+import { loadTemplateIfNeeded, isTemplateLoaded } from '../utils/htmlLoader.js';
 
 /**
- * Показ финального экрана
- * 
- * Выполняет следующие действия:
- * 1. Останавливает игровой цикл
- * 2. Скрывает все игровые UI элементы
- * 3. Обновляет статистику
- * 4. Показывает финальный экран
+ * Внутренняя функция показа финального экрана (после загрузки шаблона)
  * 
  * @returns {void}
+ * @private
  */
-export function showFinalScreen() {
+function doShowFinalScreen() {
   Game.stopLoop();
   
   const gameUI = document.getElementById('ui');
@@ -47,8 +43,30 @@ export function showFinalScreen() {
     finalScreen.style.display = 'flex';
     finalScreen.style.animation = 'fadeInText 0.8s ease forwards';
   }
+}
+
+/**
+ * Показ финального экрана
+ * 
+ * Выполняет следующие действия:
+ * 1. Останавливает игровой цикл
+ * 2. Скрывает все игровые UI элементы
+ * 3. Обновляет статистику
+ * 4. Показывает финальный экран
+ * 
+ * @returns {void}
+ */
+export function showFinalScreen() {
+  // ==== ЗАГРУЗКА ШАБЛОНА (ЕСЛИ НУЖНО) =====
+  if (!isTemplateLoaded('final')) {
+    loadTemplateIfNeeded('final').then(() => {
+      // Кнопки уже инициализированы через initModalHandlers()
+      doShowFinalScreen();
+    });
+    return;
+  }
   
-  console.log('🏆 Финальный экран показан!');
+  doShowFinalScreen();
 }
 
 /**
@@ -139,7 +157,10 @@ export function setupFinalScreenButtons() {
   const menuBtn = document.getElementById('final-menu-btn');
   
   if (menuBtn) {
-    menuBtn.addEventListener('click', () => {
+    const newMenuBtn = menuBtn.cloneNode(true);
+    menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
+    
+    newMenuBtn.addEventListener('click', () => {
       // ===== СКРЫТИЕ ФИНАЛЬНОГО ЭКРАНА =====
       const finalScreen = document.getElementById('final-screen-ui');
       if (finalScreen) finalScreen.style.display = 'none';

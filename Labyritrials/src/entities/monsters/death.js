@@ -59,7 +59,7 @@ export function handleMonsterDeath(m, index, monstersArray) {
     state.trapMonstersKilled = (state.trapMonstersKilled || 0) + 1;
 
     // Проверяем завершение волны в комнате-ловушке
-    import('../../world/rooms/trapRoom.js').then(module => {
+    import('../../world/rooms/trapRoom/index.js').then(module => {
       if (state.inTrapRoom && state.trapActivated) {
         setTimeout(() => {
           module.checkTrapWaveComplete();

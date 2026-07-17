@@ -10,21 +10,32 @@ import { state } from '../../core/config/index.js';
 import { Game } from '../../core/game.js';
 import { audio } from '../../audio/audioManager.js';
 import { getAllNotes, getNoteById } from '../../data/notes.js';
+import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../../utils/htmlLoader.js';
 
 /** @type {boolean} - Открыта ли библиотека */
 let bookshelfOpen = false;
 
 /**
- * Открытие библиотеки
- * 
- * Приостанавливает игру, скрывает игровой UI и отображает окно библиотеки
- * со списком всех записок.
+ * Инициализация обработчиков библиотеки
  * 
  * @returns {void}
  */
-export function openBookshelf() {
-  if (bookshelfOpen) return;
-  
+export function initBookshelfHandlers() {
+  const closeBtn = document.getElementById('bookshelf-close-btn');
+  if (closeBtn) {
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+    newCloseBtn.addEventListener('click', closeBookshelf);
+  }
+}
+
+/**
+ * Внутренняя функция открытия библиотеки (после загрузки шаблона)
+ * 
+ * @returns {void}
+ * @private
+ */
+function doOpenBookshelf() {
   const ui = document.getElementById('bookshelf-ui');
   if (!ui) {
     console.warn('❌ bookshelf-ui не найдено в DOM!');
@@ -49,20 +60,40 @@ export function openBookshelf() {
   // ===== ОТОБРАЖЕНИЕ БИБЛИОТЕКИ =====
   renderBookshelf();
   ui.style.display = 'flex';
+}
+
+/**
+ * Открытие библиотеки
+ * 
+ * @returns {void}
+ */
+export function openBookshelf() {
+  if (bookshelfOpen) return;
   
-  // ===== НАСТРОЙКА КНОПКИ ЗАКРЫТИЯ =====
-  const closeBtn = document.getElementById('bookshelf-close-btn');
-  if (closeBtn) {
-    const newCloseBtn = closeBtn.cloneNode(true);
-    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-    newCloseBtn.addEventListener('click', closeBookshelf);
+  // ==== ЗАГРУЗКА ШАБЛОНА (ЕСЛИ НУЖНО) =====
+  if (!isTemplateLoaded('bookshelf')) {
+    loadTemplateIfNeeded('bookshelf').then(() => {
+      // Инициализируем обработчики ТОЛЬКО ПОСЛЕ того, как HTML вставлен в DOM
+      initTemplateHandlers('bookshelf').then(() => {
+        doOpenBookshelf();
+      });
+    });
+    return;
   }
+  
+  // Если шаблон загружен, но не инициализирован — инициализируем
+  if (!isTemplateInitialized('bookshelf')) {
+    initTemplateHandlers('bookshelf').then(() => {
+      doOpenBookshelf();
+    });
+    return;
+  }
+  
+  doOpenBookshelf();
 }
 
 /**
  * Закрытие библиотеки
- * 
- * Скрывает окно библиотеки и возобновляет игру.
  * 
  * @returns {void}
  */
@@ -100,8 +131,6 @@ export function isBookshelfOpen() {
 /**
  * Рендер списка записок в библиотеке
  * 
- * Отображает все записки с указанием уровня и статуса (найдена/не найдена).
- * 
  * @returns {void}
  * @private
  */
@@ -115,11 +144,9 @@ function renderBookshelf() {
   const allNotes = getAllNotes();
   const foundNotes = state.notes.found || [];
   
-  // Обновляем статистику
   if (foundCountEl) foundCountEl.textContent = foundNotes.length;
   if (totalCountEl) totalCountEl.textContent = allNotes.length;
   
-  // Сортировка записок по уровню, затем по ID
   const sortedNotes = [...allNotes].sort((a, b) => {
     if (a.level !== b.level) return a.level - b.level;
     return a.id - b.id;
@@ -176,46 +203,66 @@ window.openNoteFromBookshelf = function(noteId) {
     return;
   }
   
-  // Проверяем, найдена ли записка
   const foundNotes = state.notes.found || [];
   if (!foundNotes.includes(noteId)) {
     console.warn(`📜 Записка #${noteId} ещё не найдена!`);
     return;
   }
   
-  // Закрываем библиотеку
   closeBookshelf();
   
-  // Открываем окно с запиской (с задержкой для плавности)
   setTimeout(() => {
     import('../input/keyboard.js').then(module => {
-      const noteWindow = document.getElementById('note-reader');
-      if (!noteWindow) return;
-      
-      const titleEl = document.getElementById('note-reader-title');
-      const textEl = document.getElementById('note-reader-text');
-      const countEl = document.getElementById('note-reader-count');
-      
-      if (titleEl) titleEl.textContent = note.title || `Записка #${note.id}`;
-      if (textEl) {
-        const formattedText = (note.text || 'Текст записки отсутствует...')
-          .replace(/\n/g, '<br>');
-        textEl.innerHTML = formattedText;
-      }
-      if (countEl) countEl.textContent = `${foundNotes.length}/12`;
-      
-      module.pauseGameForNote();
-      
-      noteWindow.style.display = 'flex';
-      
-      const closeBtn = document.getElementById('note-reader-close');
-      if (closeBtn) {
-        const newCloseBtn = closeBtn.cloneNode(true);
-        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-        newCloseBtn.addEventListener('click', () => {
-          module.closeNoteWindow();
+      // ==== ЗАГРУЗКА ШАБЛОНА (ЕСЛИ НУЖНО) =====
+      if (!isTemplateLoaded('noteWindow')) {
+        loadTemplateIfNeeded('noteWindow').then(() => {
+          // Инициализируем обработчики ПОСЛЕ вставки в DOM
+          initTemplateHandlers('noteWindow').then(() => {
+            showNoteFromBookshelf(note, foundNotes, module);
+          });
         });
+        return;
       }
+      
+      // Если шаблон загружен, но не инициализирован
+      if (!isTemplateInitialized('noteWindow')) {
+        initTemplateHandlers('noteWindow').then(() => {
+          showNoteFromBookshelf(note, foundNotes, module);
+        });
+        return;
+      }
+      
+      showNoteFromBookshelf(note, foundNotes, module);
     });
   }, 200);
 };
+
+/**
+ * Показ записки из библиотеки
+ * 
+ * @param {Object} note - Объект записки
+ * @param {number[]} foundNotes - Массив найденных записок
+ * @param {Object} module - Модуль keyboard
+ * @returns {void}
+ * @private
+ */
+function showNoteFromBookshelf(note, foundNotes, module) {
+  const noteWindow = document.getElementById('note-reader');
+  if (!noteWindow) return;
+  
+  const titleEl = document.getElementById('note-reader-title');
+  const textEl = document.getElementById('note-reader-text');
+  const countEl = document.getElementById('note-reader-count');
+  
+  if (titleEl) titleEl.textContent = note.title || `Записка #${note.id}`;
+  if (textEl) {
+    const formattedText = (note.text || 'Текст записки отсутствует...')
+      .replace(/\n/g, '<br>');
+    textEl.innerHTML = formattedText;
+  }
+  if (countEl) countEl.textContent = `${foundNotes.length}/12`;
+  
+  module.pauseGameForNote();
+  
+  noteWindow.style.display = 'flex';
+}

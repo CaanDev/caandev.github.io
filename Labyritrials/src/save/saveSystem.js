@@ -43,7 +43,7 @@ import {
   collectBossData,
   collectAchievementsData,
   collectNotesData
-} from './saveCollectors.js';
+} from './collectors/index.js';
 import {
   restoreBasicData,
   restorePlayerData,
@@ -71,7 +71,7 @@ import {
   restoreAchievementsData,
   restoreNotesData,
   restoreFlags
-} from './saveRestorers.js';
+} from './restorers/index.js';
 
 /**
  * Сохранение текущего состояния игры

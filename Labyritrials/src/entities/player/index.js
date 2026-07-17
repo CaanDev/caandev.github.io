@@ -19,7 +19,7 @@ import {
 } from './portals.js';
 import { checkTraps } from './traps.js';
 import { updateAttackAnimation } from './animation.js';
-import { checkTrapWaveComplete } from '../../world/rooms/trapRoom.js';
+import { checkTrapWaveComplete } from '../../world/rooms/trapRoom/index.js';
 
 // ============================================================
 // ЭКСПОРТЫ

@@ -41,8 +41,6 @@ export {
   openSettings,
   closeSettings,
   initSettings,
-  getSettings,
-  updateSetting,
   updateFpsDisplay,
   shouldSkipFrame,
   getFrameInterval

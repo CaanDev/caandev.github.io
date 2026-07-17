@@ -10,9 +10,6 @@ import { COLORS } from '../../../core/config/colors.js';
 import { checkWallCollision, hasLineOfSight, findPath, hasDirectPath } from '../../../world/physics.js';
 import { BOSS_TYPES } from './config.js';
 
-/** @type {number} - Смещение для эффекта дрожания */
-let tremorOffset = 0;
-
 /**
  * Проверка наличия колонны в указанной клетке
  * 

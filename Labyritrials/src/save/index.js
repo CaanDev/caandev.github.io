@@ -35,10 +35,7 @@ export { formatPlayTime } from './timeFormatter.js';
  */
 export { 
   saveToLocalStorage, 
-  loadFromLocalStorage, 
-  deleteSave as deleteSaveStorage, 
-  hasSave as hasSaveStorage, 
-  getSaveInfo as getSaveInfoStorage 
+  loadFromLocalStorage
 } from './saveStorage.js';
 
 // ============================================================

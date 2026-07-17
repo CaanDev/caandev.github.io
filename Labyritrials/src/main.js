@@ -15,9 +15,8 @@ import { loadNotesFromStorage } from './save/notesStorage.js';
 import { generateRandomSeed, setSeed } from './world/mazeGenerator.js';
 import { resetGameFull } from './core/config/functions.js';
 import { player, state } from './core/config/index.js';
-import { loadAllTemplates } from './utils/htmlLoader.js';
+import { loadEssentialTemplates } from './utils/htmlLoader.js';
 import { showLoader, updateLoader, hideLoader } from './utils/gameLoader.js';
-import { initShopHandlers } from './systems/ui/shop/index.js';
 import { clearAllCaches } from './utils/cache.js';
 import { openSettings, initSettings, getSettings } from './systems/ui/settings/index.js';
 
@@ -429,9 +428,9 @@ async function init() {
     updateLoader(null, null, null, Math.min(90, progress));
   }, 200);
   
-  // Загрузка HTML-шаблонов
+  // Загрузка критических HTML-шаблонов (инкрементальная загрузка)
   updateLoader('Загрузка интерфейса...', '📄', 'Загрузка шаблонов...', 20);
-  await loadAllTemplates();
+  await loadEssentialTemplates();
   
   // Поиск холста
   updateLoader('Подготовка экрана...', '🎨', 'Инициализация графики...', 40);
@@ -489,7 +488,6 @@ async function init() {
   Input.init();
   Game.init(ctx, canvas);
   initPauseMenu();
-  initShopHandlers();
   setupStartScreenButtons();
   setupIntroScreen();
 

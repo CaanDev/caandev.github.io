@@ -12,6 +12,7 @@ import { openAchievementsWindow } from '../systems/achievements/index.js';
 import { audio } from '../audio/audioManager.js';
 import { exitToMainMenu } from '../utils/exitToMainMenu.js';
 import { resetAllKeys } from '../systems/input/index.js';
+import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../utils/htmlLoader.js';
 
 /** @type {boolean} - Открыто ли меню паузы */
 let isPaused = false;
@@ -41,18 +42,12 @@ function updatePauseStats() {
 }
 
 /**
- * Открытие меню паузы
+ * Внутренняя функция открытия меню паузы
  * 
  * @returns {void}
+ * @private
  */
-export function openPauseMenu() {
-  if (isPaused) return;
-  if (state.isShopOpen) return;
-  if (player.hp <= 0) return;
-
-  const gameUI = document.getElementById('ui');
-  if (!gameUI || gameUI.style.display === 'none') return;
-  
+function showPauseMenu() {
   const pauseMenu = document.getElementById('pause-menu');
   if (!pauseMenu) return;
   
@@ -67,6 +62,41 @@ export function openPauseMenu() {
   
   audio.pause();
   audio.isGameActive = false;
+}
+
+/**
+ * Открытие меню паузы
+ * 
+ * @returns {void}
+ */
+export function openPauseMenu() {
+  if (isPaused) return;
+  if (state.isShopOpen) return;
+  if (player.hp <= 0) return;
+
+  const gameUI = document.getElementById('ui');
+  if (!gameUI || gameUI.style.display === 'none') return;
+  
+  // ==== ЗАГРУЗКА ШАБЛОНА ПАУЗЫ (ЕСЛИ НУЖНО) =====
+  if (!isTemplateLoaded('pause')) {
+    loadTemplateIfNeeded('pause').then(() => {
+      // Инициализируем обработчики ПОСЛЕ вставки в DOM
+      initTemplateHandlers('pause').then(() => {
+        showPauseMenu();
+      });
+    });
+    return;
+  }
+  
+  // Если шаблон загружен, но не инициализирован
+  if (!isTemplateInitialized('pause')) {
+    initTemplateHandlers('pause').then(() => {
+      showPauseMenu();
+    });
+    return;
+  }
+  
+  showPauseMenu();
 }
 
 /**
@@ -130,30 +160,24 @@ async function saveGameFromPause() {
  * @private
  */
 function handleExitToMainMenu() {
-  // ===== ЗАКРЫТИЕ ПАУЗЫ =====
   const pauseMenu = document.getElementById('pause-menu');
   if (pauseMenu) pauseMenu.style.display = 'none';
   
   isPaused = false;
   
-  // ===== ОЧИСТКА КЛАВИШ =====
   resetAllKeys();
   
-  // ===== ПОКАЗ UI =====
   const ui = document.getElementById('ui');
   if (ui) ui.style.display = 'block';
   
   const controlButtons = document.getElementById('control-buttons-container');
   if (controlButtons) controlButtons.style.display = 'flex';
   
-  // ===== ЗАПУСК ИГРОВОГО ЦИКЛА =====
   Game.startLoop();
   
-  // ===== ВОЗОБНОВЛЕНИЕ МУЗЫКИ =====
   audio.isGameActive = true;
   audio.resume();
   
-  // ===== ВЫЗОВ ВЫХОДА В МЕНЮ =====
   const result = exitToMainMenu();
 }
 
@@ -168,7 +192,6 @@ export function initPauseMenu() {
   achievementsBtn = document.getElementById('pause-achievements-btn');
   exitBtn = document.getElementById('pause-exit-btn');
   
-  // ===== КНОПКА "ПРОДОЛЖИТЬ" =====
   if (resumeBtn) {
     const newResumeBtn = resumeBtn.cloneNode(true);
     resumeBtn.parentNode.replaceChild(newResumeBtn, resumeBtn);
@@ -176,7 +199,6 @@ export function initPauseMenu() {
     resumeBtn = newResumeBtn;
   }
   
-  // ===== КНОПКА "СОХРАНИТЬ" =====
   if (saveBtn) {
     const newSaveBtn = saveBtn.cloneNode(true);
     saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
@@ -184,7 +206,6 @@ export function initPauseMenu() {
     saveBtn = newSaveBtn;
   }
   
-  // ===== КНОПКА "ВЫЙТИ" =====
   if (exitBtn) {
     const newExitBtn = exitBtn.cloneNode(true);
     exitBtn.parentNode.replaceChild(newExitBtn, exitBtn);
@@ -192,7 +213,6 @@ export function initPauseMenu() {
     exitBtn = newExitBtn;
   }
 
-  // ===== КНОПКА "ДОСТИЖЕНИЯ" =====
   if (achievementsBtn) {
     const newAchievementsBtn = achievementsBtn.cloneNode(true);
     achievementsBtn.parentNode.replaceChild(newAchievementsBtn, achievementsBtn);

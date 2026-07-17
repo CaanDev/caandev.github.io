@@ -17,6 +17,7 @@ import { Game } from '../core/game.js';
 import { showLoader, updateLoader, hideLoader } from '../utils/gameLoader.js';
 import { clearPlayerTrails } from '../entities/objects/playerTrails.js';
 import { updateProgress, setProgress } from '../systems/achievements/index.js';
+import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../utils/htmlLoader.js';
 
 /** @type {number} - Количество пройденных уровней без смерти */
 let levelsCompletedWithoutDeath = 0;
@@ -82,12 +83,12 @@ export function setTransitionStatsBonusGold(value) {
 }
 
 /**
- * Показ окна перехода на следующий уровень
+ * Внутренняя функция показа окна перехода (после загрузки и инициализации шаблона)
  * 
  * @returns {void}
  * @private
  */
-function showLevelUpWindow() {
+function doShowLevelUpWindow() {
   const levelUpUI = document.getElementById('level-up-ui');
   const gameUI = document.getElementById('ui');
   
@@ -105,6 +106,65 @@ function showLevelUpWindow() {
   
   if (gameUI) gameUI.style.display = 'none';
   if (levelUpUI) levelUpUI.style.display = 'block';
+}
+
+/**
+ * Настройка кнопки продолжения в окне перехода
+ * 
+ * @returns {void}
+ * @private
+ */
+function setupContinueButton() {
+  const continueBtn = document.getElementById('continue-btn');
+  if (!continueBtn) return;
+  
+  // Удаляем старые обработчики, чтобы избежать дублирования
+  const newContinueBtn = continueBtn.cloneNode(true);
+  continueBtn.parentNode.replaceChild(newContinueBtn, continueBtn);
+  
+  newContinueBtn.addEventListener('click', () => {
+    const levelUpUI = document.getElementById('level-up-ui');
+    const gameUI = document.getElementById('ui');
+    
+    if (levelUpUI) levelUpUI.style.display = 'none';
+    if (gameUI) gameUI.style.display = 'block';
+    
+    executeLevelTransition();
+  });
+}
+
+/**
+ * Показ окна перехода на следующий уровень
+ * 
+ * @returns {void}
+ * @private
+ */
+function showLevelUpWindow() {
+  // ==== ЗАГРУЗКА ШАБЛОНА (ЕСЛИ НУЖНО) =====
+  if (!isTemplateLoaded('levelUp')) {
+    loadTemplateIfNeeded('levelUp').then(() => {
+      // Инициализируем обработчики ПОСЛЕ вставки HTML в DOM
+      initTemplateHandlers('levelUp').then(() => {
+        // Настраиваем кнопку продолжения
+        setupContinueButton();
+        doShowLevelUpWindow();
+      });
+    });
+    return;
+  }
+  
+  // Если шаблон загружен, но не инициализирован
+  if (!isTemplateInitialized('levelUp')) {
+    initTemplateHandlers('levelUp').then(() => {
+      setupContinueButton();
+      doShowLevelUpWindow();
+    });
+    return;
+  }
+  
+  // Шаблон загружен и инициализирован — просто настраиваем кнопку и показываем
+  setupContinueButton();
+  doShowLevelUpWindow();
 }
 
 /**
@@ -157,12 +217,10 @@ async function executeLevelTransition() {
     setProgress('level_15_reached', 1);
   }
   
-  // Проверяем достижение "Железный человек"
   if (state.gameLevel === 5 && state.ironManActive !== false) {
     updateProgress('iron_man_complete', 1);
   }
 
-  // Проверяем достижение "Тень"
   if (state.shadowActive) {
     const initialCount = state.initialMonstersCount || 0;
     const currentCount = state.monsters.length || 0;
@@ -407,32 +465,6 @@ export function advanceToNextLevel(updateUICallback) {
   showLevelUpWindow();
   showLevelUpNotification();
   clearAllParticles();
-  
-  setupContinueButton();
-}
-
-/**
- * Настройка кнопки продолжения в окне перехода
- * 
- * @returns {void}
- * @private
- */
-function setupContinueButton() {
-  const continueBtn = document.getElementById('continue-btn');
-  if (!continueBtn) return;
-  
-  const newContinueBtn = continueBtn.cloneNode(true);
-  continueBtn.parentNode.replaceChild(newContinueBtn, continueBtn);
-  
-  newContinueBtn.addEventListener('click', () => {
-    const levelUpUI = document.getElementById('level-up-ui');
-    const gameUI = document.getElementById('ui');
-    
-    if (levelUpUI) levelUpUI.style.display = 'none';
-    if (gameUI) gameUI.style.display = 'block';
-    
-    executeLevelTransition();
-  });
 }
 
 /**

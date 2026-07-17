@@ -144,7 +144,7 @@ export function checkTrapPortal() {
     resetTrailPosition();
     state.screenShake = 10;
 
-    import('../../world/rooms/trapRoom.js').then(module => {
+    import('../../world/rooms/trapRoom/index.js').then(module => {
       module.generateTrapRoom();
     });
     return true;
@@ -169,7 +169,7 @@ export function checkTrapRoomExit() {
     resetTrailPosition();
     state.screenShake = 8;
 
-    import('../../world/rooms/trapRoom.js').then(module => {
+    import('../../world/rooms/trapRoom/index.js').then(module => {
       module.returnFromTrapRoom();
     });
     return true;
@@ -192,7 +192,7 @@ export function checkFakeTrapPortal() {
   if (isOnFakePortal) {
     audio.playSound('portalActivate', 0.7);
     
-    import('../../world/rooms/trapRoom.js').then(module => {
+    import('../../world/rooms/trapRoom/index.js').then(module => {
       module.activateTrapRoom();
     });
     return true;

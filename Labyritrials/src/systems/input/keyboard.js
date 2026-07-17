@@ -16,7 +16,8 @@ import { isPauseMenuOpen } from '../../game/pauseMenu.js';
 import { isSettingsOpen } from '../ui/settings/index.js';
 import { updateProgress } from '../../systems/achievements/index.js';
 import { isAchievementsOpen } from '../../systems/achievements/ui.js';
-import { openBookshelf, closeBookshelf } from '../ui/bookshelfUI.js';
+import { openBookshelf } from '../ui/bookshelfUI.js';
+import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../../utils/htmlLoader.js';
 
 /**
  * @namespace keyMap
@@ -74,14 +75,12 @@ function isModalOpen() {
 export function handleKeyDown(e) {
   if (!e.key) return;
 
-  // Блокируем ввод при открытых модальных окнах
   if (isModalOpen()) {
     e.preventDefault();
     e.stopPropagation();
     return;
   }
 
-  // Блокируем ввод при открытом меню паузы
   if (isPauseMenuOpen()) {
     e.preventDefault();
     e.stopPropagation();
@@ -92,14 +91,12 @@ export function handleKeyDown(e) {
   if (e.key === 'Escape') {
     e.preventDefault();
 
-    // Закрываем настройки
     const settingsModal = document.getElementById('settings-modal');
     if (settingsModal && settingsModal.style.display === 'flex') {
       settingsModal.style.display = 'none';
       return;
     }
 
-    // Не открываем паузу на окнах перехода и смерти
     const levelUpUI = document.getElementById('level-up-ui');
     const gameOverUI = document.getElementById('game-over-ui');
     if (levelUpUI?.style.display === 'block' || gameOverUI?.style.display === 'block') {
@@ -108,7 +105,6 @@ export function handleKeyDown(e) {
 
     if (player.hp <= 0) return;
 
-    // Открываем меню паузы
     if (isGameActive()) {
       import('../../game/pauseMenu.js').then(module => {
         module.openPauseMenu();
@@ -124,21 +120,18 @@ export function handleKeyDown(e) {
 
   // Клавиша E: взаимодействие
   if (mappedKey === 'e') {
-    // Проверяем, стоит ли игрок рядом с полками (библиотека)
     if (isNearBookshelf()) {
       e.preventDefault();
       openBookshelf();
       return;
     }
 
-    // Проверяем, есть ли подсказка записки
     if (state.showNotePrompt && state.notePromptId) {
       e.preventDefault();
       openNoteWindow(state.notePromptId);
       return;
     }
 
-    // Открытие/закрытие магазина
     handleShopToggle();
   }
 }
@@ -172,11 +165,10 @@ export function handleKeyUp(e) {
 /**
  * Открытие/закрытие магазина
  * 
- * @returns {void}
+ * @returns {Promise<void>}
  * @private
  */
-function handleShopToggle() {
-  // Проверка на босс-уровне
+async function handleShopToggle() {
   if (state.isBossLevel && !state.bossReady) {
     state.damageTexts.push({
       x: player.px, y: player.py - 30,
@@ -189,7 +181,6 @@ function handleShopToggle() {
     return;
   }
 
-  // Если магазин недоступен
   if (CONFIG.shopPos.x < 0 || CONFIG.shopPos.y < 0) return;
 
   if (state.isBossLevel) {
@@ -202,18 +193,24 @@ function handleShopToggle() {
     return;
   }
 
-  // Проверка расстояния до магазина
   let distToShop = Math.hypot(
     player.px - (CONFIG.shopPos.x * CONFIG.cellSize + CONFIG.cellSize / 2),
     player.py - (CONFIG.shopPos.y * CONFIG.cellSize + CONFIG.cellSize / 2)
   );
 
   if (distToShop < CONFIG.cellSize) {
+    if (!isTemplateLoaded('shop')) {
+      await loadTemplateIfNeeded('shop');
+    }
+
+    // Настраиваем обработчики покупок (только если ещё не настроены)
+    const { initShopHandlers } = await import('../ui/shop/index.js');
+    initShopHandlers();
+
     state.isShopOpen = !state.isShopOpen;
     const shopUI = document.getElementById('shop-ui');
     if (shopUI) shopUI.style.display = state.isShopOpen ? 'block' : 'none';
 
-    // Управление паузой при открытом магазине
     if (state.isShopOpen) {
       Game.pauseTime();
       audio.pause();
@@ -257,7 +254,6 @@ function isNearBookshelf() {
  * @returns {void}
  */
 export function initKeyboardHandlers() {
-  // Обработчик клавиши Q (огненный шар)
   window.addEventListener('keydown', e => {
     if (isModalOpen()) {
       e.preventDefault();
@@ -280,7 +276,6 @@ export function initKeyboardHandlers() {
     }
   });
 
-  // Основные обработчики
   window.addEventListener('keydown', handleKeyDown);
   window.addEventListener('keyup', handleKeyUp);
 }
@@ -312,27 +307,28 @@ export function resetAllKeys() {
  * Открытие окна с запиской
  * 
  * @param {number} noteId - ID записки
- * @returns {void}
+ * @returns {Promise<void>}
  */
-export function openNoteWindow(noteId) {
+export async function openNoteWindow(noteId) {
   const note = getNoteById(noteId);
   if (!note) {
     console.warn(`📜 Записка #${noteId} не найдена!`);
     return;
   }
 
-  // Отмечаем записку как найденную
+  if (!isTemplateLoaded('noteWindow')) {
+    await loadTemplateIfNeeded('noteWindow');
+  }
+
   if (!state.notes.found.includes(noteId)) {
     state.notes.found.push(noteId);
     updateProgress('notes_found', 1);
   }
 
-  // Удаляем записку с карты
   if (state.notes.positions && state.notes.positions[noteId]) {
     delete state.notes.positions[noteId];
   }
 
-  // Удаляем записку из клетки
   if (state.notePromptX !== null && state.notePromptY !== null) {
     const cell = state.grid[state.notePromptY]?.[state.notePromptX];
     if (cell) {
@@ -341,16 +337,13 @@ export function openNoteWindow(noteId) {
     }
   }
 
-  // Сбрасываем подсказку
   state.showNotePrompt = false;
   state.notePromptId = null;
   state.notePromptX = null;
   state.notePromptY = null;
 
-  // Показываем окно
   showNoteWindow(note);
 
-  // Сохраняем игру
   import('../../save/saveSystem.js').then(({ saveGame }) => {
     saveGame();
   });
@@ -385,18 +378,6 @@ function showNoteWindow(note) {
   pauseGameForNote();
 
   window.style.display = 'flex';
-
-  // Настройка кнопки закрытия
-  const closeBtn = document.getElementById('note-reader-close');
-  if (closeBtn) {
-    const newCloseBtn = closeBtn.cloneNode(true);
-    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-
-    newCloseBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      closeNoteWindow();
-    });
-  }
 }
 
 /**

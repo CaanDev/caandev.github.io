@@ -1,6 +1,6 @@
 /**
- * @fileoverview Загрузка HTML-шаблонов.
- * Асинхронно загружает все HTML-файлы интерфейса и встраивает их в DOM.
+ * @fileoverview Загрузка HTML-шаблонов с поддержкой инкрементальной загрузки.
+ * Критические шаблоны загружаются сразу, остальные — по требованию.
  * 
  * @module utils/htmlLoader
  */
@@ -8,13 +8,36 @@
 /** @type {string} - Путь к папке с HTML-шаблонами */
 const HTML_PATH = 'html/';
 
+/** @type {Set<string>} - Имена загруженных шаблонов */
+const loadedTemplates = new Set();
+
+/** @type {Map<string, string>} - Кэш содержимого загруженных шаблонов */
+const templateCache = new Map();
+
+/** @type {Set<string>} - Имена шаблонов, которые загружаются в данный момент */
+const loadingTemplates = new Set();
+
+/** @type {Map<string, boolean>} - Флаги инициализации для каждого шаблона */
+const initializedTemplates = new Map();
+
+/**
+ * Критические шаблоны, которые загружаются сразу при старте
+ * @type {string[]}
+ */
+const ESSENTIAL_TEMPLATES = [
+  'intro',      // Заставка с историей
+  'menu',       // Главное меню
+  'ui',         // Игровой интерфейс
+  'gameOver'    // Экран смерти (нужен мгновенно)
+];
+
 /**
  * Загрузка одного HTML-шаблона
  * 
  * @param {string} name - Имя шаблона (без расширения .html)
  * @returns {Promise<string>} - HTML-содержимое шаблона или пустая строка при ошибке
  */
-export async function loadTemplate(name) {
+async function loadTemplate(name) {
   try {
     const response = await fetch(`${HTML_PATH}${name}.html`);
     if (!response.ok) {
@@ -28,63 +51,16 @@ export async function loadTemplate(name) {
 }
 
 /**
- * Загрузка всех HTML-шаблонов игры
+ * Вставка загруженных шаблонов в DOM
  * 
- * Загружает следующие шаблоны:
- * - intro, menu, pause, ui, gameOver, levelUp,
- * - shop, settings, achievements, noteWindow, bookshelf, final
- * 
- * После загрузки добавляет в DOM:
- * - Элементы для CSS-эмодзи монстров и игрока
- * - Canvas для игры
- * - Все загруженные шаблоны
- * 
- * @returns {Promise<Object>} - Результат загрузки
- * @returns {boolean} success - Все ли шаблоны загружены
- * @returns {number} loaded - Количество загруженных шаблонов
- * @returns {number} total - Общее количество шаблонов
- * @returns {string[]} errors - Список имён шаблонов с ошибками
+ * @param {string[]} htmlContents - Массив HTML-строк
+ * @param {string[]} names - Имена шаблонов (для отладки)
+ * @returns {void}
  */
-export async function loadAllTemplates() {
-  const templates = [
-    'intro',
-    'menu',
-    'pause',
-    'ui',
-    'gameOver',
-    'levelUp',
-    'shop',
-    'settings',
-    'achievements',
-    'noteWindow',
-    'bookshelf',
-    'final'
-  ];
-  
-  const errors = [];
-  const results = [];
-  
-  const rawResults = await Promise.all(
-    templates.map(name => loadTemplate(name))
-  );
-  
-  for (let i = 0; i < templates.length; i++) {
-    const html = rawResults[i];
-    if (html && html.trim().length > 0) {
-      results.push(html);
-    } else {
-      errors.push(templates[i]);
-      results.push('');
-    }
-  }
-  
-  if (errors.length > 0) {
-    console.warn(`⚠️ Не загружено ${errors.length} шаблонов:`, errors.join(', '));
-  }
-  
+function insertTemplatesIntoDOM(htmlContents, names) {
   const container = document.body;
   
-  // ===== ДОБАВЛЕНИЕ CSS-ЭМОДЗИ =====
+  // Добавляем CSS-эмодзи (всегда)
   const emojiContainer = document.createElement('div');
   emojiContainer.innerHTML = `
     <span id="css-monster-1" class="monster-emoji-1" style="display:none;"></span>
@@ -95,14 +71,14 @@ export async function loadAllTemplates() {
   `;
   container.appendChild(emojiContainer);
   
-  // ===== ДОБАВЛЕНИЕ CANVAS =====
+  // Добавляем Canvas
   const canvas = document.createElement('canvas');
   canvas.id = 'gameCanvas';
   container.appendChild(canvas);
   
-  // ===== ВСТАВКА ЗАГРУЖЕННЫХ ШАБЛОНОВ =====
-  for (let i = 0; i < templates.length; i++) {
-    const html = results[i];
+  // Вставляем загруженные шаблоны
+  for (let i = 0; i < htmlContents.length; i++) {
+    const html = htmlContents[i];
     if (html && html.trim().length > 0) {
       const wrapper = document.createElement('div');
       wrapper.innerHTML = html;
@@ -111,11 +87,219 @@ export async function loadAllTemplates() {
       }
     }
   }
+}
+
+/**
+ * Инициализация обработчиков для конкретного шаблона
+ * 
+ * @param {string} name - Имя шаблона
+ * @returns {Promise<boolean>} - true, если инициализация выполнена
+ */
+export async function initTemplateHandlers(name) {
+  // Если уже инициализирован — пропускаем
+  if (initializedTemplates.get(name)) return true;
+  
+  let success = false;
+  
+  switch (name) {
+    case 'pause':
+      const { initPauseMenu } = await import('../game/pauseMenu.js');
+      initPauseMenu();
+      success = true;
+      break;
+      
+    case 'settings':
+      const { initSettings } = await import('../systems/ui/settings/index.js');
+      initSettings();
+      success = true;
+      break;
+      
+    case 'achievements':
+      const { initAchievementsUI } = await import('../systems/achievements/index.js');
+      initAchievementsUI();
+      success = true;
+      break;
+      
+    case 'shop':
+      const { initShopHandlers } = await import('../systems/ui/shop/index.js');
+      initShopHandlers();
+      success = true;
+      break;
+      
+    case 'final':
+      const { setupFinalScreenButtons } = await import('../game/finalScreen.js');
+      setupFinalScreenButtons();
+      success = true;
+      break;
+      
+    case 'levelUp':
+      // Инициализируется при показе через setupContinueButton()
+      success = true;
+      break;
+      
+    case 'noteWindow':
+      setupNoteWindowCloseHandler();
+      success = true;
+      break;
+      
+    case 'bookshelf':
+      const { initBookshelfHandlers } = await import('../systems/ui/bookshelfUI.js');
+      initBookshelfHandlers();
+      success = true;
+      break;
+      
+    case 'intro':
+    case 'menu':
+    case 'ui':
+    case 'gameOver':
+      // Эти шаблоны не требуют инициализации обработчиков
+      success = true;
+      break;
+      
+    default:
+      console.warn(`⚠️ Нет обработчиков для шаблона: ${name}`);
+      success = false;
+  }
+  
+  if (success) {
+    initializedTemplates.set(name, true);
+  }
+  
+  return success;
+}
+
+/**
+ * Настройка обработчика закрытия окна записки
+ * 
+ * @returns {void}
+ */
+function setupNoteWindowCloseHandler() {
+  const closeBtn = document.getElementById('note-reader-close');
+  if (closeBtn) {
+    // Удаляем старые обработчики, чтобы избежать дублирования
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+    newCloseBtn.addEventListener('click', () => {
+      import('../systems/input/keyboard.js').then(module => {
+        module.closeNoteWindow();
+      });
+    });
+  }
+}
+
+/**
+ * Загрузка только критических шаблонов
+ * 
+ * @returns {Promise<Object>} - Результат загрузки
+ */
+export async function loadEssentialTemplates() {
+  const results = [];
+  const errors = [];
+  
+  for (const name of ESSENTIAL_TEMPLATES) {
+    const html = await loadTemplate(name);
+    if (html && html.trim().length > 0) {
+      results.push(html);
+      loadedTemplates.add(name);
+      templateCache.set(name, html);
+    } else {
+      errors.push(name);
+    }
+  }
+  
+  // Вставляем загруженные шаблоны в DOM
+  insertTemplatesIntoDOM(results, ESSENTIAL_TEMPLATES);
+  
+  // Инициализируем обработчики для критических шаблонов
+  for (const name of ESSENTIAL_TEMPLATES) {
+    await initTemplateHandlers(name);
+  }
   
   return {
     success: errors.length === 0,
-    loaded: results.filter(r => r && r.trim().length > 0).length,
-    total: templates.length,
+    loaded: results.length,
+    total: ESSENTIAL_TEMPLATES.length,
     errors: errors
   };
+}
+
+/**
+ * Загрузка шаблона по требованию (с кэшированием)
+ * 
+ * @param {string} name - Имя шаблона
+ * @returns {Promise<string|null>} - HTML-содержимое или null при ошибке
+ */
+export async function loadTemplateIfNeeded(name) {
+  // Уже загружен — возвращаем из кэша
+  if (loadedTemplates.has(name)) {
+    return templateCache.get(name) || null;
+  }
+  
+  // Уже загружается — ждём
+  if (loadingTemplates.has(name)) {
+    return new Promise((resolve) => {
+      const checkInterval = setInterval(() => {
+        if (loadedTemplates.has(name)) {
+          clearInterval(checkInterval);
+          resolve(templateCache.get(name) || null);
+        }
+      }, 50);
+    });
+  }
+  
+  // Загружаем
+  loadingTemplates.add(name);
+  
+  const html = await loadTemplate(name);
+  loadingTemplates.delete(name);
+  
+  if (html && html.trim().length > 0) {
+    loadedTemplates.add(name);
+    templateCache.set(name, html);
+    
+    // Вставляем в DOM
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+    while (wrapper.firstChild) {
+      document.body.appendChild(wrapper.firstChild);
+    }
+    
+    // ===== ВАЖНО: Инициализируем обработчики ПОСЛЕ вставки в DOM =====
+    await initTemplateHandlers(name);
+    
+    return html;
+  } else {
+    console.warn(`⚠️ Не удалось загрузить шаблон: ${name}.html`);
+    return null;
+  }
+}
+
+/**
+ * Проверка, загружен ли шаблон
+ * 
+ * @param {string} name - Имя шаблона
+ * @returns {boolean} - true, если шаблон загружен
+ */
+export function isTemplateLoaded(name) {
+  return loadedTemplates.has(name);
+}
+
+/**
+ * Проверка, инициализирован ли шаблон
+ * 
+ * @param {string} name - Имя шаблона
+ * @returns {boolean} - true, если шаблон инициализирован
+ */
+export function isTemplateInitialized(name) {
+  return initializedTemplates.get(name) || false;
+}
+
+/**
+ * Получение кэшированного содержимого шаблона
+ * 
+ * @param {string} name - Имя шаблона
+ * @returns {string|null} - HTML-содержимое или null
+ */
+export function getTemplateContent(name) {
+  return templateCache.get(name) || null;
 }

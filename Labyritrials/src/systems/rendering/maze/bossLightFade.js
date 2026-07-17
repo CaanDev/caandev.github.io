@@ -8,11 +8,6 @@
 
 import { CONFIG, state } from '../../../core/config/index.js';
 
-/** @type {number} - Кэш последнего прогресса для оптимизации */
-let lastProgress = 0;
-/** @type {number} - Время начала вспышки */
-let flashStartTime = 0;
-
 /**
  * Обновление анимации затемнения перед боссом
  * 
@@ -39,7 +34,6 @@ export function updateBossLightFade() {
       // Запускаем вспышку
       state.bossLightFade.flashActive = true;
       state.bossLightFade.flashTimer = 0;
-      flashStartTime = Date.now();
     }
   }
   

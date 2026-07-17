@@ -11,6 +11,7 @@ import { audio } from '../../../audio/audioManager.js';
 import { Game } from '../../../core/game.js';
 import { getRandomSpeech, updateShopkeeperSpeech } from './shopSpeech.js';
 import { SPEECH } from './shopSpeech.js';
+import { isTemplateInitialized } from '../../../utils/htmlLoader.js';
 import {
   updateBuyHpStatus,
   updateBuyDamageStatus,
@@ -33,12 +34,18 @@ import {
 /** @type {string} - Текущая активная вкладка магазина */
 let currentShopTab = 'upgrades';
 
+/** @type {boolean} - Инициализированы ли обработчики магазина */
+let shopHandlersInitialized = false;
+
 /**
- * Инициализация обработчиков магазина
+ * Внутренняя функция инициализации обработчиков магазина
  * 
  * @returns {void}
+ * @private
  */
-export function initShopHandlers() {
+function doInitShopHandlers() {
+  if (shopHandlersInitialized) return;
+  
   // ===== ОТКРЫТИЕ МАГАЗИНА — ПРИВЕТСТВЕННАЯ РЕЧЬ =====
   const shopUI = document.getElementById('shop-ui');
   if (shopUI) {
@@ -53,13 +60,17 @@ export function initShopHandlers() {
   // ===== ЗАКРЫТИЕ МАГАЗИНА =====
   const closeBtn = document.getElementById('shop-close-btn');
   if (closeBtn) {
-    closeBtn.addEventListener('click', closeShop);
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+    newCloseBtn.addEventListener('click', closeShop);
   }
 
   // ===== ВКЛАДКИ =====
   document.querySelectorAll('.shop-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const tabId = tab.dataset.tab;
+    const newTab = tab.cloneNode(true);
+    tab.parentNode.replaceChild(newTab, tab);
+    newTab.addEventListener('click', () => {
+      const tabId = newTab.dataset.tab;
       switchShopTab(tabId);
     });
   });
@@ -75,6 +86,25 @@ export function initShopHandlers() {
 
   // ===== ПЕРВОНАЧАЛЬНОЕ ОБНОВЛЕНИЕ UI =====
   updateShopUI();
+  
+  shopHandlersInitialized = true;
+}
+
+/**
+ * Инициализация обработчиков магазина
+ * 
+ * Проверяет, инициализирован ли шаблон магазина, и настраивает обработчики.
+ * 
+ * @returns {void}
+ */
+export function initShopHandlers() {
+  // Проверяем, что шаблон магазина загружен и инициализирован
+  if (!isTemplateInitialized('shop')) {
+    console.warn('⚠️ Шаблон shop не инициализирован, пропускаем настройку обработчиков');
+    return;
+  }
+  
+  doInitShopHandlers();
 }
 
 /**

@@ -11,6 +11,7 @@ import { loadSettings, getSettings, saveSettings } from './settingsManager.js';
 import { updateFpsLimit, updateFpsVisibility } from './settingsFps.js';
 import { initSliders, initToggles, initSelects, initButtons } from './settingsControls.js';
 import { updateFpsDisplay, shouldSkipFrame, getFrameInterval } from './settingsFps.js';
+import { loadTemplateIfNeeded, isTemplateLoaded } from '../../../utils/htmlLoader.js';
 
 /** @type {boolean} - Открыты ли настройки */
 let settingsOpen = false;
@@ -25,11 +26,12 @@ export function isSettingsOpen() {
 }
 
 /**
- * Открытие окна настроек
+ * Внутренняя функция открытия настроек (после загрузки шаблона)
  * 
  * @returns {void}
+ * @private
  */
-export function openSettings() {
+function showSettings() {
   const settingsUI = document.getElementById('settings-ui');
   if (!settingsUI) return;
 
@@ -49,6 +51,24 @@ export function openSettings() {
   if (!audio.isMainMenu) {
     audio.pause();
   }
+}
+
+/**
+ * Открытие окна настроек
+ * 
+ * @returns {void}
+ */
+export function openSettings() {
+  // ==== ЗАГРУЗКА ШАБЛОНА НАСТРОЕК (ЕСЛИ НУЖНО) =====
+  if (!isTemplateLoaded('settings')) {
+    loadTemplateIfNeeded('settings').then(() => {
+      // Обработчики уже инициализированы через initModalHandlers()
+      showSettings();
+    });
+    return;
+  }
+  
+  showSettings();
 }
 
 /**
@@ -169,7 +189,9 @@ export function initSettings() {
   // ===== КНОПКА ЗАКРЫТИЯ =====
   const closeBtn = document.getElementById('settings-close-btn');
   if (closeBtn) {
-    closeBtn.addEventListener('click', closeSettings);
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+    newCloseBtn.addEventListener('click', closeSettings);
   }
 
   // ===== ИНИЦИАЛИЗАЦИЯ ЭЛЕМЕНТОВ УПРАВЛЕНИЯ =====

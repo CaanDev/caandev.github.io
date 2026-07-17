@@ -16,6 +16,7 @@ import {
   isUnlocked
 } from './manager.js';
 import { CATEGORIES, getTotalCount } from './config.js';
+import { loadTemplateIfNeeded, isTemplateLoaded } from '../../utils/htmlLoader.js';
 
 /** @type {number|null} - Таймаут скрытия уведомления */
 let notificationTimeout = null;
@@ -38,10 +39,8 @@ export function showAchievementNotification(id) {
   const achievement = getAchievementState(id);
   if (!achievement) return;
   
-  // Добавляем в очередь
   notificationQueue.push(id);
   
-  // Если уведомление не показывается, показываем следующее
   if (!isNotificationShowing) {
     showNextNotification();
   }
@@ -78,20 +77,16 @@ function showNextNotification() {
     return;
   }
   
-  // Устанавливаем название
   nameEl.textContent = achievement.name;
   
-  // Показываем уведомление
   notification.style.display = 'flex';
   notification.classList.remove('hiding');
   notification.classList.remove('hidden');
   
-  // Убираем предыдущий таймаут
   if (notificationTimeout) {
     clearTimeout(notificationTimeout);
   }
   
-  // Автоматическое скрытие через 3.5 секунды
   notificationTimeout = setTimeout(() => {
     hideNotification();
   }, 3500);
@@ -113,19 +108,17 @@ function hideNotification() {
     notification.style.display = 'none';
     notification.classList.remove('hiding');
     isNotificationShowing = false;
-    // Показываем следующее уведомление из очереди
     showNextNotification();
   }, 400);
 }
 
 /**
- * Открытие окна достижений
- * 
- * Приостанавливает игру и музыку, отображает окно с достижениями.
+ * Внутренняя функция открытия окна достижений (после загрузки шаблона)
  * 
  * @returns {void}
+ * @private
  */
-export function openAchievementsWindow() {
+function showAchievementsWindow() {
   const window = document.getElementById('achievements-ui');
   if (!window) {
     console.warn('⚠️ Окно достижений не найдено');
@@ -136,32 +129,44 @@ export function openAchievementsWindow() {
   window.style.display = 'flex';
   currentCategory = 'all';
 
-  // Обновляем активную вкладку
   document.querySelectorAll('.achievements-tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.category === 'all');
   });
   
-  // Обновляем содержимое
   renderAchievements('all');
   updateCategoryStats('all');
   
-  // Приостанавливаем игру
   import('../../core/game.js').then(({ Game }) => {
     if (Game && Game.isRunning) {
       Game.stopLoop();
     }
   });
   
-  // Останавливаем музыку
   import('../../audio/audioManager.js').then(({ audio }) => {
     audio.pause();
   });
 }
 
 /**
- * Закрытие окна достижений
+ * Открытие окна достижений
  * 
- * Возобновляет игру и музыку.
+ * @returns {void}
+ */
+export function openAchievementsWindow() {
+  // ==== ЗАГРУЗКА ШАБЛОНА ДОСТИЖЕНИЙ (ЕСЛИ НУЖНО) =====
+  if (!isTemplateLoaded('achievements')) {
+    loadTemplateIfNeeded('achievements').then(() => {
+      // Обработчики уже инициализированы через initModalHandlers()
+      showAchievementsWindow();
+    });
+    return;
+  }
+  
+  showAchievementsWindow();
+}
+
+/**
+ * Закрытие окна достижений
  * 
  * @returns {void}
  */
@@ -172,14 +177,12 @@ export function closeAchievementsWindow() {
   achievementsOpen = false;
   window.style.display = 'none';
   
-  // Возобновляем игру
   import('../../core/game.js').then(({ Game }) => {
     if (Game && !Game.isRunning) {
       Game.startLoop();
     }
   });
   
-  // Возобновляем музыку
   import('../../audio/audioManager.js').then(({ audio }) => {
     audio.resume();
   });
@@ -197,7 +200,6 @@ let currentCategory = 'all';
 export function switchCategory(categoryId) {
   currentCategory = categoryId;
   
-  // Обновляем активную вкладку
   document.querySelectorAll('.achievements-tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.category === categoryId);
   });
@@ -216,7 +218,6 @@ export function renderAchievements(categoryId) {
   const container = document.getElementById('achievements-list');
   if (!container) return;
 
-  // Проверяем достижения перед рендерингом
   import('./manager.js').then(({ checkAchievements }) => {
     checkAchievements();
   });
@@ -228,30 +229,21 @@ export function renderAchievements(categoryId) {
     achievements = getAchievementsByCategoryState(categoryId);
   }
   
-  // Сортировка:
-  // 1. Сначала разблокированные (по категориям)
-  // 2. Потом заблокированные видимые (по прогрессу)
-  // 3. В самом конце — скрытые (заблокированные)
   achievements.sort((a, b) => {
-    // Сначала разблокированные
     if (a.unlocked && !b.unlocked) return -1;
     if (!a.unlocked && b.unlocked) return 1;
     
-    // Если оба разблокированы — сортируем по категории
     if (a.unlocked && b.unlocked) {
       const order = ['combat', 'exploration', 'collection', 'survival', 'secret'];
       return order.indexOf(a.category) - order.indexOf(b.category);
     }
     
-    // Если оба заблокированы
     const aIsHidden = a.hidden === true;
     const bIsHidden = b.hidden === true;
     
-    // Скрытые отправляем в конец
     if (aIsHidden && !bIsHidden) return 1;
     if (!aIsHidden && bIsHidden) return -1;
     
-    // Оба видимые — сортируем по прогрессу (у кого больше — тот выше)
     return (b.current / b.max) - (a.current / a.max);
   });
   
@@ -300,14 +292,12 @@ function renderAchievementItem(ach) {
   let description = ach.description;
   let progressHtml = '';
   
-  // Для скрытых достижений (заблокированных) показываем заглушку
   if (isHiddenAch) {
     icon = '❓';
     name = '???';
     description = '??????????????????????????????????????';
   }
   
-  // Прогресс для незавершённых достижений
   if (!isUnlockedAch && !isHiddenAch && ach.maxProgress > 1) {
     const barWidth = Math.min(100, progressPercent);
     const progressText = `${Math.min(ach.current, ach.max)} / ${ach.max}`;
@@ -321,7 +311,6 @@ function renderAchievementItem(ach) {
     `;
   }
   
-  // Правая иконка (замок)
   let checkHtml = '';
   if (isHiddenAch) {
     checkHtml = `<span class="achievement-check">🔒</span>`;
@@ -379,7 +368,6 @@ export function confirmResetAchievements() {
     return;
   }
   
-  // Двойное подтверждение
   const confirm1 = confirm(
     `⚠️ ВЫ УВЕРЕНЫ?\n\n` +
     `Будет сброшено ${stats.unlocked} достижений.\n` +
@@ -397,14 +385,11 @@ export function confirmResetAchievements() {
   
   if (!confirm2) return;
   
-  // Сбрасываем
   resetAchievements();
   
-  // Обновляем UI
   renderAchievements(currentCategory);
   updateCategoryStats(currentCategory);
   
-  // Показываем сообщение
   const container = document.getElementById('achievements-list');
   if (container) {
     container.innerHTML = `
@@ -418,29 +403,30 @@ export function confirmResetAchievements() {
 /**
  * Инициализация UI достижений
  * 
- * Настраивает вкладки, кнопки закрытия и сброса.
- * 
  * @returns {void}
  */
 export function initAchievementsUI() {
-  // Настройка вкладок
   document.querySelectorAll('.achievements-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      const category = tab.dataset.category;
+    const newTab = tab.cloneNode(true);
+    tab.parentNode.replaceChild(newTab, tab);
+    newTab.addEventListener('click', () => {
+      const category = newTab.dataset.category;
       switchCategory(category);
     });
   });
   
-  // Кнопка закрытия
   const closeBtn = document.getElementById('achievements-close-btn');
   if (closeBtn) {
-    closeBtn.addEventListener('click', closeAchievementsWindow);
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+    newCloseBtn.addEventListener('click', closeAchievementsWindow);
   }
   
-  // Кнопка сброса
   const resetBtn = document.getElementById('achievements-reset-btn');
   if (resetBtn) {
-    resetBtn.addEventListener('click', confirmResetAchievements);
+    const newResetBtn = resetBtn.cloneNode(true);
+    resetBtn.parentNode.replaceChild(newResetBtn, resetBtn);
+    newResetBtn.addEventListener('click', confirmResetAchievements);
   }
 }
 

@@ -17,7 +17,7 @@ import { spawnTorches } from '../entities/objects/spawners/torchSpawner.js';
 import { spawnRunes, clearRunes } from '../entities/objects/spawners/runeSpawner.js';
 import { generateTreasurePortal, generateTreasureMap, returnFromTreasureRoom } from './rooms/treasureRoom.js';
 import { generateShrinePortal } from './rooms/shrineRoom.js';
-import { generateTrapPortal } from './rooms/trapRoom.js';
+import { generateTrapPortal } from './rooms/trapRoom/index.js';
 import { generateSafePortal } from './rooms/safeRoom.js';
 import { generateBossArena } from './arena/bossArena.js';
 import { generateFirefliesForAllPortals, clearFireflies } from '../entities/objects/firefly.js';
