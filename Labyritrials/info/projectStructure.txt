@@ -55,7 +55,6 @@ Labyritrials/
 │   │   ├── trapLightningEffect.ogg
 │   │   ├── trapSpikeActivate.ogg
 │   │   └── wallDestroy.ogg
-│   │
 │   └── themes/
 │       ├── gameBackground.ogg
 │       ├── mainMenu.ogg
@@ -76,8 +75,7 @@ Labyritrials/
     │   ├── gameInit.js
     │   ├── gameLoop.js
     │   ├── index.js
-    │   └── renderer.js
-    │   │
+    │   ├── renderer.js
     │   └── config/
     │       ├── colors.js
     │       ├── constants.js
@@ -90,7 +88,6 @@ Labyritrials/
     │   └── notes.js
     │
     ├── entities/
-    │   │
     │   ├── monsters/
     │   │   ├── ai.js
     │   │   ├── combat.js
@@ -99,22 +96,19 @@ Labyritrials/
     │   │   ├── effects.js
     │   │   ├── fireballUpdater.js
     │   │   ├── index.js
-    │   │   └── trapInteraction.js
-    │   │   │
+    │   │   ├── trapInteraction.js
     │   │   ├── adaptations/
     │   │   │   ├── checker.js
     │   │   │   ├── config.js
     │   │   │   ├── counter.js
     │   │   │   ├── helpers.js
     │   │   │   └── index.js
-    │   │   │
     │   │   └── bosses/
     │   │       ├── ai.js
     │   │       ├── attacks.js
     │   │       ├── config.js
     │   │       ├── index.js
-    │   │       └── logic.js
-    │   │       │
+    │   │       ├── logic.js
     │   │       └── abilities/
     │   │           ├── base.js
     │   │           ├── buff.js
@@ -132,15 +126,13 @@ Labyritrials/
     │   │   ├── fly.js
     │   │   ├── index.js
     │   │   ├── playerTrails.js
-    │   │   └── sparks.js
-    │   │   │
+    │   │   ├── sparks.js
     │   │   ├── spawners/
     │   │   │   ├── chestSpawner.js
     │   │   │   ├── monsterSpawner.js
     │   │   │   ├── runeSpawner.js
     │   │   │   ├── torchSpawner.js
     │   │   │   └── trapSpawner.js
-    │   │   │
     │   │   └── utils/
     │   │       ├── bloodSystem.js
     │   │       └── spawnUtils.js
@@ -154,7 +146,6 @@ Labyritrials/
     │       ├── interaction.js
     │       ├── loot.js
     │       ├── movement.js
-    │       ├── player.js
     │       ├── portals.js
     │       ├── shrines.js
     │       └── traps.js
@@ -169,20 +160,38 @@ Labyritrials/
     ├── save/
     │   ├── index.js
     │   ├── notesStorage.js
-    │   ├── saveCollectors.js
-    │   ├── saveRestorers.js
-    │   ├── saveStorage.js
     │   ├── saveSystem.js
-    │   └── timeFormatter.js
+    │   ├── saveStorage.js
+    │   ├── timeFormatter.js
+    │   ├── collectors/
+    │   │   ├── baseCollector.js
+    │   │   ├── environmentCollector.js
+    │   │   ├── helpers.js
+    │   │   ├── index.js
+    │   │   ├── mazeCollector.js
+    │   │   ├── monsterCollector.js
+    │   │   ├── objectCollector.js
+    │   │   ├── playerCollector.js
+    │   │   ├── secretRoomCollector.js
+    │   │   └── systemCollector.js
+    │   └── restorers/
+    │       ├── baseRestorer.js
+    │       ├── environmentRestorer.js
+    │       ├── helpers.js
+    │       ├── index.js
+    │       ├── mazeRestorer.js
+    │       ├── monsterRestorer.js
+    │       ├── objectRestorer.js
+    │       ├── playerRestorer.js
+    │       ├── secretRoomRestorer.js
+    │       └── systemRestorer.js
     │
     ├── systems/
-    │   │
     │   ├── achievements/
     │   │   ├── config.js
     │   │   ├── index.js
     │   │   ├── manager.js
     │   │   └── ui.js
-    │   │
     │   ├── events/
     │   │   ├── bonuses.js
     │   │   ├── config.js
@@ -191,7 +200,6 @@ Labyritrials/
     │   │   ├── messaging.js
     │   │   ├── monsterVampirism.js
     │   │   └── ui.js
-    │   │
     │   ├── fog/
     │   │   ├── fogCore.js
     │   │   ├── fogEvents.js
@@ -201,17 +209,14 @@ Labyritrials/
     │   │   ├── fogRenderer.js
     │   │   ├── fogUtils.js
     │   │   └── index.js
-    │   │
     │   ├── input/
     │   │   ├── fireball.js
     │   │   ├── index.js
     │   │   ├── keyboard.js
     │   │   └── mouse.js
-    │   │
     │   ├── notes/
     │   │   ├── index.js
     │   │   └── noteSpawner.js
-    │   │
     │   ├── particles/
     │   │   ├── artifactParticles.js
     │   │   ├── bossExplosion.js
@@ -220,7 +225,6 @@ Labyritrials/
     │   │   ├── index.js
     │   │   ├── particlePool.js
     │   │   └── potionParticles.js
-    │   │
     │   ├── rendering/
     │   │   ├── batchRenderer.js
     │   │   ├── bloodRenderer.js
@@ -235,31 +239,26 @@ Labyritrials/
     │   │   ├── shrineRenderer.js
     │   │   ├── torchRenderer.js
     │   │   ├── trapRenderer.js
-    │   │   ├── uiRenderer.js
-    │   │   └── visibilityUtils.js
-    │   │   │
+    │   │   ├── visibilityUtils.js
     │   │   ├── maze/
     │   │   │   ├── background.js
     │   │   │   ├── bossLightFade.js
     │   │   │   ├── bossSummonCircle.js
     │   │   │   ├── index.js
     │   │   │   ├── pillars.js
-    │   │   │   └── runes.js
-    │   │   │   │
+    │   │   │   ├── runes.js
     │   │   │   ├── floors/
     │   │   │   │   ├── features.js
     │   │   │   │   ├── floorConfig.js
     │   │   │   │   ├── floorRenderer.js
     │   │   │   │   ├── index.js
     │   │   │   │   └── patterns.js
-    │   │   │   │
     │   │   │   └── walls/
     │   │   │       ├── crackTemplates.js
     │   │   │       ├── index.js
     │   │   │       ├── wallConfig.js
     │   │   │       ├── wallFeatures.js
     │   │   │       └── wallRenderer.js
-    │   │   │
     │   │   ├── player/
     │   │   │   ├── attackRenderer.js
     │   │   │   ├── effectRenderer.js
@@ -268,7 +267,6 @@ Labyritrials/
     │   │   │   ├── playerRenderer.js
     │   │   │   ├── statusEffects.js
     │   │   │   └── trailManager.js
-    │   │   │
     │   │   └── ui/
     │   │       ├── adaptationIndicator.js
     │   │       ├── bossHealthBar.js
@@ -277,13 +275,11 @@ Labyritrials/
     │   │       ├── miniMap.js
     │   │       ├── roomLabel.js
     │   │       └── utils.js
-    │   │
     │   └── ui/
     │       ├── bookshelfUI.js
     │       ├── controlButtons.js
     │       ├── index.js
-    │       └── statsUpdater.js
-    │       │
+    │       ├── statsUpdater.js
     │       ├── settings/
     │       │   ├── index.js
     │       │   ├── settingsControls.js
@@ -291,7 +287,6 @@ Labyritrials/
     │       │   ├── settingsFps.js
     │       │   ├── settingsManager.js
     │       │   └── settingsUI.js
-    │       │
     │       └── shop/
     │           ├── index.js
     │           ├── shopHandlers.js
@@ -310,16 +305,18 @@ Labyritrials/
         ├── index.js
         ├── maze.js
         ├── mazeGenerator.js
-        └── physics.js
-        │
+        ├── physics.js
         ├── arena/
         │   └── bossArena.js
-        │
         ├── cells/
         │   └── cell.js
-        │
         └── rooms/
             ├── safeRoom.js
             ├── shrineRoom.js
-            ├── trapRoom.js
-            └── treasureRoom.js
+            ├── treasureRoom.js
+            └── trapRoom/
+                ├── index.js
+                ├── trapRoomCore.js
+                ├── trapRoomSetup.js
+                ├── trapRoomUtils.js
+                └── trapRoomWaves.js
