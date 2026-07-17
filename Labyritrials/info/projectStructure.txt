@@ -29,6 +29,7 @@ Labyritrials/
 │   ├── intro.html
 │   ├── levelUp.html
 │   ├── menu.html
+│   ├── notification.html
 │   ├── noteWindow.html
 │   ├── pause.html
 │   ├── settings.html

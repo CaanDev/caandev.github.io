@@ -195,7 +195,7 @@ export function unlockAchievement(id) {
   
   console.log(`🏆 Достижение разблокировано: ${achievement.name}`);
   
-  // Показываем уведомление
+  // Показываем уведомление (теперь всегда работает)
   showAchievementNotification(id);
 
   // Воспроизводим звук

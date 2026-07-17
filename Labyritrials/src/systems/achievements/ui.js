@@ -16,7 +16,7 @@ import {
   isUnlocked
 } from './manager.js';
 import { CATEGORIES, getTotalCount } from './config.js';
-import { loadTemplateIfNeeded, isTemplateLoaded } from '../../utils/htmlLoader.js';
+import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../../utils/htmlLoader.js';
 
 /** @type {number|null} - Таймаут скрытия уведомления */
 let notificationTimeout = null;
@@ -38,6 +38,13 @@ let achievementsOpen = false;
 export function showAchievementNotification(id) {
   const achievement = getAchievementState(id);
   if (!achievement) return;
+  
+  // Проверяем, существует ли элемент уведомления (он должен быть всегда)
+  const notification = document.getElementById('achievement-notification');
+  if (!notification) {
+    console.warn('⚠️ Элемент уведомления не найден в DOM');
+    return;
+  }
   
   notificationQueue.push(id);
   
@@ -156,7 +163,15 @@ export function openAchievementsWindow() {
   // ==== ЗАГРУЗКА ШАБЛОНА ДОСТИЖЕНИЙ (ЕСЛИ НУЖНО) =====
   if (!isTemplateLoaded('achievements')) {
     loadTemplateIfNeeded('achievements').then(() => {
-      // Обработчики уже инициализированы через initModalHandlers()
+      // Обработчики уже инициализированы через initTemplateHandlers
+      showAchievementsWindow();
+    });
+    return;
+  }
+  
+  // Если шаблон загружен, но не инициализирован
+  if (!isTemplateInitialized('achievements')) {
+    initTemplateHandlers('achievements').then(() => {
       showAchievementsWindow();
     });
     return;
@@ -406,6 +421,7 @@ export function confirmResetAchievements() {
  * @returns {void}
  */
 export function initAchievementsUI() {
+  // ===== ВКЛАДКИ =====
   document.querySelectorAll('.achievements-tab').forEach(tab => {
     const newTab = tab.cloneNode(true);
     tab.parentNode.replaceChild(newTab, tab);
@@ -415,6 +431,7 @@ export function initAchievementsUI() {
     });
   });
   
+  // ===== КНОПКА ЗАКРЫТИЯ =====
   const closeBtn = document.getElementById('achievements-close-btn');
   if (closeBtn) {
     const newCloseBtn = closeBtn.cloneNode(true);
@@ -422,6 +439,7 @@ export function initAchievementsUI() {
     newCloseBtn.addEventListener('click', closeAchievementsWindow);
   }
   
+  // ===== КНОПКА СБРОСА =====
   const resetBtn = document.getElementById('achievements-reset-btn');
   if (resetBtn) {
     const newResetBtn = resetBtn.cloneNode(true);
