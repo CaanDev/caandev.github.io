@@ -5,6 +5,7 @@
  */
 
 import { CONFIG, state } from '../../core/config/index.js';
+import { logger } from '../../utils/logger.js';
 import { Cell } from '../../world/cells/cell.js';
 import {
   restoreMazeGrid,
@@ -28,7 +29,7 @@ export function restoreMazeData(save) {
   }
 
   if (!restoreMazeGrid(save.mazeGrid)) {
-    console.warn('⚠️ Не удалось восстановить лабиринт');
+    logger.warn('⚠️ Не удалось восстановить лабиринт');
     return false;
   }
 

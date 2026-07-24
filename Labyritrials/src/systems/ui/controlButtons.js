@@ -7,6 +7,7 @@
 
 import { state, player } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
+import { logger } from '../../utils/logger.js';
 import { audio } from '../../audio/audioManager.js';
 import { openSettings } from './settings/index.js';
 import { Game } from '../../core/game.js';
@@ -93,7 +94,7 @@ function initSaveHandler(saveBtn) {
     e.stopPropagation();
     
     if (isSaving) {
-      console.log('Сохранение уже выполняется, подождите...');
+      logger.info('Сохранение уже выполняется, подождите...');
       return;
     }
     
@@ -106,7 +107,7 @@ function initSaveHandler(saveBtn) {
         isSaving = false;
       }, 1000);
     }).catch(err => {
-      console.error('Ошибка сохранения:', err);
+      logger.error('Ошибка сохранения:', err);
       isSaving = false;
     });
   });
@@ -155,19 +156,26 @@ export function updateControlButtonsVisibility() {
   const container = document.getElementById('control-buttons-container');
   if (!container) return;
   
+  // Защита от NaN в HP
+  const hp = (typeof player.hp === 'number' && !isNaN(player.hp)) ? player.hp : 0;
+  
+  const gameUI = document.getElementById('ui');
   const startScreen = document.getElementById('start-screen-ui');
   const gameOverUI = document.getElementById('game-over-ui');
   const levelUpUI = document.getElementById('level-up-ui');
   const shopUI = document.getElementById('shop-ui');
   const pauseMenu = document.getElementById('pause-menu');
   
+  const isGameActive = gameUI && gameUI.style.display === 'block';
   const isStartScreenVisible = startScreen && startScreen.style.display !== 'none';
   const isGameOverVisible = gameOverUI && gameOverUI.style.display === 'block';
   const isLevelUpVisible = levelUpUI && levelUpUI.style.display === 'block';
   const isShopVisible = shopUI && shopUI.style.display === 'block';
   const isPauseVisible = pauseMenu && pauseMenu.style.display === 'flex';
   
-  if (player.hp > 0 && 
+  // Показываем кнопки, если игрок жив и игра активна
+  if (hp > 0 && 
+      isGameActive && 
       !isStartScreenVisible && 
       !isGameOverVisible && 
       !isLevelUpVisible && 

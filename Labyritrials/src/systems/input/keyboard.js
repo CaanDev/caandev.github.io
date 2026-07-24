@@ -8,6 +8,7 @@
 
 import { CONFIG, state, player } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
+import { logger } from '../../utils/logger.js';
 import { audio } from '../../audio/audioManager.js';
 import { Game } from '../../core/game.js';
 import { getNoteById } from '../../data/notes.js';
@@ -199,19 +200,28 @@ async function handleShopToggle() {
   );
 
   if (distToShop < CONFIG.cellSize) {
+    // ===== ЗАГРУЗКА ШАБЛОНА МАГАЗИНА (ЕСЛИ НУЖНО) =====
     if (!isTemplateLoaded('shop')) {
       await loadTemplateIfNeeded('shop');
     }
 
-    // Настраиваем обработчики покупок (только если ещё не настроены)
-    const { initShopHandlers } = await import('../ui/shop/index.js');
-    initShopHandlers();
+    // ===== ИМПОРТ МОДУЛЯ МАГАЗИНА =====
+    const shopModule = await import('../ui/shop/index.js');
+    
+    // ===== ИНИЦИАЛИЗАЦИЯ ОБРАБОТЧИКОВ =====
+    if (shopModule.initShopHandlers) {
+      shopModule.initShopHandlers();
+    }
 
     state.isShopOpen = !state.isShopOpen;
     const shopUI = document.getElementById('shop-ui');
     if (shopUI) shopUI.style.display = state.isShopOpen ? 'block' : 'none';
 
     if (state.isShopOpen) {
+      // Обновляем UI магазина (включая изображения)
+      if (shopModule.updateShopUIForExternal) {
+        setTimeout(shopModule.updateShopUIForExternal, 50);
+      }
       Game.pauseTime();
       audio.pause();
       audio.isGameActive = false;
@@ -312,7 +322,7 @@ export function resetAllKeys() {
 export async function openNoteWindow(noteId) {
   const note = getNoteById(noteId);
   if (!note) {
-    console.warn(`📜 Записка #${noteId} не найдена!`);
+    logger.warn(`📜 Записка #${noteId} не найдена!`);
     return;
   }
 
@@ -359,7 +369,7 @@ export async function openNoteWindow(noteId) {
 function showNoteWindow(note) {
   const window = document.getElementById('note-reader');
   if (!window) {
-    console.warn('❌ Окно note-reader не найдено в DOM!');
+    logger.warn('❌ Окно note-reader не найдено в DOM!');
     return;
   }
 

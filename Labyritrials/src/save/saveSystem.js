@@ -6,6 +6,7 @@
  */
 
 import { state, player } from '../core/config/index.js';
+import { logger } from '../utils/logger.js';
 import { audio } from '../audio/audioManager.js';
 import {
   saveToLocalStorage,
@@ -83,6 +84,7 @@ export function saveGame() {
   if (player.hp <= 0) return;
 
   const saveData = {
+    compressed: true,
     ...collectBasicData(),
     ...collectPlayerData(),
     ...collectWeaponData(),
@@ -128,12 +130,6 @@ export async function loadGame() {
   if (!save) return false;
 
   try {
-    // ===== ПРОВЕРКА ВЕРСИИ =====
-    if (!save.version || !save.version.startsWith('1.')) {
-      console.warn('⚠️ Неподдерживаемая версия сохранения:', save.version);
-      return false;
-    }
-
     // ===== ВОССТАНОВЛЕНИЕ ДАННЫХ =====
     restoreBasicData(save);
 
@@ -169,8 +165,8 @@ export async function loadGame() {
     restoreNotesData(save);
     restoreFlags(save);
 
-    console.log('📀 Игра загружена! Уровень:', state.gameLevel);
-    console.log(`🏆 Достижений разблокировано: ${state.achievements.unlocked.length}`);
+    logger.save('📀 Игра загружена! Уровень:', state.gameLevel);
+    logger.save(`🏆 Достижений разблокировано: ${state.achievements.unlocked.length}`);
 
     // ===== ПРИМЕНЕНИЕ НАСТРОЕК =====
     await applySettingsAfterLoad();
@@ -192,7 +188,7 @@ export async function loadGame() {
       if (notesFound > currentProgress) {
         const { setProgress } = await import('../systems/achievements/manager.js');
         setProgress('notes_found', notesFound);
-        console.log(`📚 Синхронизировано записок: ${notesFound}`);
+        logger.save(`📚 Синхронизировано записок: ${notesFound}`);
       }
     }
 
@@ -211,7 +207,7 @@ export async function loadGame() {
 
     return true;
   } catch (e) {
-    console.error('❌ Ошибка загрузки сохранения:', e);
+    logger.error('❌ Ошибка загрузки сохранения:', e);
     return false;
   }
 }
@@ -247,7 +243,7 @@ async function applySettingsAfterLoad() {
       updateFpsLimit();
     }
   } catch (e) {
-    console.warn('⚠️ Не удалось применить настройки:', e);
+    logger.warn('⚠️ Не удалось применить настройки:', e);
   }
 }
 

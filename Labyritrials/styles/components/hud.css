@@ -1,0 +1,395 @@
+/**
+ * Игровой HUD
+ */
+
+#ui {
+  display: none;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: var(--color-ui-panel-light);
+  color: var(--color-text-light);
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(100, 60, 140, 0.2);
+  font-size: 15px;
+  pointer-events: none;
+  line-height: 1.7;
+  box-shadow: 0 4px 20px var(--color-shadow-strong);
+  z-index: 5;
+  min-width: 350px;
+  font-family: 'Courier New', Courier, monospace;
+  backdrop-filter: blur(4px);
+}
+
+/* ===== HP ===== */
+#ui-hp {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#hp-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+#hp-bar-bg {
+  flex: 1;
+  height: 10px;
+  background: rgba(44, 62, 80, 0.6);
+  border-radius: 5px;
+  overflow: hidden;
+  min-width: 80px;
+}
+
+#hp-bar-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #e74c3c, #f1c40f, #2ecc71);
+  background-size: 200% 100%;
+  transition: width 0.3s ease;
+}
+
+#hp-text {
+  font-size: 14px;
+  color: var(--color-text-dark);
+  flex-shrink: 0;
+  min-width: 60px;
+  text-align: right;
+  font-weight: bold;
+}
+
+#hp-text #hp-val {
+  color: var(--color-text-light);
+}
+
+/* ===== СТРОКИ СТАТИСТИКИ ===== */
+#ui-row-1,
+#ui-row-2 {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 15px;
+  color: var(--color-text-dark);
+  padding: 2px 0;
+}
+
+#ui-row-1 span,
+#ui-row-2 span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+#ui-row-1 span:first-child,
+#ui-row-2 span:first-child {
+  justify-content: flex-start;
+}
+
+#ui-row-1 span:last-child,
+#ui-row-2 span:last-child {
+  justify-content: flex-end;
+}
+
+/* ===== ВЫДЕЛЕНИЕ ЗНАЧЕНИЙ ===== */
+#lvl-val {
+  color: var(--color-text-gold);
+  font-weight: bold;
+}
+
+#monsters-val {
+  color: var(--color-text-red);
+  font-weight: bold;
+}
+
+#gold-val {
+  color: var(--color-text-gold);
+  font-weight: bold;
+}
+
+#dmg-val {
+  color: var(--color-text-light);
+  font-weight: bold;
+}
+
+/* ===== ОРУЖИЕ ===== */
+#ui-weapons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-top: 8px;
+  margin-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+#weapon-melee,
+#weapon-ranged {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-dark);
+  flex: 1;
+}
+
+#weapon-melee {
+  justify-content: flex-start;
+}
+
+#weapon-ranged {
+  justify-content: flex-start;
+}
+
+#weapon-melee img,
+#weapon-ranged img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px;
+}
+
+#weapon-melee img {
+  border: 1px solid rgba(241, 196, 15, 0.3);
+  box-shadow: 0 0 12px rgba(241, 196, 15, 0.1);
+}
+
+#weapon-ranged {
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+}
+
+#weapon-ranged.active {
+  opacity: 1;
+}
+
+#weapon-ranged img {
+  border: 1px solid rgba(255, 100, 0, 0.3);
+  box-shadow: 0 0 12px rgba(255, 100, 0, 0.1);
+}
+
+#weapon-melee-label,
+#weapon-ranged-label {
+  font-size: 13px;
+  color: var(--color-text-dark);
+  white-space: nowrap;
+}
+
+#weapon-melee-label {
+  color: var(--color-text-gold);
+}
+
+/* ===== ПОДСКАЗКА ДЛЯ МАГАЗИНА ===== */
+
+#shop-prompt {
+  display: none;
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: var(--color-text-gold);
+  padding: 10px 20px;
+  border-radius: 4px;
+  border: 1px solid var(--color-text-gold);
+  font-weight: bold;
+  font-size: 18px;
+  pointer-events: none;
+  z-index: 5;
+  animation: pulse 1.5s infinite;
+}
+
+/* ===== КНОПКИ УПРАВЛЕНИЯ (правый нижний угол) ===== */
+
+#control-buttons-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: none;
+  gap: 10px;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+/* ===== БАЗОВЫЕ СТИЛИ ДЛЯ ВСЕХ КНОПОК ===== */
+
+#control-buttons-container button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 18px;
+  border: 1px solid rgba(60, 30, 80, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  background: rgba(8, 6, 12, 0.85);
+  color: var(--color-text-light);
+  box-shadow: 0 0 25px rgba(60, 30, 80, 0.1), inset 0 0 30px rgba(60, 30, 80, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+}
+
+#control-buttons-container button::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(100, 60, 140, 0.12) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+#control-buttons-container button:hover::before {
+  opacity: 1;
+}
+
+#control-buttons-container button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(100, 60, 140, 0.1), transparent);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+#control-buttons-container button:hover::after {
+  left: 100%;
+}
+
+#control-buttons-container button:hover {
+  transform: translateY(-2px) scale(1.05);
+  border-color: rgba(100, 60, 140, 0.5);
+  box-shadow: 0 0 35px rgba(80, 40, 120, 0.25), 0 0 70px rgba(80, 40, 120, 0.08);
+}
+
+#control-buttons-container button:active {
+  transform: scale(0.92);
+}
+
+/* ===== ИНДИВИДУАЛЬНЫЕ ЦВЕТА КНОПОК ===== */
+
+#settings-btn {
+  color: var(--color-text-light) !important;
+  border-color: rgba(100, 100, 140, 0.3) !important;
+}
+
+#settings-btn:hover {
+  border-color: rgba(100, 100, 180, 0.5) !important;
+  box-shadow: 0 0 35px rgba(80, 80, 160, 0.2), 0 0 70px rgba(80, 80, 160, 0.05) !important;
+}
+
+#manual-save-btn {
+  color: var(--color-effect-stun) !important;
+  border-color: rgba(52, 152, 219, 0.25) !important;
+}
+
+#manual-save-btn:hover {
+  border-color: rgba(52, 152, 219, 0.5) !important;
+  box-shadow: 0 0 35px rgba(52, 152, 219, 0.18), 0 0 70px rgba(52, 152, 219, 0.06) !important;
+}
+
+#exit-to-menu-btn {
+  color: var(--color-text-red) !important;
+  border-color: rgba(231, 76, 60, 0.2) !important;
+}
+
+#exit-to-menu-btn:hover {
+  border-color: rgba(231, 76, 60, 0.45) !important;
+  box-shadow: 0 0 35px rgba(231, 76, 60, 0.15), 0 0 70px rgba(231, 76, 60, 0.05) !important;
+}
+
+/* ===== АДАПТАЦИЯ ===== */
+@media (max-width: 600px) {
+  #ui {
+    top: 10px;
+    left: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    min-width: 280px;
+  }
+
+  #ui-row-1,
+  #ui-row-2 {
+    font-size: 13px;
+    gap: 12px;
+  }
+
+  #weapon-melee img,
+  #weapon-ranged img {
+    width: 26px;
+    height: 26px;
+  }
+
+  #weapon-melee-label,
+  #weapon-ranged-label {
+    font-size: 12px;
+  }
+
+  #hp-text {
+    font-size: 12px;
+    min-width: 50px;
+  }
+
+  #hp-bar-bg {
+    height: 8px;
+    min-width: 60px;
+  }
+}
+
+@media (max-width: 400px) {
+  #ui {
+    top: 6px;
+    left: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    min-width: 220px;
+  }
+
+  #ui-row-1,
+  #ui-row-2 {
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  #weapon-melee img,
+  #weapon-ranged img {
+    width: 22px;
+    height: 22px;
+  }
+
+  #weapon-melee-label,
+  #weapon-ranged-label {
+    font-size: 11px;
+  }
+
+  #hp-bar-bg {
+    height: 6px;
+    min-width: 40px;
+  }
+
+  #hp-text {
+    font-size: 11px;
+    min-width: 40px;
+  }
+}

@@ -7,6 +7,7 @@
  */
 
 import { CONFIG, state } from '../../core/config/index.js';
+import { logger } from '../../utils/logger.js';
 import { getNotesForLevel, isBossLevel } from '../../data/notes.js';
 
 /**
@@ -99,7 +100,7 @@ export function spawnNotes() {
 
       spawnedCount++;
     } else {
-      console.warn(`📜 ❌ Не удалось найти место для записки #${noteData.id} на уровне ${level}`);
+      logger.warn(`📜 ❌ Не удалось найти место для записки #${noteData.id} на уровне ${level}`);
     }
   }
 }

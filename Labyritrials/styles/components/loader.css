@@ -1,0 +1,108 @@
+/**
+ * Стили для прелоадера
+ */
+
+#game-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg-overlay);
+  backdrop-filter: blur(8px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  font-family: 'Courier New', Courier, monospace;
+  animation: fadeInLoader 0.3s ease forwards;
+}
+
+#game-loader .loader-content {
+  background: var(--color-ui-panel);
+  background: var(--gradient-panel);
+  border: 1.5px solid var(--color-border-primary);
+  border-radius: 12px;
+  padding: 40px 45px 35px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  color: var(--color-text-primary);
+  box-shadow: 0 0 80px rgba(80, 20, 120, 0.12),
+              0 0 40px rgba(40, 10, 80, 0.08),
+              inset 0 0 60px rgba(40, 10, 80, 0.03);
+  animation: loaderSlideIn 0.3s ease forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+#game-loader .loader-corner-tl {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  border-top: 2px solid var(--color-border-primary);
+  border-left: 2px solid var(--color-border-primary);
+  pointer-events: none;
+}
+
+#game-loader .loader-corner-br {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-bottom: 2px solid var(--color-border-primary);
+  border-right: 2px solid var(--color-border-primary);
+  pointer-events: none;
+}
+
+#game-loader .loader-icon {
+  font-size: 52px;
+  margin-bottom: 12px;
+  animation: loaderPulse 1.5s ease-in-out infinite;
+  display: block;
+}
+
+#game-loader .loader-title {
+  margin: 0 0 6px 0;
+  color: var(--color-text-light);
+  font-size: 22px;
+  letter-spacing: 3px;
+  text-shadow: 0 0 30px rgba(140, 80, 180, 0.2);
+  font-weight: bold;
+}
+
+#game-loader .loader-text {
+  margin: 0 0 20px 0;
+  color: var(--color-text-dark);
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+#game-loader .loader-bar-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(60, 30, 80, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+#game-loader .loader-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-btn-primary), var(--color-text-light), var(--color-btn-primary));
+  background-size: 200% 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+  animation: loaderBarShine 1.5s ease-in-out infinite;
+}
+
+#game-loader .loader-subtext {
+  margin: 0;
+  color: var(--color-text-dark);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}

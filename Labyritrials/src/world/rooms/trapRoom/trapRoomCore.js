@@ -8,12 +8,19 @@
 import { CONFIG, state, player } from '../../../core/config/index.js';
 import { COLORS } from '../../../core/config/colors.js';
 import { addProtectedCell, clearProtectedCells } from '../../maze.js';
+import { logger } from '../../../utils/logger.js';
 import { clearPlayerTrails } from '../../../entities/objects/playerTrails.js';
 import { clearAllRoomParticles } from '../../../entities/objects/index.js';
 import { clearFireflies, generatedPortals } from '../../../entities/objects/firefly.js';
 import { spawnTrapRoomBloodstains, setTorchesColor, showTrapRoomActivationNotification } from './trapRoomUtils.js';
 import { generateEmptyArena, setupTrapTorches, createFakeExitPortal } from './trapRoomSetup.js';
 import { startNextWave } from './trapRoomWaves.js';
+import { 
+  ITEM_IMAGES, 
+  getRandomGoldImage, 
+  getRandomArtifactImage, 
+  getRandomPotionImage 
+} from '../../../images/itemImages.js';
 
 /** @type {number} - Размер комнаты-ловушки в клетках */
 const TRAP_ROOM_SIZE = 11;
@@ -211,7 +218,7 @@ export function returnFromTrapRoom() {
   clearAllRoomParticles();
 
   if (!state.originalGrid) {
-    console.error('❌ [TRAP] originalGrid не существует!');
+    logger.error('❌ [TRAP] originalGrid не существует!');
     state.inTrapRoom = false;
     return;
   }
@@ -295,20 +302,72 @@ export function returnFromTrapRoom() {
     }
   }
 
+  // ===== ВОССТАНАВЛИВАЕМ СУНДУКИ (С КЛЮЧАМИ ИЗОБРАЖЕНИЙ) =====
+  if (state.originalChests && state.originalChests.length > 0) {
+    state.chests = state.originalChests.map(c => {
+      const chest = {
+        x: c.x,
+        y: c.y,
+        type: c.type,
+        opened: c.opened,
+        countedForAchievement: c.countedForAchievement || false
+      };
+      
+      // Восстанавливаем ключи картинок для сундуков
+      if (c.type === 'gold') {
+        if (c.goldImageKey) {
+          chest.goldImageKey = c.goldImageKey;
+          chest.goldImagePath = c.goldImagePath;
+        } else {
+          const imagePath = getRandomGoldImage();
+          const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+          chest.goldImageKey = cacheKey;
+          chest.goldImagePath = imagePath;
+        }
+      }
+      
+      if (c.type === 'artifact') {
+        if (c.artifactImageKey) {
+          chest.artifactImageKey = c.artifactImageKey;
+          chest.artifactImagePath = c.artifactImagePath;
+        } else {
+          const imagePath = getRandomArtifactImage();
+          const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+          chest.artifactImageKey = cacheKey;
+          chest.artifactImagePath = imagePath;
+        }
+      }
+      
+      if (c.type === 'potion_chest') {
+        if (c.potionImageKey) {
+          chest.potionImageKey = c.potionImageKey;
+          chest.potionImagePath = c.potionImagePath;
+        } else {
+          const imagePath = getRandomPotionImage();
+          const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+          chest.potionImageKey = cacheKey;
+          chest.potionImagePath = imagePath;
+        }
+      }
+      
+      return chest;
+    });
+  } else {
+    state.chests = [];
+  }
+
   // Проверяем формат сохранённых артефактов
   if (state.originalArtifacts && state.originalArtifacts.length > 0) {
-      // Если это массив с gridX/gridY — конвертируем
-      if (state.originalArtifacts[0].gridX !== undefined) {
-          state.artifacts = state.originalArtifacts.map(a => ({
-              x: a.gridX * CONFIG.cellSize + CONFIG.cellSize / 2,
-              y: a.gridY * CONFIG.cellSize + CONFIG.cellSize / 2
-          }));
-      } else {
-          // Если это уже пиксельные координаты — используем как есть
-          state.artifacts = state.originalArtifacts;
-      }
+    if (state.originalArtifacts[0].gridX !== undefined) {
+      state.artifacts = state.originalArtifacts.map(a => ({
+        x: a.gridX * CONFIG.cellSize + CONFIG.cellSize / 2,
+        y: a.gridY * CONFIG.cellSize + CONFIG.cellSize / 2
+      }));
+    } else {
+      state.artifacts = state.originalArtifacts;
+    }
   } else {
-      state.artifacts = [];
+    state.artifacts = [];
   }
 
   // Удаляем постоянные пятна крови
@@ -412,4 +471,6 @@ export function returnFromTrapRoom() {
   state.originalFireflies = null;
   state.originalHadMonsters = false;
   state.originalRevealedCells = [];
+  state.originalChests = [];
+  state.originalArtifacts = [];
 }

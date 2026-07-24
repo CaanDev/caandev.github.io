@@ -7,6 +7,7 @@
 
 import { Game } from '../core/game.js';
 import { state, player } from '../core/config/index.js';
+import { logger } from '../utils/logger.js';
 import { formatPlayTime } from '../save/timeFormatter.js';
 import { openAchievementsWindow } from '../systems/achievements/index.js';
 import { audio } from '../audio/audioManager.js';
@@ -144,7 +145,7 @@ async function saveGameFromPause() {
       saveBtn.disabled = false;
     }, 1500);
   } catch (err) {
-    console.error('Ошибка сохранения:', err);
+    logger.error('Ошибка сохранения:', err);
     saveBtn.textContent = '❌ Ошибка!';
     setTimeout(() => {
       saveBtn.textContent = originalText;

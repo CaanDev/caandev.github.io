@@ -1,0 +1,81 @@
+/**
+ * Базовая типографика
+ */
+
+body,
+html {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Заголовки */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+}
+
+/* Моноширинный текст */
+code,
+pre,
+.mono {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Текст с тенью для лучшей читаемости */
+.text-shadow {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.text-shadow-light {
+  text-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px var(--color-glow-magic);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 30px var(--color-glow-gold);
+}
+
+/* Утилиты для выравнивания */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* Цвета текста */
+.text-primary {
+  color: var(--color-text-primary);
+}
+
+.text-light {
+  color: var(--color-text-light);
+}
+
+.text-dark {
+  color: var(--color-text-dark);
+}
+
+.text-gold {
+  color: var(--color-text-gold);
+}
+
+.text-red {
+  color: var(--color-text-red);
+}
+
+.text-green {
+  color: var(--color-text-green);
+}

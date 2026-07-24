@@ -8,6 +8,8 @@
 
 import { CONFIG, state, player } from '../../../core/config/index.js';
 import { COLORS } from '../../../core/config/colors.js';
+import { getImage, isImageLoaded } from '../../../utils/imageLoader.js';
+import { UI_IMAGES } from '../../../images/uiImages.js';
 
 /**
  * Отрисовка мини-карты
@@ -17,6 +19,8 @@ import { COLORS } from '../../../core/config/colors.js';
  * @returns {void}
  */
 export function drawMiniMap(ctx, canvas) {
+  // Не показываем мини-карту на босс-уровнях
+  if (state.isBossLevel) return;
   // Мини-карта не отображается в тайных комнатах и безопасной комнате
   if (state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom || state.inSafeRoom) return;
   if (!player.hasMap) return;
@@ -25,13 +29,38 @@ export function drawMiniMap(ctx, canvas) {
   const padding = 20;
   const rx = canvas.width - mSize - padding;
   const ry = padding;
+  const radius = 6;
   
-  // ===== ФОН МИНИ-КАРТЫ =====
-  ctx.fillStyle = COLORS.ui.minimap.bg;
-  ctx.fillRect(rx, ry, mSize, mSize);
-  ctx.strokeStyle = COLORS.ui.minimap.border;
-  ctx.lineWidth = 2;
-  ctx.strokeRect(rx, ry, mSize, mSize);
+  // ===== ФОН =====
+  const bgKey = 'minimapBg';
+  if (isImageLoaded(bgKey)) {
+    const img = getImage(bgKey);
+    if (img) {
+      ctx.save();
+      ctx.drawImage(img, rx - 40, ry - 40, mSize + 80, mSize + 80);
+      ctx.restore();
+    }
+  } else {
+    ctx.fillStyle = COLORS.ui.minimap.bg;
+    ctx.fillRect(rx, ry, mSize, mSize);
+  }
+  
+  // ===== МИНИ-КАРТА =====
+  ctx.save();
+  
+  // Закруглённые углы
+  ctx.beginPath();
+  ctx.moveTo(rx + radius, ry);
+  ctx.lineTo(rx + mSize - radius, ry);
+  ctx.quadraticCurveTo(rx + mSize, ry, rx + mSize, ry + radius);
+  ctx.lineTo(rx + mSize, ry + mSize - radius);
+  ctx.quadraticCurveTo(rx + mSize, ry + mSize, rx + mSize - radius, ry + mSize);
+  ctx.lineTo(rx + radius, ry + mSize);
+  ctx.quadraticCurveTo(rx, ry + mSize, rx, ry + mSize - radius);
+  ctx.lineTo(rx, ry + radius);
+  ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
+  ctx.closePath();
+  ctx.clip();
   
   // Определение размеров карты
   let mapCols = CONFIG.cols;
@@ -48,33 +77,34 @@ export function drawMiniMap(ctx, canvas) {
   // ===== ОТРИСОВКА КЛЕТОК КАРТЫ =====
   for (let y = 0; y < mapRows; y++) {
     for (let x = 0; x < mapCols; x++) {
-      if (state.grid[y] && state.grid[y][x] && state.grid[y][x].revealed) {
+      const isBossSafePortal = state.isBossLevel && x === 0 && y === 1;
+      const isRevealed = state.grid[y]?.[x]?.revealed || isBossSafePortal;
+      
+      if (state.grid[y] && state.grid[y][x] && isRevealed) {
         const cell = state.grid[y][x];
         const bx = rx + x * pSizeX;
         const by = ry + y * pSizeY;
         
-        // Стены
-        if (cell.isWall) {
-          ctx.fillStyle = COLORS.ui.minimap.wall;
+        if (cell.isWall || isBossSafePortal) {
+          // Стены
+          ctx.fillStyle = 'rgba(28, 37, 48, 0.9)';
           ctx.fillRect(bx, by, pSizeX, pSizeY);
-        } 
-        // Колонны
-        else if (cell.isPillar) {
-          ctx.fillStyle = COLORS.ui.minimap.pillar;
+        } else if (cell.isPillar) {
+          // Колонны
+          ctx.fillStyle = 'rgba(28, 37, 48, 0.9)';
           ctx.fillRect(bx, by, pSizeX, pSizeY);
-          ctx.strokeStyle = COLORS.ui.minimap.pillarBorder;
+          ctx.strokeStyle = 'rgba(60, 60, 80, 0.3)';
           ctx.lineWidth = 0.5;
           ctx.strokeRect(bx, by, pSizeX, pSizeY);
-        } 
-        // Пол
-        else {
-          ctx.fillStyle = COLORS.ui.minimap.floor;
+        } else {
+          // Пол
+          ctx.fillStyle = 'rgba(15, 20, 28, 0.05)';
           ctx.fillRect(bx, by, pSizeX, pSizeY);
         }
         
         // Магазин
         if (x === CONFIG.shopPos.x && y === CONFIG.shopPos.y) {
-          ctx.fillStyle = COLORS.ui.minimap.shop;
+          ctx.fillStyle = 'rgba(211, 84, 0, 0.9)';
           ctx.fillRect(bx, by, pSizeX, pSizeY);
         }
         
@@ -102,7 +132,7 @@ export function drawMiniMap(ctx, canvas) {
           }
           
           if (canShowPortal) {
-            ctx.fillStyle = COLORS.ui.minimap.portal;
+            ctx.fillStyle = 'rgba(139,0,255, 1)';
             ctx.fillRect(bx, by, pSizeX, pSizeY);
           }
         }
@@ -113,8 +143,10 @@ export function drawMiniMap(ctx, canvas) {
   // ===== ПОЗИЦИЯ ИГРОКА =====
   const pbx = rx + player.x * pSizeX;
   const pby = ry + player.y * pSizeY;
-  ctx.fillStyle = COLORS.ui.minimap.player;
+  ctx.fillStyle = 'rgba(231, 76, 60, 0.9)';
   ctx.beginPath();
   ctx.arc(pbx + pSizeX / 2, pby + pSizeY / 2, Math.min(pSizeX, pSizeY) / 1.5, 0, Math.PI * 2);
   ctx.fill();
+  
+  ctx.restore();
 }

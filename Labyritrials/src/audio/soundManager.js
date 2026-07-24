@@ -4,6 +4,7 @@
  */
 
 import { state } from '../core/config/state.js';
+import { logger } from '../utils/logger.js';
 
 /**
  * Класс SoundManager — управление звуковыми эффектами
@@ -45,25 +46,25 @@ class SoundManager {
     if (this.isInitialized) return;
     
     // Игрок
-    this.loadSound('playerStep', 'music/sounds/playerStep.ogg');
+    this.loadSound('playerStep', 'assets/audio/sounds/playerStep.ogg');
     // Лабиринт
-    this.loadSound('wallDestroy', 'music/sounds/wallDestroy.ogg');
-    this.loadSound('torchActivate', 'music/sounds/torchActivate.ogg');
-    this.loadSound('portalActivate', 'music/sounds/portalActivate.ogg');
+    this.loadSound('wallDestroy', 'assets/audio/sounds/wallDestroy.ogg');
+    this.loadSound('torchActivate', 'assets/audio/sounds/torchActivate.ogg');
+    this.loadSound('portalActivate', 'assets/audio/sounds/portalActivate.ogg');
     // Монстры
-    this.loadSound('monsterDeath', 'music/sounds/monsterDeath.ogg');
+    this.loadSound('monsterDeath', 'assets/audio/sounds/monsterDeath.ogg');
     // Лавка торговца
-    this.loadSound('shopBuyItem', 'music/sounds/shopBuyItem.ogg');
+    this.loadSound('shopBuyItem', 'assets/audio/sounds/shopBuyItem.ogg');
     // Ловушки
-    this.loadSound('trapSpikeActivate', 'music/sounds/trapSpikeActivate.ogg');
-    this.loadSound('trapIceActivate', 'music/sounds/trapIceActivate.ogg');
-    this.loadSound('trapIceFinish', 'music/sounds/trapIceFinish.ogg');
-    this.loadSound('trapLightningActivate', 'music/sounds/trapLightningActivate.ogg');
-    this.loadSound('trapLightningEffect', 'music/sounds/trapLightningEffect.ogg');
+    this.loadSound('trapSpikeActivate', 'assets/audio/sounds/trapSpikeActivate.ogg');
+    this.loadSound('trapIceActivate', 'assets/audio/sounds/trapIceActivate.ogg');
+    this.loadSound('trapIceFinish', 'assets/audio/sounds/trapIceFinish.ogg');
+    this.loadSound('trapLightningActivate', 'assets/audio/sounds/trapLightningActivate.ogg');
+    this.loadSound('trapLightningEffect', 'assets/audio/sounds/trapLightningEffect.ogg');
     // Достижения
-    this.loadSound('achievementCompleted', 'music/sounds/achievementCompleted.ogg');
+    this.loadSound('achievementCompleted', 'assets/audio/sounds/achievementCompleted.ogg');
     // Прочее
-    this.loadSound('dodge', 'music/sounds/dodge.ogg');
+    this.loadSound('dodge', 'assets/audio/sounds/dodge.ogg');
     
     this.isInitialized = true;
   }
@@ -84,8 +85,8 @@ class SoundManager {
     audio.addEventListener('error', (e) => {
       if (!this._hasLoadError) {
         this._hasLoadError = true;
-        console.warn(`⚠️ Не удалось загрузить звук "${name}":`, e);
-        console.warn('🔇 Режим отказоустойчивости: звуковые эффекты могут работать нестабильно');
+        logger.warn(`⚠️ Не удалось загрузить звук "${name}":`, e);
+        logger.warn('🔇 Режим отказоустойчивости: звуковые эффекты могут работать нестабильно');
       }
     });
     

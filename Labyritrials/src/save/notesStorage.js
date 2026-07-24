@@ -5,6 +5,8 @@
  * @module save/notesStorage
  */
 
+import { logger } from '../utils/logger.js';
+
 /** @type {string} - Ключ для хранения записок в localStorage */
 const NOTES_KEY = 'labirithria_notes';
 
@@ -21,7 +23,7 @@ export function saveNotesToStorage(notesData) {
   try {
     localStorage.setItem(NOTES_KEY, JSON.stringify(notesData));
   } catch (e) {
-    console.warn('⚠️ Не удалось сохранить записки:', e);
+    logger.warn('⚠️ Не удалось сохранить записки:', e);
   }
 }
 
@@ -37,7 +39,7 @@ export function loadNotesFromStorage() {
       return JSON.parse(raw);
     }
   } catch (e) {
-    console.warn('⚠️ Не удалось загрузить записки:', e);
+    logger.warn('⚠️ Не удалось загрузить записки:', e);
   }
   return null;
 }

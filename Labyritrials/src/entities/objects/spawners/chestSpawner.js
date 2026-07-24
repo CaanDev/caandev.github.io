@@ -8,6 +8,12 @@
 import { CONFIG, state } from '../../../core/config/index.js';
 import { createFlies } from '../fly.js';
 import { getRandomFreeCells, getRandomFreeCell, markCellUsed, isPortalCell } from '../utils/spawnUtils.js';
+import { 
+  ITEM_IMAGES, 
+  getRandomPotionImage, 
+  getRandomGoldImage,
+  getRandomArtifactImage 
+} from '../../../images/itemImages.js';
 
 /**
  * Создание сундуков на уровне
@@ -32,7 +38,6 @@ export function spawnChests(isTreasureRoom = false, isProtectedCell = () => fals
       if (isPortalCell(x, y)) continue;
 
       if (state.grid[y] && state.grid[y][x] && !state.grid[y][x].isWall) {
-        // Пропускаем стартовую позицию, выход и магазин
         if (x === 1 && y === 1) continue;
         if (x === CONFIG.goal.x && y === CONFIG.goal.y) continue;
         if (x === CONFIG.shopPos.x && y === CONFIG.shopPos.y) continue;
@@ -50,7 +55,6 @@ export function spawnChests(isTreasureRoom = false, isProtectedCell = () => fals
         if (state.grid[y][x-1].isBreakable) breakableWalls++;
         if (state.grid[y][x+1].isBreakable) breakableWalls++;
 
-        // Тупик = 3 стены вокруг клетки
         if (wallCount === 3) {
           deadEnds.push({ x, y, breakableWalls });
         }
@@ -70,7 +74,6 @@ export function spawnChests(isTreasureRoom = false, isProtectedCell = () => fals
   for (let i = 0; i < targetCount; i++) {
     let pos = deadEnds[i];
 
-    // ===== ОПРЕДЕЛЕНИЕ ТИПА СУНДУКА =====
     let rand = Math.random();
     let chestType;
     const canBeMimic = pos.breakableWalls === 0;
@@ -88,13 +91,31 @@ export function spawnChests(isTreasureRoom = false, isProtectedCell = () => fals
     }
 
     // ===== СОЗДАНИЕ СУНДУКА =====
-    state.chests.push({
+    const chestData = {
       x: pos.x * CONFIG.cellSize + CONFIG.cellSize / 2,
       y: pos.y * CONFIG.cellSize + CONFIG.cellSize / 2,
       type: chestType,
       opened: false,
       countedForAchievement: false
-    });
+    };
+
+    // Если сундук с золотом — добавляем картинку
+    if (chestType === 'gold') {
+      const imagePath = getRandomGoldImage();
+      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+      chestData.goldImageKey = cacheKey;
+      chestData.goldImagePath = imagePath;
+    }
+
+    // Если сундук с артефактом — добавляем картинку
+    if (chestType === 'artifact') {
+      const imagePath = getRandomArtifactImage();
+      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+      chestData.artifactImageKey = cacheKey;
+      chestData.artifactImagePath = imagePath;
+    }
+
+    state.chests.push(chestData);
 
     // Мухи для мимиков
     if (chestType === 'mimic') {
@@ -119,11 +140,16 @@ export function spawnTreasureRoomLoot() {
       return !state.grid[y][x].isWall;
     });
     if (cell) {
+      const imagePath = getRandomGoldImage();
+      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+      
       state.lootItems.push({
         x: cell.x * CONFIG.cellSize + CONFIG.cellSize / 2,
         y: cell.y * CONFIG.cellSize + CONFIG.cellSize / 2,
         type: 'gold',
-        value: 50 + Math.random() * 100
+        value: 50 + Math.random() * 100,
+        imageKey: cacheKey,
+        imagePath: imagePath,
       });
       markCellUsed(cell.x, cell.y);
     }
@@ -137,9 +163,14 @@ export function spawnTreasureRoomLoot() {
       return !state.grid[y][x].isWall;
     });
     if (cell) {
+      const imagePath = getRandomArtifactImage();
+      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+      
       state.artifacts.push({
         x: cell.x * CONFIG.cellSize + CONFIG.cellSize / 2,
-        y: cell.y * CONFIG.cellSize + CONFIG.cellSize / 2
+        y: cell.y * CONFIG.cellSize + CONFIG.cellSize / 2,
+        imageKey: cacheKey,
+        imagePath: imagePath,
       });
       markCellUsed(cell.x, cell.y);
     }
@@ -153,12 +184,17 @@ export function spawnTreasureRoomLoot() {
       return !state.grid[y][x].isWall;
     });
     if (cell) {
+      const imagePath = getRandomGoldImage();
+      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+      
       state.chests.push({
         x: cell.x * CONFIG.cellSize + CONFIG.cellSize / 2,
         y: cell.y * CONFIG.cellSize + CONFIG.cellSize / 2,
         type: 'gold',
         opened: false,
-        countedForAchievement: false
+        countedForAchievement: false,
+        goldImageKey: cacheKey,
+        goldImagePath: imagePath,
       });
       markCellUsed(cell.x, cell.y);
     }
@@ -172,11 +208,16 @@ export function spawnTreasureRoomLoot() {
       return !state.grid[y][x].isWall;
     });
     if (cell) {
+      const imagePath = getRandomPotionImage();
+      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+      
       state.lootItems.push({
         x: cell.x * CONFIG.cellSize + CONFIG.cellSize / 2,
         y: cell.y * CONFIG.cellSize + CONFIG.cellSize / 2,
         type: 'potion',
-        value: 50
+        value: 50,
+        imageKey: cacheKey,
+        imagePath: imagePath,
       });
       markCellUsed(cell.x, cell.y);
     }

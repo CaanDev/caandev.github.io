@@ -7,6 +7,7 @@
 
 import { state } from '../../core/config/state.js';
 import { ACHIEVEMENTS_LIST, getTotalCount } from './config.js';
+import { logger } from '../../utils/logger.js';
 import { showAchievementNotification } from './ui.js';
 import { saveGame } from '../../save/saveSystem.js';
 import { audio } from '../../audio/audioManager.js';
@@ -31,7 +32,7 @@ function loadAchievementsFromStorage() {
       };
     }
   } catch (e) {
-    console.warn('⚠️ Не удалось загрузить достижения из localStorage:', e);
+    logger.warn('⚠️ Не удалось загрузить достижения из localStorage:', e);
   }
   return null;
 }
@@ -50,7 +51,7 @@ function saveAchievementsToStorage() {
     };
     localStorage.setItem(ACHIEVEMENTS_STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
-    console.warn('⚠️ Не удалось сохранить достижения в localStorage:', e);
+    logger.warn('⚠️ Не удалось сохранить достижения в localStorage:', e);
   }
 }
 
@@ -183,7 +184,7 @@ export function checkAchievements() {
 export function unlockAchievement(id) {
   const achievement = ACHIEVEMENTS_LIST[id];
   if (!achievement) {
-    console.warn(`⚠️ Достижение "${id}" не найдено`);
+    logger.warn(`⚠️ Достижение "${id}" не найдено`);
     return;
   }
   
@@ -193,7 +194,7 @@ export function unlockAchievement(id) {
   // Добавляем в список разблокированных
   state.achievements.unlocked.push(id);
   
-  console.log(`🏆 Достижение разблокировано: ${achievement.name}`);
+  logger.achievement(`🏆 Достижение разблокировано: ${achievement.name}`);
   
   // Показываем уведомление (теперь всегда работает)
   showAchievementNotification(id);
@@ -202,7 +203,7 @@ export function unlockAchievement(id) {
   try {
     audio.playSound('achievementCompleted', 0.8);
   } catch (e) {
-    console.warn('⚠️ Не удалось воспроизвести звук достижения:', e);
+    logger.warn('⚠️ Не удалось воспроизвести звук достижения:', e);
   }
   
   // Сохраняем в localStorage
@@ -212,7 +213,7 @@ export function unlockAchievement(id) {
   try {
     saveGame();
   } catch (e) {
-    console.warn('⚠️ Не удалось сохранить достижение:', e);
+    logger.warn('⚠️ Не удалось сохранить достижение:', e);
   }
 }
 
@@ -308,7 +309,7 @@ export function resetAchievements() {
   try {
     localStorage.removeItem('labirithria_achievements');
   } catch (e) {
-    console.warn('⚠️ Не удалось очистить localStorage:', e);
+    logger.warn('⚠️ Не удалось очистить localStorage:', e);
   }
   
   // Сохраняем пустые данные
@@ -317,10 +318,10 @@ export function resetAchievements() {
   try {
     saveGame();
   } catch (e) {
-    console.warn('⚠️ Не удалось сохранить после сброса достижений:', e);
+    logger.warn('⚠️ Не удалось сохранить после сброса достижений:', e);
   }
   
-  console.log('🗑️ Все достижения сброшены');
+  logger.info('🗑️ Все достижения сброшены');
 }
 
 /**

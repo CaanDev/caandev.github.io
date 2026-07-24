@@ -106,7 +106,7 @@ export const CONFIG = {
   wallThickness: 6,
   
   /** @type {Object} - Позиция магазина (обновляется динамически) */
-  shopPos: { x: 1, y: 2 },
+  shopPos: { x: 1, y: 1 },
   /** @type {Object} - Позиция выхода с уровня */
   goal: { x: 12, y: 12 },
   

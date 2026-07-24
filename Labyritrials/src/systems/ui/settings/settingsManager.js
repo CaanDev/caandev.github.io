@@ -5,6 +5,7 @@
  * @module systems/ui/settings/settingsManager
  */
 
+import { logger } from '../../../utils/logger.js';
 import { audio } from '../../../audio/audioManager.js';
 
 /** @type {string} - Ключ для хранения настроек в localStorage */
@@ -21,7 +22,8 @@ export const DEFAULT_SETTINGS = {
   soundEnabled: true,
   showFps: false,
   fpsLimit: 0,
-  vsyncEnabled: true
+  vsyncEnabled: true,
+  smoothingEnabled: true,
 };
 
 /** @type {Object} - Текущие настройки */
@@ -56,7 +58,7 @@ export function saveSettings() {
   try {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   } catch (e) {
-    console.warn('Не удалось сохранить настройки:', e);
+    logger.warn('Не удалось сохранить настройки:', e);
   }
 }
 
@@ -152,6 +154,10 @@ export function applySetting(key, value) {
       break;
     case 'vsyncEnabled':
       applyVsyncSetting(value);
+      break;
+    case 'smoothingEnabled':
+      // Настройка применяется в рендерере при каждом кадре
+      // Дополнительных действий не требуется
       break;
     default:
       break;

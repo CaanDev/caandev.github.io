@@ -13,10 +13,14 @@ import {
   getAchievementsStats,
   resetAchievements,
   isHidden,
-  isUnlocked
+  isUnlocked,
+  getUnlocked
 } from './manager.js';
 import { CATEGORIES, getTotalCount } from './config.js';
+import { logger } from '../../utils/logger.js';
 import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../../utils/htmlLoader.js';
+import { getImage, isImageLoaded } from '../../utils/imageLoader.js';
+import { UI_IMAGES } from '../../images/uiImages.js';
 
 /** @type {number|null} - Таймаут скрытия уведомления */
 let notificationTimeout = null;
@@ -28,9 +32,83 @@ let isNotificationShowing = false;
 let achievementsOpen = false;
 
 /**
- * Показ уведомления о разблокировке достижения
+ * Получение изображения для достижения по ID
  * 
- * Добавляет достижение в очередь и показывает следующее уведомление.
+ * @param {string} id - ID достижения
+ * @returns {string|null} - Ключ изображения или null
+ * @private
+ */
+function getAchievementImageKey(id) {
+  // Строгое соответствие: ID достижения → ключ в UI_IMAGES
+  // Если картинки нет — возвращаем null (будет использован эмодзи)
+  const imageMap = {
+    // Combat
+    'fire_mage': 'fire_mage',
+    'vampire_lord': 'vampire_lord',
+    'thunderer': 'thunderer',
+    
+    // Exploration
+    'explorer': 'explorer',
+    'cartographer': 'cartographer',
+    'treasure_hunter': 'treasure_hunter',
+    'mystic': 'mystic',
+    'daredevil': 'daredevil',
+    'adventurer': 'adventurer',
+    
+    // Collection
+    'gold_finder': 'gold_finder',
+    'gold_hoarder': 'gold_hoarder',
+    'gold_millionaire': 'gold_millionaire',
+    'collector': 'collector',
+    'artifactor': 'artifactor',
+    'fully_equipped': 'fully_equipped',
+    'story_collector': 'story_collector',
+    
+    // Survival
+    'iron_man': 'iron_man',
+    
+    // Secret
+    'secret_meeting': 'secret_meeting',
+    'potion_glutton': 'potion_glutton',
+    'dodge_master': 'dodge_master',
+    'unlucky': 'unlucky',
+    'cleaner': 'cleaner',
+    'shadow': 'shadow',
+    'mimic_paranoid': 'mimic_paranoid',
+  };
+  
+  // Возвращаем ключ только если он есть в imageMap И картинка загружена
+  const key = imageMap[id];
+  if (key && isImageLoaded(key)) {
+    return key;
+  }
+  
+  return null;
+}
+
+/**
+ * Получение иконки для отображения (картинка или эмодзи)
+ * 
+ * @param {string} id - ID достижения
+ * @param {string} defaultEmoji - Эмодзи по умолчанию
+ * @returns {string} - HTML для иконки
+ * @private
+ */
+function getAchievementIconHTML(id, defaultEmoji) {
+  const imageKey = getAchievementImageKey(id);
+  
+  if (imageKey && isImageLoaded(imageKey)) {
+    const img = getImage(imageKey);
+    if (img) {
+      return `<img src="${img.src}" class="achievement-icon-img" alt="${id}">`;
+    }
+  }
+  
+  return defaultEmoji;
+}
+
+/**
+ * Показ уведомления о разблокировке достижения
  * 
  * @param {string} id - ID достижения
  * @returns {void}
@@ -39,10 +117,9 @@ export function showAchievementNotification(id) {
   const achievement = getAchievementState(id);
   if (!achievement) return;
   
-  // Проверяем, существует ли элемент уведомления (он должен быть всегда)
   const notification = document.getElementById('achievement-notification');
   if (!notification) {
-    console.warn('⚠️ Элемент уведомления не найден в DOM');
+    logger.warn('⚠️ Элемент уведомления не найден в DOM');
     return;
   }
   
@@ -76,15 +153,29 @@ function showNextNotification() {
   
   const notification = document.getElementById('achievement-notification');
   const nameEl = document.getElementById('notification-achievement-name');
+  const iconEl = notification?.querySelector('.notification-icon');
   
   if (!notification || !nameEl) {
-    console.warn('⚠️ Элементы уведомления не найдены');
+    logger.warn('⚠️ Элементы уведомления не найдены');
     isNotificationShowing = false;
     showNextNotification();
     return;
   }
   
   nameEl.textContent = achievement.name;
+  
+  // Обновляем иконку уведомления
+  if (iconEl) {
+    const imageKey = getAchievementImageKey(id);
+    if (imageKey && isImageLoaded(imageKey)) {
+      const img = getImage(imageKey);
+      if (img) {
+        iconEl.innerHTML = `<img src="${img.src}" style="width:32px;height:32px;object-fit:contain;image-rendering:pixelated;">`;
+      }
+    } else {
+      iconEl.textContent = '🏆';
+    }
+  }
   
   notification.style.display = 'flex';
   notification.classList.remove('hiding');
@@ -128,7 +219,7 @@ function hideNotification() {
 function showAchievementsWindow() {
   const window = document.getElementById('achievements-ui');
   if (!window) {
-    console.warn('⚠️ Окно достижений не найдено');
+    logger.warn('⚠️ Окно достижений не найдено');
     return;
   }
   
@@ -160,16 +251,13 @@ function showAchievementsWindow() {
  * @returns {void}
  */
 export function openAchievementsWindow() {
-  // ==== ЗАГРУЗКА ШАБЛОНА ДОСТИЖЕНИЙ (ЕСЛИ НУЖНО) =====
   if (!isTemplateLoaded('achievements')) {
     loadTemplateIfNeeded('achievements').then(() => {
-      // Обработчики уже инициализированы через initTemplateHandlers
       showAchievementsWindow();
     });
     return;
   }
   
-  // Если шаблон загружен, но не инициализирован
   if (!isTemplateInitialized('achievements')) {
     initTemplateHandlers('achievements').then(() => {
       showAchievementsWindow();
@@ -244,22 +332,39 @@ export function renderAchievements(categoryId) {
     achievements = getAchievementsByCategoryState(categoryId);
   }
   
+  const unlockedList = getUnlocked();
+  
   achievements.sort((a, b) => {
-    if (a.unlocked && !b.unlocked) return -1;
-    if (!a.unlocked && b.unlocked) return 1;
+    const aUnlocked = a.unlocked;
+    const bUnlocked = b.unlocked;
     
-    if (a.unlocked && b.unlocked) {
-      const order = ['combat', 'exploration', 'collection', 'survival', 'secret'];
-      return order.indexOf(a.category) - order.indexOf(b.category);
+    // 1. Сначала разблокированные достижения
+    if (aUnlocked && !bUnlocked) return -1;
+    if (!aUnlocked && bUnlocked) return 1;
+    
+    // 2. Если оба разблокированы — по порядку получения (сначала последние)
+    if (aUnlocked && bUnlocked) {
+      const aIndex = unlockedList.indexOf(a.id);
+      const bIndex = unlockedList.indexOf(b.id);
+      return bIndex - aIndex;
     }
     
-    const aIsHidden = a.hidden === true;
-    const bIsHidden = b.hidden === true;
+    // 3. Если оба заблокированы — по прогрессу (чем ближе к разблокировке, тем выше)
+    const aProgress = a.current / a.max;
+    const bProgress = b.current / b.max;
+    if (aProgress !== bProgress) {
+      return bProgress - aProgress;
+    }
     
-    if (aIsHidden && !bIsHidden) return 1;
-    if (!aIsHidden && bIsHidden) return -1;
+    // 4. Если прогресс одинаков — по категории
+    const categoryOrder = ['combat', 'exploration', 'collection', 'survival', 'secret'];
+    const aCatIndex = categoryOrder.indexOf(a.category);
+    const bCatIndex = categoryOrder.indexOf(b.category);
+    if (aCatIndex !== bCatIndex) {
+      return aCatIndex - bCatIndex;
+    }
     
-    return (b.current / b.max) - (a.current / a.max);
+    return a.name.localeCompare(b.name);
   });
   
   if (achievements.length === 0) {
@@ -290,7 +395,6 @@ function renderAchievementItem(ach) {
   const isUnlockedAch = ach.unlocked;
   const isHiddenAch = ach.hidden && !isUnlockedAch;
   const progressPercent = ach.progressPercent;
-  const isCompleted = ach.isCompleted;
   
   let classes = 'achievement-item';
   if (isUnlockedAch) {
@@ -302,15 +406,17 @@ function renderAchievementItem(ach) {
     classes += ' locked';
   }
   
-  let icon = ach.icon || '🏆';
+  let iconHTML;
   let name = ach.name;
   let description = ach.description;
   let progressHtml = '';
   
   if (isHiddenAch) {
-    icon = '❓';
+    iconHTML = '❓';
     name = '???';
     description = '??????????????????????????????????????';
+  } else {
+    iconHTML = getAchievementIconHTML(ach.id, ach.icon || '🏆');
   }
   
   if (!isUnlockedAch && !isHiddenAch && ach.maxProgress > 1) {
@@ -335,7 +441,7 @@ function renderAchievementItem(ach) {
   
   return `
     <div class="${classes}">
-      <span class="achievement-icon">${icon}</span>
+      <span class="achievement-icon">${iconHTML}</span>
       <div class="achievement-info">
         <div class="achievement-name">${name}</div>
         <div class="achievement-description">${description}</div>

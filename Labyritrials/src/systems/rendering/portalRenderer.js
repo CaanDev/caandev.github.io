@@ -39,8 +39,11 @@ function drawPortalGate(ctx, portal, baseColor, emoji, customOptions = null) {
   const centerX = px + CONFIG.cellSize / 2;
   const centerY = py + CONFIG.cellSize / 2;
   
-  const visibility = getDistanceVisibility(centerX, centerY);
-  if (visibility <= 0.05) return;
+  let visibility = 1.0;
+  if (!state.inSafeRoom) {
+    visibility = getDistanceVisibility(centerX, centerY);
+    if (visibility <= 0.05) return;
+  }
   
   ctx.save();
   ctx.globalAlpha = Math.min(1, visibility * 0.9 + 0.1);
@@ -220,15 +223,12 @@ function drawPortalParticles(ctx, px, py, portal, r, g, b, visibility) {
 }
 
 /**
- * Отрисовка магазина и всех порталов
+ * Отрисовка всех порталов
  * 
  * @param {CanvasRenderingContext2D} ctx - Контекст рисования
  * @returns {void}
  */
-export function drawShopAndPortal(ctx) {
-  // ===== ЛАВКА ТОРГОВЦА =====
-  drawShop(ctx);
-
+export function drawAllPortals(ctx) {
   // ===== ПОРТАЛ ПЕРЕХОДА НА СЛЕДУЮЩИЙ УРОВЕНЬ =====
   drawExitPortal(ctx);
 
@@ -243,60 +243,6 @@ export function drawShopAndPortal(ctx) {
 
   // ===== ПОРТАЛЫ ВЫХОДА ИЗ ТАЙНЫХ КОМНАТ =====
   drawSecretRoomExitPortals(ctx);
-}
-
-/**
- * Отрисовка магазина
- * 
- * @param {CanvasRenderingContext2D} ctx - Контекст рисования
- * @returns {void}
- * @private
- */
-function drawShop(ctx) {
-  if (state.grid && CONFIG.shopPos && 
-      CONFIG.shopPos.x !== undefined && CONFIG.shopPos.y !== undefined &&
-      CONFIG.shopPos.x >= 0 && CONFIG.shopPos.y >= 0) {
-
-    if (CONFIG.shopPos.y < CONFIG.rows && CONFIG.shopPos.x < CONFIG.cols) {
-      const cell = state.grid[CONFIG.shopPos.y]?.[CONFIG.shopPos.x];
-      if (cell && !cell.isWall && (cell.revealed || player.hasMap)) {
-        let sdx = CONFIG.shopPos.x * CONFIG.cellSize;
-        let sdy = CONFIG.shopPos.y * CONFIG.cellSize;
-        
-        const shopCenterX = sdx + CONFIG.cellSize / 2;
-        const shopCenterY = sdy + CONFIG.cellSize / 2;
-        const visibility = getDistanceVisibility(shopCenterX, shopCenterY);
-        
-        if (visibility > 0.05) {
-          ctx.save();
-          ctx.globalAlpha = Math.min(1, visibility * 0.85 + 0.1);
-          
-          // Фон магазина
-          ctx.beginPath();
-          ctx.roundRect(sdx + 15, sdy + 15, CONFIG.cellSize - 30, CONFIG.cellSize - 30, 12);
-          ctx.fillStyle = COLORS.ui.shop.bg;
-          ctx.fill();
-          
-          // Рамка магазина
-          ctx.beginPath();
-          ctx.roundRect(sdx + 15, sdy + 15, CONFIG.cellSize - 30, CONFIG.cellSize - 30, 12);
-          ctx.strokeStyle = COLORS.ui.shop.border;
-          ctx.lineWidth = 3;
-          ctx.stroke();
-          
-          ctx.globalAlpha = 1.0;
-          ctx.restore();
-          
-          // Иконка магазина
-          ctx.fillStyle = COLORS.player.shadow;
-          ctx.font = '36px Arial';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(EMOJIS.items.shop, sdx + CONFIG.cellSize / 2, sdy + CONFIG.cellSize / 2);
-        }
-      }
-    }
-  }
 }
 
 /**

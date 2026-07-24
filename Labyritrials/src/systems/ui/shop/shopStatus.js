@@ -18,8 +18,10 @@ export function updateBuyHpStatus() {
   const status = document.getElementById('hp-status');
   if (!btn || !status) return;
 
+  // Убираем конфликтующие классы
+  btn.classList.remove('no-gold');
+
   if (player.gold >= player.hpCost) {
-    btn.classList.remove('no-gold');
     status.textContent = 'Купить';
     status.className = 'shop-status buy';
   } else {
@@ -39,8 +41,10 @@ export function updateBuyDamageStatus() {
   const status = document.getElementById('dmg-status');
   if (!btn || !status) return;
 
+  // Убираем конфликтующие классы
+  btn.classList.remove('no-gold');
+
   if (player.gold >= player.dmgCost) {
-    btn.classList.remove('no-gold');
     status.textContent = 'Купить';
     status.className = 'shop-status buy';
   } else {
@@ -61,15 +65,16 @@ export function updateMapStatus() {
   const price = document.getElementById('map-price');
   if (!btn || !status || !price) return;
 
+  // Убираем конфликтующие классы
+  btn.classList.remove('active', 'no-gold');
+
   if (player.hasMap) {
     btn.classList.add('active');
-    btn.classList.remove('no-gold');
     status.textContent = '✅ Есть';
     status.className = 'shop-status active';
     price.style.display = 'none';
     btn.style.cursor = 'default';
   } else if (player.gold >= CONFIG.shop.mapCost) {
-    btn.classList.remove('active', 'no-gold');
     status.textContent = 'Купить';
     status.className = 'shop-status buy';
     price.style.display = 'block';
@@ -77,7 +82,6 @@ export function updateMapStatus() {
     btn.style.cursor = 'pointer';
   } else {
     btn.classList.add('no-gold');
-    btn.classList.remove('active');
     status.textContent = 'Не хватает золота';
     status.className = 'shop-status no-gold';
     price.style.display = 'block';
@@ -101,29 +105,28 @@ export function updateVampireStaffStatus() {
   const isOwned = player.ownedMeleeWeapons.includes('vampire');
   const isActive = player.meleeWeapon === 'vampire';
 
+  // Убираем все конфликтующие классы
+  btn.classList.remove('active', 'locked', 'no-gold');
+
   if (isActive) {
     btn.classList.add('active');
-    btn.classList.remove('locked', 'no-gold');
     status.textContent = '✅ Активно';
     status.className = 'shop-status active';
     price.style.display = 'none';
     btn.style.cursor = 'default';
   } else if (isOwned) {
-    btn.classList.remove('active', 'locked', 'no-gold');
     status.textContent = '🔄 Выбрать';
     status.className = 'shop-status owned';
     price.style.display = 'none';
     btn.style.cursor = 'pointer';
   } else if (!isLevelAvailable) {
     btn.classList.add('locked');
-    btn.classList.remove('active', 'no-gold');
     status.textContent = `🔒 Ур. ${CONFIG.shop.vampireStaffMinLevel}`;
     status.className = 'shop-status locked';
     price.style.display = 'block';
     price.textContent = `${CONFIG.shop.vampireStaffCost} 💰`;
     btn.style.cursor = 'not-allowed';
   } else if (player.gold >= CONFIG.shop.vampireStaffCost) {
-    btn.classList.remove('locked', 'active', 'no-gold');
     status.textContent = 'Купить';
     status.className = 'shop-status buy';
     price.style.display = 'block';
@@ -131,7 +134,6 @@ export function updateVampireStaffStatus() {
     btn.style.cursor = 'pointer';
   } else {
     btn.classList.add('no-gold');
-    btn.classList.remove('locked', 'active');
     status.textContent = 'Не хватает золота';
     status.className = 'shop-status no-gold';
     price.style.display = 'block';
@@ -155,29 +157,28 @@ export function updateStunStaffStatus() {
   const isOwned = player.ownedMeleeWeapons.includes('stun');
   const isActive = player.meleeWeapon === 'stun';
 
+  // Убираем все конфликтующие классы
+  btn.classList.remove('active', 'locked', 'no-gold');
+
   if (isActive) {
     btn.classList.add('active');
-    btn.classList.remove('no-gold');
     status.textContent = '✅ Активно';
     status.className = 'shop-status active';
     price.style.display = 'none';
     btn.style.cursor = 'default';
   } else if (isOwned) {
-    btn.classList.remove('active', 'no-gold');
     status.textContent = '🔄 Выбрать';
     status.className = 'shop-status owned';
     price.style.display = 'none';
     btn.style.cursor = 'pointer';
   } else if (!isLevelAvailable) {
     btn.classList.add('locked');
-    btn.classList.remove('active', 'no-gold');
-    status.textContent = '🔒 Ур. 4';
+    status.textContent = `🔒 Ур. 4`;
     status.className = 'shop-status locked';
     price.style.display = 'block';
     price.textContent = `${CONFIG.shop.stunStaffCost} 💰`;
     btn.style.cursor = 'not-allowed';
   } else if (player.gold >= CONFIG.shop.stunStaffCost) {
-    btn.classList.remove('active', 'no-gold');
     status.textContent = 'Купить';
     status.className = 'shop-status buy';
     price.style.display = 'block';
@@ -185,7 +186,6 @@ export function updateStunStaffStatus() {
     btn.style.cursor = 'pointer';
   } else {
     btn.classList.add('no-gold');
-    btn.classList.remove('active');
     status.textContent = 'Не хватает золота';
     status.className = 'shop-status no-gold';
     price.style.display = 'block';
@@ -209,13 +209,15 @@ export function updateDefaultStaffStatus() {
     priceEl.style.display = 'none';
   }
 
+  // Убираем конфликтующие классы
+  btn.classList.remove('active');
+
   if (player.meleeWeapon === 'default') {
     btn.classList.add('active');
     status.textContent = '✅ Активно';
     status.className = 'shop-status active';
     btn.style.cursor = 'default';
   } else {
-    btn.classList.remove('active');
     status.textContent = '🔄 Выбрать';
     status.className = 'shop-status owned';
     btn.style.cursor = 'pointer';
@@ -237,29 +239,28 @@ export function updateFireballStatus() {
   const isOwned = player.ownedRangedWeapons.includes('fireball');
   const isActive = player.rangedWeapon === 'fireball';
 
+  // Убираем все конфликтующие классы
+  btn.classList.remove('active', 'locked', 'no-gold');
+
   if (isActive) {
     btn.classList.add('active');
-    btn.classList.remove('locked', 'no-gold');
     status.textContent = '✅ Активно';
     status.className = 'shop-status active';
     price.style.display = 'none';
     btn.style.cursor = 'default';
   } else if (isOwned) {
-    btn.classList.remove('active', 'locked', 'no-gold');
     status.textContent = '🔄 Выбрать';
     status.className = 'shop-status owned';
     price.style.display = 'none';
     btn.style.cursor = 'pointer';
   } else if (!isLevelAvailable) {
     btn.classList.add('locked');
-    btn.classList.remove('active', 'no-gold');
     status.textContent = `🔒 Ур. ${CONFIG.shop.fireballMinLevel}`;
     status.className = 'shop-status locked';
     price.style.display = 'block';
     price.textContent = `${CONFIG.shop.fireballCost} 💰`;
     btn.style.cursor = 'not-allowed';
   } else if (player.gold >= CONFIG.shop.fireballCost) {
-    btn.classList.remove('locked', 'active', 'no-gold');
     status.textContent = 'Купить';
     status.className = 'shop-status buy';
     price.style.display = 'block';
@@ -267,7 +268,6 @@ export function updateFireballStatus() {
     btn.style.cursor = 'pointer';
   } else {
     btn.classList.add('no-gold');
-    btn.classList.remove('locked', 'active');
     status.textContent = 'Не хватает золота';
     status.className = 'shop-status no-gold';
     price.style.display = 'block';

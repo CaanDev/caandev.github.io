@@ -7,6 +7,7 @@
 
 import { CONFIG, state, player } from '../../../core/config/index.js';
 import { COLORS } from '../../../core/config/colors.js';
+import { logger } from '../../../utils/logger.js';
 import { showRealExitPortal } from './trapRoomSetup.js';
 import { showTrapWaveNotification } from './trapRoomUtils.js';
 
@@ -137,7 +138,7 @@ export function checkTrapWaveComplete() {
  */
 export function spawnTrapMonsters(count, multiplier, waveTypes) {
   if (!waveTypes || !Array.isArray(waveTypes)) {
-    console.warn('⚠️ waveTypes не определён, используем типы по умолчанию');
+    logger.warn('⚠️ waveTypes не определён, используем типы по умолчанию');
     waveTypes = ['pumpkin', 'bat'];
   }
 
@@ -157,7 +158,7 @@ export function spawnTrapMonsters(count, multiplier, waveTypes) {
     .filter(t => t !== undefined);
 
   if (availableTypes.length === 0) {
-    console.warn('⚠️ Нет доступных типов монстров для волны, используем fallback');
+    logger.warn('⚠️ Нет доступных типов монстров для волны, используем fallback');
     availableTypes = [typeMap['pumpkin']];
   }
 

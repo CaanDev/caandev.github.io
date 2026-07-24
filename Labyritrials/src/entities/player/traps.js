@@ -20,15 +20,20 @@ import { updateProgress } from '../../systems/achievements/index.js';
  */
 export function checkTraps() {
   for (let t of state.traps) {
+    // Обновление таймера перезарядки
+    if (t.resetTimer > 0) {
+      t.resetTimer--;
+      if (t.resetTimer <= 0) {
+        t.triggered = false;
+        t.hasDealtDamage = false;
+      }
+    }
+    
+    // Проверка активации (только если ловушка не активна и не на перезарядке)
     if (!t.triggered && t.resetTimer <= 0) {
       if (Math.hypot(player.px - t.x, player.py - t.y) < 30) {
         activateTrap(t);
       }
-    }
-
-    if (t.resetTimer > 0) {
-      t.resetTimer--;
-      if (t.resetTimer <= 0) t.triggered = false;
     }
   }
 }
@@ -73,7 +78,7 @@ function activateTrap(t) {
   const didEvade = Math.random() < evasionChance;
 
   if (didEvade) {
-    handleEvasion(evasionChance);
+    handleEvasion(evasionChance, t);
   } else {
     applyTrapEffectToPlayer(t, evasionChance);
   }
@@ -83,10 +88,14 @@ function activateTrap(t) {
  * Обработка уклонения от ловушки
  * 
  * @param {number} evasionChance - Шанс уклонения (0-1)
+ * @param {Object} t - Объект ловушки
  * @returns {void}
  * @private
  */
-function handleEvasion(evasionChance) {
+function handleEvasion(evasionChance, t) {
+  // При увороте ловушка НЕ считается сработавшей
+  t.hasDealtDamage = false;
+
   let evadeX = 0, evadeY = 0;
   const evadeDistance = 70;
   const isMoving = (player.dirX !== 0 || player.dirY !== 0);
@@ -167,6 +176,9 @@ function handleEvasion(evasionChance) {
  * @private
  */
 function applyTrapEffectToPlayer(t, evasionChance) {
+  // Ловушка сработала (нанесла урон/эффект)
+  t.hasDealtDamage = true;
+
   // ===== ОБНОВЛЕНИЕ ПРОГРЕССА ДОСТИЖЕНИЙ =====
   switch (t.type) {
     case 'spike':

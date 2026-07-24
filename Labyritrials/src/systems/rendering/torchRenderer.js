@@ -8,7 +8,29 @@
 import { CONFIG, state, player } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
 import { EMOJIS } from '../../emojis.js';
+import { getImage, isImageLoaded } from '../../utils/imageLoader.js';
+import { getRandomTorchImage, TORCH_IMAGES, OBJECT_IMAGES } from '../../images/objectImages.js';
 import { getDistanceVisibility } from '../fog/index.js';
+
+/**
+ * Определение типа факела на основе текущего состояния игры
+ * 
+ * @returns {string} - Тип факела
+ * @private
+ */
+function getTorchType() {
+  if (state.inShrineRoom) return 'shrine';
+  if (state.inTrapRoom) return 'trap';
+  
+  if (state.isBossLevel) {
+    const bossLevel = Math.floor(state.gameLevel / 5) * 5;
+    if (bossLevel === 5) return 'boss5';
+    if (bossLevel === 10) return 'boss10';
+    if (bossLevel === 15) return 'boss15';
+  }
+  
+  return 'normal';
+}
 
 /**
  * Отрисовка всех активных факелов
@@ -19,20 +41,21 @@ import { getDistanceVisibility } from '../fog/index.js';
 export function drawTorches(ctx) {
   if (!state.torches) return;
 
-  const isMindBossArena = state.isBossLevel && (state.gameLevel === 10);
+  const torchType = getTorchType();
   
   for (let torch of state.torches) {
     if (!torch.active) continue;
     if (!state.grid[torch.y] || !state.grid[torch.y][torch.x]) continue;
     if (!state.grid[torch.y][torch.x].revealed && !player.hasMap) continue;
     
-    const cellX = torch.x * CONFIG.cellSize;
-    const cellY = torch.y * CONFIG.cellSize;
-    const torchX = cellX + CONFIG.cellSize / 2;
-    const torchY = cellY + CONFIG.cellSize / 2;
+    const torchX = torch.x * CONFIG.cellSize + CONFIG.cellSize / 2;
+    const torchY = torch.y * CONFIG.cellSize + CONFIG.cellSize / 2;
     
-    const visibility = getDistanceVisibility(torchX, torchY);
-    if (visibility <= 0.05) continue;
+    let visibility = 1.0;
+    if (!state.inSafeRoom) {
+      visibility = getDistanceVisibility(torchX, torchY);
+      if (visibility <= 0.05) continue;
+    }
     
     // Анимация появления факела
     if (torch.appearTimer === undefined) torch.appearTimer = 0;
@@ -44,14 +67,25 @@ export function drawTorches(ctx) {
     torch.flickerPhase = (torch.flickerPhase || 0) + CONFIG.torchFlickerSpeed;
     const flicker = 0.8 + Math.sin(torch.flickerPhase * 2) * 0.25;
     
-    const flameColor = torch.flameColor || COLORS.torches.flame;
-    const glowColor = torch.glowColor || COLORS.torches.glow;
-    const emoji = torch.emoji || '🕯️';
+    // ===== ВЫБИРАЕМ ИЗОБРАЖЕНИЕ СЛУЧАЙНО =====
+    if (!torch.imageKey) {
+      // Просто случайный выбор для всех типов факелов
+      const imagePath = getRandomTorchImage(torchType);
+      const cacheKey = Object.keys(OBJECT_IMAGES).find(key => OBJECT_IMAGES[key] === imagePath);
+      torch.imageKey = cacheKey;
+      torch.imagePath = imagePath;
+    }
+    
+    const cacheKey = torch.imageKey;
+    const size = 46;
     
     ctx.save();
     ctx.globalAlpha = Math.min(1, visibility * 0.8 + 0.1);
     
-    // Свет от факела
+    // ===== СВЕТ ОТ ФАКЕЛА =====
+    const flameColor = torch.flameColor || COLORS.torches.flame;
+    const glowColor = torch.glowColor || COLORS.torches.glow;
+    
     const gradient = ctx.createRadialGradient(torchX, torchY, 0, torchX, torchY, 80);
     gradient.addColorStop(0, `rgba(${hexToRgb(flameColor)}, ${0.5 * flicker * visibility})`);
     gradient.addColorStop(0.3, `rgba(${hexToRgb(flameColor)}, ${0.3 * flicker * visibility})`);
@@ -65,16 +99,34 @@ export function drawTorches(ctx) {
     ctx.fill();
     ctx.globalCompositeOperation = 'source-over';
     
-    // Эмодзи факела с тенью
-    ctx.shadowBlur = 15 * appearProgress * visibility;
-    ctx.shadowColor = flameColor;
-    ctx.font = `${32 * appearProgress}px Arial`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.globalAlpha = 0.7 * appearProgress * visibility;
-    ctx.fillStyle = flameColor;
-    ctx.fillText(emoji, torchX, torchY);
-    ctx.globalAlpha = 1.0;
+    // ===== ИЗОБРАЖЕНИЕ ФАКЕЛА =====
+    if (cacheKey && isImageLoaded(cacheKey)) {
+      const img = getImage(cacheKey);
+      if (img) {
+        ctx.save();
+        ctx.shadowBlur = 15 * appearProgress * visibility;
+        ctx.shadowColor = flameColor;
+        ctx.globalAlpha = 0.85 * appearProgress * visibility;
+        ctx.drawImage(img, torchX - size/2, torchY - size/2, size, size);
+        ctx.restore();
+      }
+    } else {
+      // Fallback: эмодзи
+      ctx.save();
+      ctx.shadowBlur = 15 * appearProgress * visibility;
+      ctx.shadowColor = flameColor;
+      ctx.globalAlpha = 0.7 * appearProgress * visibility;
+      ctx.fillStyle = flameColor;
+      ctx.font = '32px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      let emoji = torch.emoji || EMOJIS.torches.normal;
+      if (torchType === 'boss10') emoji = EMOJIS.torches.magic;
+      ctx.fillText(emoji, torchX, torchY);
+      ctx.restore();
+    }
+    
     ctx.restore();
   }
 }

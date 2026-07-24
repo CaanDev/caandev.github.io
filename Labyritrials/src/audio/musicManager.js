@@ -3,6 +3,8 @@
  * Управляет загрузкой, воспроизведением и переключением музыкальных треков.
  */
 
+import { logger } from '../utils/logger.js';
+
 /**
  * Класс MusicManager — управление фоновой музыкой
  * 
@@ -49,34 +51,34 @@ class MusicManager {
   init() {
     if (this.isInitialized) return;
     
-    this.gameMusic = new Audio('music/themes/gameBackground.ogg');
+    this.gameMusic = new Audio('assets/audio/themes/gameBackground.ogg');
     this.gameMusic.loop = true;
     this.gameMusic.volume = this.volume;
     this.gameMusic.preload = 'auto';
     
-    this.menuMusic = new Audio('music/themes/mainMenu.ogg');
+    this.menuMusic = new Audio('assets/audio/themes/mainMenu.ogg');
     this.menuMusic.loop = true;
     this.menuMusic.volume = this.volume;
     this.menuMusic.preload = 'auto';
     
-    this.safeRoomMusic = new Audio('music/themes/safeRoom.ogg');
+    this.safeRoomMusic = new Audio('assets/audio/themes/safeRoom.ogg');
     this.safeRoomMusic.loop = true;
     this.safeRoomMusic.volume = this.volume;
     this.safeRoomMusic.preload = 'auto';
     
     // Обработчики ошибок с повторными попытками
     this.gameMusic.addEventListener('error', (e) => {
-      console.warn('⚠️ Не удалось загрузить музыку игры:', e);
+      logger.warn('⚠️ Не удалось загрузить музыку игры:', e);
       this._handleLoadError('game');
     });
     
     this.menuMusic.addEventListener('error', (e) => {
-      console.warn('⚠️ Не удалось загрузить музыку меню:', e);
+      logger.warn('⚠️ Не удалось загрузить музыку меню:', e);
       this._handleLoadError('menu');
     });
     
     this.safeRoomMusic.addEventListener('error', (e) => {
-      console.warn('⚠️ Не удалось загрузить музыку безопасной комнаты:', e);
+      logger.warn('⚠️ Не удалось загрузить музыку безопасной комнаты:', e);
       this._handleLoadError('safeRoom');
     });
     
@@ -95,7 +97,7 @@ class MusicManager {
     this._hasLoadError = true;
     if (!this._errorReported) {
       this._errorReported = true;
-      console.warn('🔇 Режим отказоустойчивости: музыка отключена');
+      logger.warn('🔇 Режим отказоустойчивости: музыка отключена');
     }
     // Автоматически отключаем музыку при ошибке
     this.isEnabled = false;
@@ -145,14 +147,14 @@ class MusicManager {
     this.currentTrack = audio;
     
     if (!audio || !audio.src) {
-      console.warn('⚠️ Аудио не инициализировано');
+      logger.warn('⚠️ Аудио не инициализировано');
       this._isLoading = false;
       return;
     }
 
     // Проверяем, есть ли у аудио src (не пустой)
     if (!audio.src || audio.src === '') {
-      console.warn('⚠️ Аудио файл не найден:', mode);
+      logger.warn('⚠️ Аудио файл не найден:', mode);
       this._isLoading = false;
       this._handleLoadError(mode);
       return;
@@ -193,7 +195,7 @@ class MusicManager {
                 return;
               }
               // Любая другая ошибка — включаем отказоустойчивый режим
-              console.warn('⚠️ Ошибка воспроизведения музыки:', err.name, err.message);
+              logger.warn('⚠️ Ошибка воспроизведения музыки:', err.name, err.message);
               this._handleLoadError(mode);
             });
         } else {
@@ -202,7 +204,7 @@ class MusicManager {
       } catch (err) {
         this._isLoading = false;
         if (err.name !== 'AbortError') {
-          console.warn('⚠️ Не удалось запустить музыку:', err.name);
+          logger.warn('⚠️ Не удалось запустить музыку:', err.name);
           this._handleLoadError(mode);
         }
       }
@@ -225,7 +227,7 @@ class MusicManager {
       this.isPlaying = false;
     } catch (err) {
       if (err.name !== 'AbortError') {
-        console.warn('⚠️ Не удалось поставить на паузу:', err);
+        logger.warn('⚠️ Не удалось поставить на паузу:', err);
       }
     }
   }
@@ -252,14 +254,14 @@ class MusicManager {
           })
           .catch((err) => {
             if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
-              console.warn('⚠️ Не удалось возобновить:', err);
+              logger.warn('⚠️ Не удалось возобновить:', err);
               this._handleLoadError(this.currentMode);
             }
           });
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
-        console.warn('⚠️ Не удалось возобновить:', err);
+        logger.warn('⚠️ Не удалось возобновить:', err);
         this._handleLoadError(this.currentMode);
       }
     }
@@ -290,7 +292,7 @@ class MusicManager {
       this.currentTrack = null;
     } catch (err) {
       if (err.name !== 'AbortError') {
-        console.warn('⚠️ Не удалось остановить музыку:', err);
+        logger.warn('⚠️ Не удалось остановить музыку:', err);
       }
     }
   }

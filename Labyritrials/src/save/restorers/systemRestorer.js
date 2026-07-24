@@ -5,6 +5,7 @@
  */
 
 import { state, player } from '../../core/config/index.js';
+import { logger } from '../../utils/logger.js';
 import { formatPlayTime } from '../timeFormatter.js';
 import { loadNotesFromStorage } from '../notesStorage.js';
 import { restoreNotesOnGrid } from './helpers.js';
@@ -94,8 +95,8 @@ export function restoreGameStatsData(save) {
     state.gameStats.playTime = stats.playTime || 0;
     state.playTimeAccumulator = state.gameStats.playTime;
 
-    console.log('📀 Восстановлена статистика игры');
-    console.log(`⏱️ Время игры: ${stats.playTimeFormatted || formatPlayTime(state.gameStats.playTime)}`);
+    logger.save('📀 Восстановлена статистика игры');
+    logger.save(`⏱️ Время игры: ${stats.playTimeFormatted || formatPlayTime(state.gameStats.playTime)}`);
   } else {
     state.gameStats = {
       maxHpAtEnd: 0,

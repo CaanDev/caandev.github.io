@@ -6,8 +6,24 @@
  */
 
 import { CONFIG, state } from '../../../core/config/index.js';
+import { getMonsterTypesByLevel } from '../../../core/config/biomes.js';
 import { EMOJIS } from '../../../emojis.js';
+import { getRandomArtifactImage } from '../../../images/itemImages.js';
+import { ITEM_IMAGES } from '../../../images/itemImages.js';
 import { getRandomFreeCells, markCellUsed, isPortalCell } from '../utils/spawnUtils.js';
+
+// ============================================================
+// ВСЕ ТИПЫ МОНСТРОВ
+// ============================================================
+
+const typeMap = {
+  bat: { emoji: EMOJIS.monsters.bat, hp: 25, damage: 6, radius: 18, name: 'Летучая мышь', speed: 2.5, vision: 280, minLevel: 1 },
+  pumpkin: { emoji: EMOJIS.monsters.pumpkin, hp: 60, damage: 12, radius: 24, name: 'Тыква', speed: 2.0, vision: 320, minLevel: 1 },
+  ghost: { emoji: EMOJIS.monsters.ghost, hp: 30, damage: 6, radius: 22, name: 'Призрак', speed: 1.5, vision: 260, minLevel: 8, isGhost: true },
+  skull: { emoji: EMOJIS.monsters.skull, hp: 90, damage: 18, radius: 22, name: 'Череп', speed: 2.4, vision: 350, minLevel: 3 },
+  demon: { emoji: EMOJIS.monsters.demon, hp: 150, damage: 28, radius: 28, name: 'Демон', speed: 1.8, vision: 400, minLevel: 6 },
+  scorpion: { emoji: EMOJIS.monsters.scorpion, hp: 130, damage: 24, radius: 26, name: 'Гигантский скорпион', speed: 1.6, vision: 350, minLevel: 11, poisonOnHit: true },
+};
 
 /**
  * Создание монстров на уровне
@@ -24,20 +40,17 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
 
   // ===== МАСШТАБИРОВАНИЕ СЛОЖНОСТИ =====
   let scaling = 1 + (state.gameLevel - 1) * 0.15;
+  // ===== ПОЛУЧЕНИЕ ТИПОВ МОНСТРОВ ПО БИОМУ =====
+  const monsterTypeKeys = getMonsterTypesByLevel(state.gameLevel);
 
-  // ===== ДОСТУПНЫЕ ТИПЫ МОНСТРОВ =====
-  const types = [
-    { type: 6, emoji: EMOJIS.monsters.bat, hp: 20, damage: 4, radius: 18, name: "Летучая мышь", speed: 2.5, vision: 280, minLevel: 1 },
-    { type: 2, emoji: EMOJIS.monsters.pumpkin, hp: 60, damage: 12, radius: 24, name: "Тыква", speed: 2.0, vision: 320, minLevel: 1 },
-    { type: 3, emoji: EMOJIS.monsters.skull, hp: 90, damage: 18, radius: 22, name: "Череп", speed: 2.4, vision: 350, minLevel: 3 },
-    { type: 4, emoji: EMOJIS.monsters.demon, hp: 150, damage: 26, radius: 28, name: "Демон", speed: 1.8, vision: 400, minLevel: 6 },
-    { type: 1, emoji: EMOJIS.monsters.ghost, hp: 30, damage: 6, radius: 22, name: "Призрак", speed: 1.5, vision: 260, minLevel: 8, isGhost: true },
-    { type: 5, emoji: EMOJIS.monsters.scorpion, hp: 130, damage: 22, radius: 26, name: "Гигантский скорпион", speed: 1.6, vision: 350, minLevel: 11, poisonOnHit: true }
-  ];
+  // Фильтруем только те типы, которые доступны по уровню
+  let availableTypes = monsterTypeKeys
+    .map(key => typeMap[key])
+    .filter(t => t !== undefined && state.gameLevel >= t.minLevel);
 
-  let availableTypes = types.filter(t => state.gameLevel >= t.minLevel);
+  // Если по какой-то причине нет доступных типов — fallback
   if (availableTypes.length === 0) {
-    availableTypes = [types[0]];
+    availableTypes = [typeMap['pumpkin']];
   }
 
   // ===== КОЛИЧЕСТВО МОНСТРОВ =====
@@ -163,10 +176,16 @@ export function spawnArtifacts(isTreasureRoom = false, isProtectedCell = () => f
 
   for (let i = 0; i < Math.min(artifactCount, cells.length); i++) {
     const cell = cells[i];
+    const imagePath = getRandomArtifactImage();
+    const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+    
     state.artifacts.push({
       x: cell.x * CONFIG.cellSize + CONFIG.cellSize / 2,
-      y: cell.y * CONFIG.cellSize + CONFIG.cellSize / 2
+      y: cell.y * CONFIG.cellSize + CONFIG.cellSize / 2,
+      imageKey: cacheKey,
+      imagePath: imagePath,
     });
+    
     markCellUsed(cell.x, cell.y);
   }
 }

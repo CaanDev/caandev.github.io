@@ -15,6 +15,8 @@ import { loadTemplateIfNeeded, isTemplateLoaded } from '../../../utils/htmlLoade
 
 /** @type {boolean} - Открыты ли настройки */
 let settingsOpen = false;
+/** @type {string} - Текущая активная вкладка */
+let currentTab = 'audio';
 
 /**
  * Проверка, открыты ли настройки
@@ -23,6 +25,26 @@ let settingsOpen = false;
  */
 export function isSettingsOpen() {
   return settingsOpen;
+}
+
+/**
+ * Переключение вкладки настроек
+ * 
+ * @param {string} tabId - ID вкладки ('audio', 'graphics', 'save')
+ * @returns {void}
+ */
+export function switchSettingsTab(tabId) {
+  currentTab = tabId;
+  
+  // Обновляем классы у вкладок
+  document.querySelectorAll('.settings-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.tab === tabId);
+  });
+  
+  // Обновляем классы у содержимого
+  document.querySelectorAll('.settings-tab-content').forEach(content => {
+    content.classList.toggle('active', content.id === `settings-tab-${tabId}`);
+  });
 }
 
 /**
@@ -39,6 +61,9 @@ function showSettings() {
   loadSettings();
   updateSettingsUI();
   settingsUI.style.display = 'flex';
+
+  // Устанавливаем активную вкладку по умолчанию
+  switchSettingsTab('audio');
 
   // ===== ПАУЗА ИГРЫ =====
   import('../../../core/game.js').then(({ Game }) => {
@@ -62,7 +87,8 @@ export function openSettings() {
   // ==== ЗАГРУЗКА ШАБЛОНА НАСТРОЕК (ЕСЛИ НУЖНО) =====
   if (!isTemplateLoaded('settings')) {
     loadTemplateIfNeeded('settings').then(() => {
-      // Обработчики уже инициализированы через initModalHandlers()
+      // Инициализируем обработчики ПОСЛЕ вставки в DOM
+      initSettingsHandlers();
       showSettings();
     });
     return;
@@ -125,12 +151,39 @@ function updateSettingsUI() {
   const fpsToggle = document.getElementById('settings-show-fps');
   const fpsLimitSelect = document.getElementById('settings-fps-limit');
   const vsyncToggle = document.getElementById('settings-vsync-toggle');
+  const smoothingToggle = document.getElementById('settings-smoothing-toggle');
 
   if (musicToggle) musicToggle.checked = settings.musicEnabled;
   if (soundToggle) soundToggle.checked = settings.soundEnabled;
   if (fpsToggle) fpsToggle.checked = settings.showFps;
   if (fpsLimitSelect) fpsLimitSelect.value = settings.fpsLimit;
   if (vsyncToggle) vsyncToggle.checked = settings.vsyncEnabled;
+  if (smoothingToggle) smoothingToggle.checked = settings.smoothingEnabled;
+}
+
+/**
+ * Инициализация обработчиков настроек (вкладки + кнопка закрытия)
+ * 
+ * @returns {void}
+ */
+export function initSettingsHandlers() {
+  // ===== ВКЛАДКИ =====
+  document.querySelectorAll('.settings-tab').forEach(tab => {
+    const newTab = tab.cloneNode(true);
+    tab.parentNode.replaceChild(newTab, tab);
+    newTab.addEventListener('click', () => {
+      const tabId = newTab.dataset.tab;
+      switchSettingsTab(tabId);
+    });
+  });
+
+  // ===== КНОПКА ЗАКРЫТИЯ =====
+  const closeBtn = document.getElementById('settings-close-btn');
+  if (closeBtn) {
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+    newCloseBtn.addEventListener('click', closeSettings);
+  }
 }
 
 /**
@@ -163,6 +216,18 @@ export function initSettings() {
     updateFpsVisibility();
   }
 
+  // ===== ИНИЦИАЛИЗАЦИЯ ЭЛЕМЕНТОВ УПРАВЛЕНИЯ =====
+  initSliders();
+  initToggles();
+  initSelects();
+  initButtons();
+
+  // ===== ИНИЦИАЛИЗАЦИЯ ОБРАБОТЧИКОВ ВКЛАДОК =====
+  // (если шаблон уже загружен)
+  if (document.querySelector('.settings-tab')) {
+    initSettingsHandlers();
+  }
+
   // ===== ОТСЛЕЖИВАНИЕ ИЗМЕНЕНИЯ ВИДИМОСТИ UI =====
   const observer = new MutationObserver(() => {
     updateFpsVisibility();
@@ -185,20 +250,6 @@ export function initSettings() {
   if (pauseMenu) {
     observer.observe(pauseMenu, { attributes: true, attributeFilter: ['style'] });
   }
-
-  // ===== КНОПКА ЗАКРЫТИЯ =====
-  const closeBtn = document.getElementById('settings-close-btn');
-  if (closeBtn) {
-    const newCloseBtn = closeBtn.cloneNode(true);
-    closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-    newCloseBtn.addEventListener('click', closeSettings);
-  }
-
-  // ===== ИНИЦИАЛИЗАЦИЯ ЭЛЕМЕНТОВ УПРАВЛЕНИЯ =====
-  initSliders();
-  initToggles();
-  initSelects();
-  initButtons();
 }
 
 // ===== РЕЭКСПОРТ ДЛЯ ОБРАТНОЙ СОВМЕСТИМОСТИ =====

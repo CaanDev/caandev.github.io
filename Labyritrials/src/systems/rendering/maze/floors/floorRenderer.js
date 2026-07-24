@@ -7,6 +7,7 @@
  */
 
 import { CONFIG, state, player } from '../../../../core/config/index.js';
+import { getFloorColorForBiome } from '../../../../core/config/biomes.js';
 import {
   getFloorTypeFromState,
   getFloorColors,
@@ -44,12 +45,26 @@ export function drawFloor(ctx, visibleRange) {
   const colors = getFloorColors(floorType);
   const isCheckeredFloor = isCheckered(floorType);
   const features = getFloorFeatures(floorType);
+
+  // ===== ОПРЕДЕЛЯЕМ ЦВЕТ ПОЛА В ЗАВИСИМОСТИ ОТ БИОМА =====
+  // Для тайных комнат и безопасной комнаты используем цвета из FLOOR_TYPES
+  const isSecretRoom = state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom || state.inSafeRoom;
   
+  let floorColor;
+  if (isSecretRoom) {
+    // В тайных комнатах используем цвета из FLOOR_TYPES
+    floorColor = colors[0] || '#0b0d13';
+  } else {
+    // В обычном лабиринте используем цвет из биома
+    const biomeColor = getFloorColorForBiome(state.currentBiome);
+    floorColor = biomeColor || colors[0] || '#0b0d13';
+  }
+
   // ===== РИСУЕМ ПОЛ =====
   if (isCheckeredFloor) {
     drawCheckeredFloor(ctx, minX, maxX, minY, maxY, state.grid, player, colors);
   } else {
-    drawSolidFloor(ctx, minX, maxX, minY, maxY, state.grid, player, colors[0]);
+    drawSolidFloor(ctx, minX, maxX, minY, maxY, state.grid, player, floorColor);
   }
   
   // ===== РИСУЕМ ОСОБЕННОСТИ =====

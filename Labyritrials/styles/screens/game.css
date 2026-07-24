@@ -1,0 +1,59 @@
+/**
+ * Игровой экран
+ * Специфичные стили для игрового экрана
+ */
+
+/* ============ КОНТЕЙНЕР ИГРЫ ============ */
+
+#game-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* ============ ЗАЩИТА ОТ МАСШТАБИРОВАНИЯ ============ */
+
+.game-no-zoom {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* ============ ЭКРАН ЗАГРУЗКИ УРОВНЯ ============ */
+
+#level-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg-dark);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  color: var(--color-text-light);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 24px;
+  letter-spacing: 3px;
+}
+
+#level-loading-overlay .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border-primary);
+  border-top-color: var(--color-text-gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 20px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

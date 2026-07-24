@@ -11,7 +11,10 @@ import {
   updateFreezeEffect, updateShockEffect, restoreMonsterSpeed, 
   updatePoisonEffect, updateGhostGlow, updateTrapGlowTimer
 } from './effects.js';
-import { updateMonsterState, updateChaseMovement, updatePatrolMovement, updateLostGhostBehavior, updateFleeMovement } from './ai.js';
+import { 
+  updateMonsterState, updateChaseMovement, updatePatrolMovement, 
+  updateLostGhostBehavior, updateFleeMovement, usePotionIfNearby 
+} from './ai.js';
 import { updateBossLogic, updateBossAttack, updateBossState, updateBossMovement } from './bosses/index.js';
 import { handleMonsterTrapInteraction, updateMonsterDodgeAnimations } from './trapInteraction.js';
 import { handleMonsterDamageToPlayer } from './combat.js';
@@ -19,14 +22,6 @@ import { checkAdaptations } from './adaptations/index.js';
 
 /**
  * Основная функция обновления всех монстров
- * 
- * Выполняется каждый кадр в следующем порядке:
- * 1. Обновляет анимации уворота монстров
- * 2. Обновляет все огненные шары
- * 3. Для каждого монстра применяет эффекты (шок, отравление, заморозка)
- * 4. Обновляет ИИ и движение (обычные монстры или боссы)
- * 5. Проверяет нанесение урона игроку
- * 6. Проверяет адаптации монстров
  * 
  * @returns {void}
  */
@@ -46,7 +41,6 @@ export function updateMonsters() {
 
     // Босс ещё не готов к бою (анимация появления)
     if ((m.isBoss || m.isDuoBoss) && !state.bossReady) continue;
-    
     // Монстр в анимации уворота — движение пропускаем
     if (m.dodgeAnimation && m.dodgeAnimation.active) continue;
 
@@ -68,10 +62,8 @@ export function updateMonsters() {
     
     // Заморозка (ледяная ловушка)
     updateFreezeEffect(m);
-    
     // Восстановление скорости (после шока)
     restoreMonsterSpeed(m);
-    
     // Обновление свечения призрака
     updateGhostGlow(m);
 
@@ -93,6 +85,9 @@ export function updateMonsters() {
       updateMonsterState(m, distToPlayer);
 
       if (m.state === 'chase') {
+        // Использование зелья
+        const usedPotion = usePotionIfNearby(m);
+
         // Преследование
         if (m.stunTimer <= 0 && !m.isFrozen) updateChaseMovement(m);
         if (handleMonsterTrapInteraction(m, i)) continue;

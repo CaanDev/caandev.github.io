@@ -5,6 +5,7 @@
  */
 
 import { state, CONFIG } from '../../core/config/index.js';
+import { BIOMES } from '../../core/config/biomes.js';
 import { setSeed } from '../../world/mazeGenerator.js';
 
 /**
@@ -21,6 +22,9 @@ export function restoreBasicData(save) {
   state.bossMinionDropCounter = save.bossMinionDropCounter || 0;
   state.treasureRoomLastLevel = save.treasureRoomLastLevel || 0;
   state.shrineRoomLastLevel = save.shrineRoomLastLevel || 0;
+
+  const savedBiome = save.currentBiome || 'cave';
+  state.currentBiome = BIOMES[savedBiome] ? savedBiome : 'cave';
   
   if (save.seed !== undefined) {
     setSeed(save.seed, save.randomCounter || 0);

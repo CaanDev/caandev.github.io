@@ -13,4 +13,4 @@
  * Экспорт функций управления магазином
  * @see module:systems/ui/shop/shopUI
  */
-export { initShopHandlers, updateShopUIForExternal } from './shopUI.js';
+export { initShopHandlers, updateShopUIForExternal, updateAllShopIcons } from './shopUI.js';

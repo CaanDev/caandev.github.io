@@ -8,6 +8,7 @@
 
 import { Input } from './systems/input/index.js';
 import { Game } from './core/game.js';
+import { getBiomeByLevel, getBiomeConfig } from './core/config/biomes.js';
 import { audio } from './audio/audioManager.js';
 import { initPauseMenu } from './game/pauseMenu.js';
 import { initAchievements, initAchievementsUI, openAchievementsWindow } from './systems/achievements/index.js';
@@ -18,7 +19,15 @@ import { player, state } from './core/config/index.js';
 import { loadEssentialTemplates } from './utils/htmlLoader.js';
 import { showLoader, updateLoader, hideLoader } from './utils/gameLoader.js';
 import { clearAllCaches } from './utils/cache.js';
+import { logger } from './utils/logger.js';
 import { openSettings, initSettings, getSettings } from './systems/ui/settings/index.js';
+// Импорты для изображений
+import { registerImages, loadAllImages } from './utils/imageLoader.js';
+import { SHOP_IMAGES } from './images/shopImages.js';
+import { ITEM_IMAGES } from './images/itemImages.js';
+import { OBJECT_IMAGES } from './images/objectImages.js';
+import { getAllWallImagesForRegistration } from './images/wallImages.js';
+import { UI_IMAGES } from './images/uiImages.js';
 
 /** @type {boolean} - Флаг: находится ли игрок в секции сохранения */
 let isInSaveSection = false;
@@ -62,7 +71,7 @@ async function updateSaveInfo() {
       if (loadSaveBtn) loadSaveBtn.style.display = 'none';
     }
   } catch (err) {
-    console.error('Ошибка при проверке сохранения:', err);
+    logger.error('Ошибка при проверке сохранения:', err);
     saveInfo.innerHTML = '❌ Ошибка при проверке сохранения';
     saveInfo.style.display = 'block';
   }
@@ -102,10 +111,6 @@ async function startNewGame() {
     const { deleteSave } = await import('./save/saveSystem.js');
     deleteSave();
     
-    await import('./save/saveStorage.js').then(({ deleteSave: forceDelete }) => {
-      forceDelete();
-    });
-    
     updateLoader('Генерация лабиринта...', '🗺️', 'Создание подземелий...', 50);
     
     // Полный сброс и генерация нового мира
@@ -130,7 +135,7 @@ async function startNewGame() {
     Game.startLoop();
     
   } catch (err) {
-    console.error('Ошибка при создании новой игры:', err);
+    logger.error('Ошибка при создании новой игры:', err);
     hideLoader(0);
     alert('❌ Ошибка при создании новой игры!');
   }
@@ -239,7 +244,7 @@ async function transitionToGame() {
  */
 function setupLoadSaveHandler(loadSaveBtn) {
   if (!loadSaveBtn || !loadSaveBtn.parentNode) {
-    console.warn('setupLoadSaveHandler: кнопка загрузки не найдена');
+    logger.warn('setupLoadSaveHandler: кнопка загрузки не найдена');
     return;
   }
   
@@ -281,7 +286,7 @@ function setupLoadSaveHandler(loadSaveBtn) {
         updateSaveInfo();
       }
     } catch (err) {
-      console.error('Ошибка при загрузке:', err);
+      logger.error('Ошибка при загрузке:', err);
       hideLoader(0);
       alert('❌ Ошибка при загрузке сохранения!');
     }
@@ -443,12 +448,27 @@ async function init() {
   }
   
   if (!canvas) {
-    console.error('❌ Canvas не найден после загрузки шаблонов');
+    logger.error('❌ Canvas не найден после загрузки шаблонов');
     hideLoader(0);
     return;
   }
   
   const ctx = canvas.getContext('2d');
+
+  updateLoader('Загрузка изображений...', '🖼️', 'Подготовка спрайтов...', 45);
+  // Регистрируем изображения
+  registerImages(SHOP_IMAGES);
+  registerImages(ITEM_IMAGES);
+  registerImages(OBJECT_IMAGES);
+  registerImages(getAllWallImagesForRegistration());
+  registerImages(UI_IMAGES);
+
+  // Загружаем с прогрессом
+  await loadAllImages((progress) => {
+    // Прогресс от 45% до 65%
+    const mappedProgress = 45 + (progress * 0.2);
+    updateLoader(null, null, null, Math.min(65, mappedProgress));
+  });
 
   // Очистка кэшей
   clearAllCaches();
@@ -483,6 +503,11 @@ async function init() {
   updateLoader('Создание мира...', '🗺️', 'Генерация лабиринта...', 60);
   
   await new Promise(resolve => setTimeout(resolve, 300));
+
+  // Определение биома
+  state.currentBiome = getBiomeByLevel(state.gameLevel);
+  const biomeConfig = getBiomeConfig(state.currentBiome);
+  logger.game(`🌍 БИОМ: ${biomeConfig.name} (${state.currentBiome}) | Уровень ${state.gameLevel}`);
 
   // Инициализация всех систем
   Input.init();

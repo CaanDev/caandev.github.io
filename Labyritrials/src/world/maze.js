@@ -7,7 +7,9 @@
  */
 
 import { CONFIG, state, player } from '../core/config/index.js';
+import { getBiomeByLevel, getBiomeConfig } from '../core/config/biomes.js';
 import { Cell } from './cells/cell.js';
+import { logger } from '../utils/logger.js';
 import { generateMazeOnly, addBreakableWalls, generateRandomSeed, setSeed, getSeed, seededRandom } from './mazeGenerator.js';
 import { spawnMonsters, spawnArtifacts } from '../entities/objects/spawners/monsterSpawner.js';
 import { resetMonsterKillCounter, resetLevelStats, getTransitionStats, setTransitionStatsBonusGold } from '../game/levelTransition.js';
@@ -69,6 +71,14 @@ export function clearProtectedCells() {
 export function generateMaze(isNewGame = true) {
   clearAllCaches();
 
+  // ===== ПРОВЕРКА И УСТАНОВКА БИОМА =====
+  if (!state.currentBiome || state.currentBiome === 'cave' && state.gameLevel > 1) {
+    const biomeId = getBiomeByLevel(state.gameLevel);
+    state.currentBiome = biomeId;
+    const biomeConfig = getBiomeConfig(biomeId);
+    logger.game(`🌍 БИОМ (защита): ${biomeConfig.name} (${biomeId}) | Уровень ${state.gameLevel}`);
+  }
+
   // ===== ИНИЦИАЛИЗАЦИЯ SEED =====
   if (isNewGame || !getSeed()) {
     const newSeed = generateRandomSeed();
@@ -110,7 +120,7 @@ export function generateMaze(isNewGame = true) {
                           state.gameLevel <= 5;
 
   if (isShopAvailable) {
-    CONFIG.shopPos = { x: 1, y: 2 };
+    CONFIG.shopPos = { x: 1, y: 1 };
   } else {
     CONFIG.shopPos = { x: -100, y: -100 };
   }
@@ -193,6 +203,21 @@ export function generateMaze(isNewGame = true) {
   // ===== ПОРТАЛ В БЕЗОПАСНУЮ КОМНАТУ =====
   if (!isBossLevel && !state.inTreasureRoom && !state.inShrineRoom && !state.inTrapRoom) {
     generateSafePortal();
+  }
+
+  // ===== ПОЗИЦИЯ ИГРОКА =====
+  // На уровнях 2-4 игрок появляется на (2, 1), чтобы не стоять на лавке
+  // На остальных уровнях — на (1, 1)
+  if (state.gameLevel >= 2 && state.gameLevel <= 4 && !isInSecretRoom && !isBossLevel) {
+    player.x = 2;
+    player.y = 1;
+    player.px = 2 * CONFIG.cellSize + CONFIG.cellSize / 2;
+    player.py = 1 * CONFIG.cellSize + CONFIG.cellSize / 2;
+  } else {
+    player.x = 1;
+    player.y = 1;
+    player.px = CONFIG.cellSize + CONFIG.cellSize / 2;
+    player.py = CONFIG.cellSize + CONFIG.cellSize / 2;
   }
 }
 

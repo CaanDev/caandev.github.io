@@ -21,7 +21,9 @@ export {
   updateFpsDisplay,
   shouldSkipFrame,
   getFrameInterval,
-  updateFpsLimit
+  updateFpsLimit,
+  switchSettingsTab,
+  initSettingsHandlers
 } from './settingsUI.js';
 
 // ============================================================

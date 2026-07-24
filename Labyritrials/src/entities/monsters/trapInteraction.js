@@ -14,9 +14,6 @@ import { handleMonsterDeath } from './death.js';
 /**
  * Обработка уворота монстра от ловушки с анимацией смещения
  * 
- * Пытается найти безопасное направление для уворота,
- * проверяя несколько вариантов и постепенно уменьшая дистанцию.
- * 
  * @param {Object} m - Объект монстра
  * @param {Object} t - Объект ловушки
  * @returns {boolean} - true, если монстру удалось увернуться
@@ -177,9 +174,6 @@ export function updateMonsterDodgeAnimations() {
 /**
  * Обработка взаимодействия монстра с ловушкой
  * 
- * Проверяет, находится ли монстр на ловушке, обрабатывает уворот
- * или применяет эффект ловушки.
- * 
  * @param {Object} m - Объект монстра
  * @param {number} i - Индекс монстра в массиве
  * @returns {boolean} - true, если монстр умер
@@ -205,7 +199,10 @@ export function handleMonsterTrapInteraction(m, i) {
   }
 
   for (let t of state.traps) {
-    if (t.triggered || t.resetTimer > 0) continue;
+    // Проверяем состояние ловушки
+    if (t.triggered || t.resetTimer > 0) {
+      continue;
+    }
 
     // Проверка, находится ли монстр на ловушке
     if (Math.hypot(m.x - t.x, m.y - t.y) < m.radius + 12) {
@@ -221,6 +218,9 @@ export function handleMonsterTrapInteraction(m, i) {
         const dodged = performMonsterDodge(m, t);
 
         if (dodged) {
+          // Монстр увернулся — ловушка НЕ считается сработавшей
+          t.hasDealtDamage = false;
+          
           audio.playSound('dodge', 0.4);
           
           state.damageTexts.push({ 
@@ -250,12 +250,16 @@ export function handleMonsterTrapInteraction(m, i) {
           }
         } else {
           // Не удалось увернуться — применяем эффект
+          // Ловушка считается сработавшей
+          t.hasDealtDamage = true;
           return applyTrapEffect(m, i, t);
         }
         return false;
       }
 
       // Монстр не пытается увернуться — применяем эффект
+      // Ловушка считается сработавшей
+      t.hasDealtDamage = true;
       const died = applyTrapEffect(m, i, t);
       if (died) return true;
       break;

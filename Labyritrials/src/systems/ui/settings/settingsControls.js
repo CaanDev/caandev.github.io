@@ -45,7 +45,8 @@ export function initToggles() {
     { id: 'settings-music-toggle', key: 'musicEnabled' },
     { id: 'settings-sound-toggle', key: 'soundEnabled' },
     { id: 'settings-show-fps', key: 'showFps' },
-    { id: 'settings-vsync-toggle', key: 'vsyncEnabled' }
+    { id: 'settings-vsync-toggle', key: 'vsyncEnabled' },
+    { id: 'settings-smoothing-toggle', key: 'smoothingEnabled' },
   ];
 
   toggles.forEach(({ id, key }) => {

@@ -6,6 +6,7 @@
  */
 
 import { state, player } from '../../core/config/index.js';
+import { getEventTypesByLevel } from '../../core/config/biomes.js';
 import { EVENTS } from './config.js';
 
 /**
@@ -19,24 +20,28 @@ import { EVENTS } from './config.js';
 export function generateRandomEvent() {
   // События не генерируются в тайных комнатах
   if (state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom || state.inSafeRoom) return;
-  
   // События не генерируются на босс-уровнях
   if (state.isBossLevel) return;
-  
   // События доступны с 3 уровня
   if (state.gameLevel < 3) return;
-  
   // Если событие уже активно — не генерируем новое
   if (state.currentEvent) return;
   
   // Шанс появления события — 25%
   const eventChance = 0.25;
   if (Math.random() > eventChance) return;
+
+  // Получение доступных событий по биому
+  const availableEventTypes = getEventTypesByLevel(state.gameLevel);
+  // Если нет доступных событий — выходим
+  if (availableEventTypes.length === 0) return;
   
-  // Выбор случайного события
-  const eventKeys = Object.keys(EVENTS);
-  const randomEventKey = eventKeys[Math.floor(Math.random() * eventKeys.length)];
+  // Выбор случайного события из доступных
+  const randomEventKey = availableEventTypes[Math.floor(Math.random() * availableEventTypes.length)];
   const event = EVENTS[randomEventKey];
+
+  // Если событие не найдено — выходим
+  if (!event) return;
   
   // Устанавливаем событие
   state.currentEvent = randomEventKey;

@@ -9,7 +9,9 @@
 import { CONFIG, state, player } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
 import { EMOJIS } from '../../emojis.js';
+import { logger } from '../../utils/logger.js';
 import { audio } from '../../audio/audioManager.js';
+import { ITEM_IMAGES, getRandomPotionImage } from '../../images/itemImages.js';
 import { addProtectedCell, clearProtectedCells } from '../maze.js';
 import { clearPlayerTrails } from '../../entities/objects/playerTrails.js';
 import { clearAllRoomParticles } from '../../entities/objects/index.js';
@@ -303,12 +305,18 @@ function createSafeRoomChest() {
   const chestX = 7;
   const chestY = 7;
 
+  // Выбираем случайное изображение для зелья
+  const imagePath = getRandomPotionImage();
+  const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+
   state.chests.push({
     x: chestX * CONFIG.cellSize + CONFIG.cellSize / 2,
     y: chestY * CONFIG.cellSize + CONFIG.cellSize / 2,
     type: 'potion_chest',
     opened: false,
-    countedForAchievement: false
+    countedForAchievement: false,
+    potionImageKey: cacheKey,
+    potionImagePath: imagePath,
   });
 }
 
@@ -371,7 +379,7 @@ export function returnFromSafeRoom() {
   clearAllRoomParticles();
 
   if (!state.originalGrid) {
-    console.error('❌ [SAFE] originalGrid не существует!');
+    logger.error('❌ [SAFE] originalGrid не существует!');
     state.inSafeRoom = false;
     return;
   }

@@ -8,10 +8,17 @@
 
 import { CONFIG, state, player } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
+import { logger } from '../../utils/logger.js';
 import { addProtectedCell, clearProtectedCells } from '../maze.js';
 import { clearPlayerTrails } from '../../entities/objects/playerTrails.js';
 import { clearAllRoomParticles } from '../../entities/objects/index.js';
 import { clearFireflies, generatedPortals } from '../../entities/objects/firefly.js';
+import { 
+  ITEM_IMAGES, 
+  getRandomGoldImage, 
+  getRandomArtifactImage, 
+  getRandomPotionImage 
+} from '../../images/itemImages.js';
 
 /**
  * Генерация портала в комнату с алтарём
@@ -348,7 +355,7 @@ export function returnFromShrineRoom() {
   clearAllRoomParticles();
   
   if (!state.originalGrid) {
-    console.error('❌ [SHRINE] originalGrid не существует!');
+    logger.error('❌ [SHRINE] originalGrid не существует!');
     state.inShrineRoom = false;
     return;
   }
@@ -411,13 +418,48 @@ export function returnFromShrineRoom() {
   // ===== ВОССТАНОВЛЕНИЕ СУНДУКОВ =====
   if (state.originalChests && state.originalChests.length > 0) {
     if (state.originalChests[0].gridX !== undefined) {
-      state.chests = state.originalChests.map(c => ({
-        x: c.x !== undefined ? c.x : c.gridX * CONFIG.cellSize + CONFIG.cellSize / 2,
-        y: c.y !== undefined ? c.y : c.gridY * CONFIG.cellSize + CONFIG.cellSize / 2,
-        type: c.type,
-        opened: c.opened,
-        countedForAchievement: c.countedForAchievement || false
-      }));
+      state.chests = state.originalChests.map(c => {
+        const chest = {
+          x: c.x !== undefined ? c.x : c.gridX * CONFIG.cellSize + CONFIG.cellSize / 2,
+          y: c.y !== undefined ? c.y : c.gridY * CONFIG.cellSize + CONFIG.cellSize / 2,
+          type: c.type,
+          opened: c.opened,
+          countedForAchievement: c.countedForAchievement || false
+        };
+        
+        // Восстанавливаем ключи картинок
+        if (c.type === 'gold' && c.goldImageKey) {
+          chest.goldImageKey = c.goldImageKey;
+          chest.goldImagePath = c.goldImagePath;
+        } else if (c.type === 'gold' && !c.goldImageKey) {
+          const imagePath = getRandomGoldImage();
+          const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+          chest.goldImageKey = cacheKey;
+          chest.goldImagePath = imagePath;
+        }
+        
+        if (c.type === 'artifact' && c.artifactImageKey) {
+          chest.artifactImageKey = c.artifactImageKey;
+          chest.artifactImagePath = c.artifactImagePath;
+        } else if (c.type === 'artifact' && !c.artifactImageKey) {
+          const imagePath = getRandomArtifactImage();
+          const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+          chest.artifactImageKey = cacheKey;
+          chest.artifactImagePath = imagePath;
+        }
+        
+        if (c.type === 'potion_chest' && c.potionImageKey) {
+          chest.potionImageKey = c.potionImageKey;
+          chest.potionImagePath = c.potionImagePath;
+        } else if (c.type === 'potion_chest' && !c.potionImageKey) {
+          const imagePath = getRandomPotionImage();
+          const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+          chest.potionImageKey = cacheKey;
+          chest.potionImagePath = imagePath;
+        }
+        
+        return chest;
+      });
     } else {
       state.chests = state.originalChests;
     }

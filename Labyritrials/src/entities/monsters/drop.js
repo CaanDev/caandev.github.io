@@ -8,7 +8,9 @@
 
 import { state, player } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
+import { logger } from '../../utils/logger.js';
 import { getEventGoldMultiplier } from '../../systems/events/index.js';
+import { ITEM_IMAGES, getRandomPotionImage, getRandomGoldImage } from '../../images/itemImages.js';
 
 /**
  * Обработка выпадения предметов с монстра
@@ -23,13 +25,13 @@ import { getEventGoldMultiplier } from '../../systems/events/index.js';
 export function handleMonsterDrop(m) {
   // Монстры в комнате-ловушке не дропают предметы
   if (m.isTrapMonster) {
-    console.log(`🚫 Монстр-ловушка (${m.emoji}) не даёт предметов (isTrapMonster)`);
+    logger.debug(`🚫 Монстр-ловушка (${m.emoji}) не даёт предметов (isTrapMonster)`);
     return false;
   }
 
   // Проверка по ID для монстров в комнате-ловушке
   if (state.trapMonsterIds && state.trapMonsterIds.has(m.id)) {
-    console.log(`🚫 Монстр-ловушка (${m.emoji}) не даёт предметов (по ID)`);
+    logger.debug(`🚫 Монстр-ловушка (${m.emoji}) не даёт предметов (по ID)`);
     return false;
   }
 
@@ -47,26 +49,42 @@ export function handleMonsterDrop(m) {
     let amount;
 
     if (itemType === 'gold') {
-      // Расчёт золота с учётом типа монстра и уровня
       amount = m.isMinion
         ? Math.floor((Math.random() * 8) + 3 + state.gameLevel)
         : Math.floor((Math.random() * 12) + 6 + state.gameLevel);
-      // Применяем модификатор золота (события, алтари)
       amount = Math.floor(amount * player.goldMultiplier);
+      
+      const imagePath = getRandomGoldImage();
+      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+      
+      state.lootItems.push({
+        x: m.x,
+        y: m.y,
+        type: 'gold',
+        value: getEventGoldMultiplier(amount),
+        imageKey: cacheKey,
+        imagePath: imagePath,
+      });
     } else {
       // Зелье: количество зависит от уровня
       amount = m.isMinion
         ? Math.floor(10 + state.gameLevel)
         : Math.floor(20 + state.gameLevel * 2);
+      
+      // Выбираем случайное изображение для зелья
+      const imagePath = getRandomPotionImage();
+      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+      
+      // Добавляем зелье на пол
+      state.lootItems.push({
+        x: m.x,
+        y: m.y,
+        type: 'potion',
+        value: amount,
+        imageKey: cacheKey,
+        imagePath: imagePath,
+      });
     }
-
-    // Добавляем предмет на пол
-    state.lootItems.push({
-      x: m.x,
-      y: m.y,
-      type: itemType,
-      value: getEventGoldMultiplier(amount)
-    });
     return true;
   }
   return false;

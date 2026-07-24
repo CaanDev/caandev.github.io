@@ -7,6 +7,7 @@
 
 import { CONFIG } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
+import { logger } from '../../utils/logger.js';
 
 /**
  * Универсальный пул объектов
@@ -60,7 +61,7 @@ export class ObjectPool {
     } else {
       obj = this.createFn();
       this.resetFn(obj, data);
-      console.warn('⚠️ Пул пуст, создан новый объект');
+      logger.warn('⚠️ Пул пуст, создан новый объект');
     }
     
     obj.active = true;

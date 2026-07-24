@@ -5,11 +5,12 @@
 
 import { CONFIG, state, player } from './config/index.js';
 import { COLORS } from './config/colors.js';
+import { getSettings } from '../systems/ui/settings/index.js';
 import { drawFloor, drawWalls } from '../systems/rendering/mazeRenderer.js';
 import { drawBackground, drawBossSummonCircle, drawBossLightFade } from '../systems/rendering/maze/index.js';
 import { drawBloodPuddles } from '../systems/rendering/bloodRenderer.js';
 import { drawTorches, updateTorchParticles } from '../systems/rendering/torchRenderer.js';
-import { drawShopAndPortal } from '../systems/rendering/portalRenderer.js';
+import { drawAllPortals, drawShop } from '../systems/rendering/index.js';
 import { drawTraps } from '../systems/rendering/trapRenderer.js';
 import { drawShrines } from '../systems/rendering/shrineRenderer.js';
 import { drawLoot, drawChests, drawFlies } from '../systems/rendering/chestRenderer.js';
@@ -26,6 +27,7 @@ import { drawRealityShift } from '../systems/rendering/realityShiftRenderer.js';
 import { getVisibleCellRange } from '../systems/rendering/visibilityUtils.js';
 import { drawPlayerTrails } from '../entities/objects/playerTrails.js';
 import { drawExplosion } from '../entities/objects/explosion.js';
+import { drawPillars } from '../systems/rendering/maze/pillars.js';
 
 /** @type {number} - Кэшированная ширина холста для оптимизации */
 let cachedWidth = 0;
@@ -101,6 +103,11 @@ export const Renderer = {
       return;
     }
 
+    // Применение настройки сглаживания
+    const settings = getSettings();
+    ctx.imageSmoothingEnabled = settings.smoothingEnabled !== false;
+    ctx.imageSmoothingQuality = 'high';
+
     // Обновляем кэш размеров холста
     if (cachedWidth !== canvas.width || cachedHeight !== canvas.height) {
       cachedWidth = canvas.width;
@@ -161,6 +168,7 @@ export const Renderer = {
     drawFloor(ctx, this._visibleRange);
     drawPlayerTrails(ctx);
     drawBloodPuddles(ctx);
+    drawPillars(ctx, this._visibleRange);
 
     // Круг призыва босса
     if (state.isBossLevel && 
@@ -172,10 +180,11 @@ export const Renderer = {
     // Стены и объекты лабиринта
     drawWalls(ctx, this._visibleRange);
     
-    // Факелы, порталы, ловушки, алтари
+    // Лавка торговца, факелы, порталы, ловушки, алтари
     drawTorches(ctx, camX, camY, canvas);
     updateTorchParticles(ctx, camX, camY);
-    drawShopAndPortal(ctx);
+    drawShop(ctx);
+    drawAllPortals(ctx);
     
     drawTraps(ctx);
     drawShrines(ctx);

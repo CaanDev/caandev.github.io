@@ -117,7 +117,7 @@ export const EMOJIS = {
    */
   traps: {
     /** @type {string} - Взрывная ловушка */
-    spike: '💥',
+    explosion: '💥',
     /** @type {string} - Ледяная ловушка */
     ice: '❄️',
     /** @type {string} - Кислотная ловушка */

@@ -7,6 +7,7 @@
 
 import { CONFIG, state, player } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
+import { logger } from '../../utils/logger.js';
 import { audio } from '../../audio/audioManager.js';
 import { checkWallCollision } from '../../world/physics.js';
 import { updateProgress } from '../../systems/achievements/index.js';
@@ -68,7 +69,7 @@ export function updateMovement() {
   
   // Коррекция некорректной скорости
   if (player.speed > 10 || player.speed < 1 || isNaN(player.speed)) {
-    console.warn('⚠️ Исправлена некорректная скорость:', player.speed);
+    logger.warn('⚠️ Исправлена некорректная скорость:', player.speed);
     player.baseSpeed = player.baseSpeed || 5;
     player.speed = player.baseSpeed;
   }

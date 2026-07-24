@@ -404,27 +404,23 @@ function applyWeaponEffects(m, damage, isStrong) {
   
   // ===== ПОСОХ ВАМПИРА (лечение) =====
   if (player.meleeWeapon === 'vampire') {
-    // Рассчитываем процент лечения
     let healPercent;
     
     if (isStrong) {
-      // Усиленный удар: 3% + бонус от артефактов
       healPercent = player.vampireStrongPercent + (player.artifactsCollected * player.vampireArtifactBonus);
     } else {
-      // Обычный удар: 1% + бонус от артефактов
       healPercent = player.vampireBasePercent + (player.artifactsCollected * player.vampireArtifactBonus);
     }
     
-    // Применяем множитель от алтаря вампира
     healPercent = healPercent * player.vampireHealMultiplier;
     
-    // Рассчитываем количество восстанавливаемого HP
     let healAmount = Math.floor((player.maxHp * healPercent) / 100);
-    
-    // Минимальное лечение — 1 HP (если процент даёт 0)
     if (healAmount < 1 && healPercent > 0) healAmount = 1;
     
-    // Применяем лечение (не больше максимального HP)
+    // Защита от NaN
+    if (isNaN(healAmount) || healAmount < 0) healAmount = 0;
+    if (isNaN(player.hp)) player.hp = player.maxHp || 100;
+    
     const oldHp = player.hp;
     player.hp = Math.min(player.maxHp, player.hp + healAmount);
     const actualHeal = player.hp - oldHp;

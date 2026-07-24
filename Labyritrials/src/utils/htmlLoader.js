@@ -5,8 +5,10 @@
  * @module utils/htmlLoader
  */
 
+import { logger } from './logger.js';
+
 /** @type {string} - Путь к папке с HTML-шаблонами */
-const HTML_PATH = 'html/';
+const HTML_PATH = 'views/';
 
 /** @type {Set<string>} - Имена загруженных шаблонов */
 const loadedTemplates = new Set();
@@ -21,15 +23,41 @@ const loadingTemplates = new Set();
 const initializedTemplates = new Map();
 
 /**
+ * Маппинг имени шаблона к пути с подпапкой
+ * @type {Object<string, string>}
+ */
+const TEMPLATE_MAP = {
+  // screens/
+  'intro': 'screens/intro',
+  'menu': 'screens/menu',
+  
+  // components/
+  'ui': 'components/ui',
+  'notification': 'components/notification',
+  'noteWindow': 'components/noteWindow',
+  
+  // windows/
+  'achievements': 'windows/achievements',
+  'settings': 'windows/settings',
+  'shop': 'windows/shop',
+  'bookshelf': 'windows/bookshelf',
+  'pause': 'windows/pause',
+  'gameOver': 'windows/gameOver',
+  'levelUp': 'windows/levelUp',
+  'final': 'windows/final'
+};
+
+/**
  * Критические шаблоны, которые загружаются сразу при старте
  * @type {string[]}
  */
 const ESSENTIAL_TEMPLATES = [
-  'intro',      // Заставка с историей
-  'menu',       // Главное меню
-  'ui',         // Игровой интерфейс
-  'gameOver',   // Экран смерти (нужен мгновенно)
-  'notification' // Уведомления о достижениях (нужны всегда)
+  'screens/intro',      // Заставка с историей
+  'screens/menu',       // Главное меню
+  'components/ui',      // Игровой интерфейс
+  'windows/gameOver',   // Экран смерти (нужен мгновенно)
+  'components/notification', // Уведомления о достижениях (нужны всегда)
+  'windows/shop',
 ];
 
 /**
@@ -40,13 +68,16 @@ const ESSENTIAL_TEMPLATES = [
  */
 async function loadTemplate(name) {
   try {
-    const response = await fetch(`${HTML_PATH}${name}.html`);
+    // Используем маппинг для определения пути
+    const mappedName = TEMPLATE_MAP[name] || name;
+    const response = await fetch(`${HTML_PATH}${mappedName}.html`);
+    
     if (!response.ok) {
       throw new Error(`Не удалось загрузить шаблон: ${name} (${response.status})`);
     }
     return await response.text();
   } catch (error) {
-    console.error(`❌ Ошибка загрузки шаблона ${name}:`, error);
+    logger.error(`❌ Ошибка загрузки шаблона ${name}:`, error);
     return '';
   }
 }
@@ -123,7 +154,9 @@ export async function initTemplateHandlers(name) {
       
     case 'shop':
       const { initShopHandlers } = await import('../systems/ui/shop/index.js');
-      initShopHandlers();
+      if (typeof initShopHandlers === 'function') {
+        initShopHandlers();
+      }
       success = true;
       break;
       
@@ -153,12 +186,13 @@ export async function initTemplateHandlers(name) {
     case 'menu':
     case 'ui':
     case 'gameOver':
+    case 'notification':
       // Эти шаблоны не требуют инициализации обработчиков
       success = true;
       break;
       
     default:
-      console.warn(`⚠️ Нет обработчиков для шаблона: ${name}`);
+      logger.warn(`⚠️ Нет обработчиков для шаблона: ${name}`);
       success = false;
   }
   
@@ -213,7 +247,9 @@ export async function loadEssentialTemplates() {
   
   // Инициализируем обработчики для критических шаблонов
   for (const name of ESSENTIAL_TEMPLATES) {
-    await initTemplateHandlers(name);
+    // Извлекаем имя без пути для инициализации
+    const shortName = name.includes('/') ? name.split('/').pop() : name;
+    await initTemplateHandlers(shortName);
   }
   
   return {
@@ -266,11 +302,13 @@ export async function loadTemplateIfNeeded(name) {
     }
     
     // ===== ВАЖНО: Инициализируем обработчики ПОСЛЕ вставки в DOM =====
-    await initTemplateHandlers(name);
+    // Извлекаем имя без пути для инициализации
+    const shortName = name.includes('/') ? name.split('/').pop() : name;
+    await initTemplateHandlers(shortName);
     
     return html;
   } else {
-    console.warn(`⚠️ Не удалось загрузить шаблон: ${name}.html`);
+    logger.warn(`⚠️ Не удалось загрузить шаблон: ${name}.html`);
     return null;
   }
 }

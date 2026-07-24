@@ -7,6 +7,7 @@
 
 import { CONFIG, state } from '../../../core/config/index.js';
 import { COLORS } from '../../../core/config/colors.js';
+import { logger } from '../../../utils/logger.js';
 import { addProtectedCell } from '../../maze.js';
 import { setTorchesColor, showTrapExitNotification } from './trapRoomUtils.js';
 
@@ -237,6 +238,6 @@ export function showRealExitPortal() {
     addProtectedCell(exitX, exitY);
     showTrapExitNotification();
   } else {
-    console.warn('⚠️ Не найдено место для портала выхода!');
+    logger.warn('⚠️ Не найдено место для портала выхода!');
   }
 }

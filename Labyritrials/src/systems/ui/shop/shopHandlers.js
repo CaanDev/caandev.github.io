@@ -41,7 +41,6 @@ export function initBuyHpHandler(updateShopUICallback) {
         audio.playSound('shopBuyItem', 0.6);
         updateShopUICallback();
         Game.updateUI();
-        import('../../../save/saveSystem.js').then(module => module.saveGame());
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.hp));
       } else {
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));
@@ -76,7 +75,6 @@ export function initBuyDamageHandler(updateShopUICallback) {
         audio.playSound('shopBuyItem', 0.6);
         updateShopUICallback();
         Game.updateUI();
-        import('../../../save/saveSystem.js').then(module => module.saveGame());
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.damage));
       } else {
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));
@@ -108,7 +106,6 @@ export function initBuyMapHandler(updateShopUICallback) {
         audio.playSound('shopBuyItem', 0.6);
         updateShopUICallback();
         Game.updateUI();
-        import('../../../save/saveSystem.js').then(module => module.saveGame());
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.map));
       } else if (player.hasMap) {
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyOwned));
@@ -165,7 +162,6 @@ export function initBuyVampireStaffHandler(updateShopUICallback) {
         audio.playSound('shopBuyItem', 0.6);
         updateShopUICallback();
         Game.updateUI();
-        import('../../../save/saveSystem.js').then(module => module.saveGame());
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.vampireStaff));
       } else {
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));
@@ -216,7 +212,6 @@ export function initBuyStunStaffHandler(updateShopUICallback) {
         audio.playSound('shopBuyItem', 0.6);
         updateShopUICallback();
         Game.updateUI();
-        import('../../../save/saveSystem.js').then(module => module.saveGame());
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.stunStaff));
       } else {
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));
@@ -243,7 +238,6 @@ export function initBuyDefaultStaffHandler(updateShopUICallback) {
       player.meleeWeapon = 'default';
       updateShopUICallback();
       Game.updateUI();
-      import('../../../save/saveSystem.js').then(module => module.saveGame());
       updateShopkeeperSpeech(getRandomSpeech(SPEECH.defaultStaff));
     });
   }
@@ -291,7 +285,6 @@ export function initBuyFireballHandler(updateShopUICallback) {
         audio.playSound('shopBuyItem', 0.6);
         updateShopUICallback();
         Game.updateUI();
-        import('../../../save/saveSystem.js').then(module => module.saveGame());
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.fireball));
       } else {
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));

@@ -16,6 +16,7 @@ export function collectBasicData() {
     version: '1.3',
     gameLevel: state.gameLevel,
     isBossLevel: state.isBossLevel,
+    currentBiome: state.currentBiome || 'cave',
     saveDate: Date.now(),
     seed: state.seed,
     randomCounter: state.randomCounter,

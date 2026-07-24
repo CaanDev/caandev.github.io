@@ -7,6 +7,8 @@
  */
 
 import { CONFIG, state, player } from '../../../../core/config/index.js';
+import { getWallImage, WALL_IMAGES } from '../../../../images/wallImages.js';
+import { getImage, isImageLoaded } from '../../../../utils/imageLoader.js';
 import {
   getWallTypeFromState,
   getWallColor,
@@ -27,6 +29,41 @@ import {
 
 /** @type {string|null} - Предыдущий тип стены для очистки кэша */
 let previousWallType = null;
+
+/**
+ * Получение ключа изображения для стены
+ * 
+ * @param {string} biomeId - ID биома
+ * @param {boolean} isCracked - Разрушаемая ли стена
+ * @param {number} seed - Seed для детерминированного выбора
+ * @returns {string|null} - Ключ изображения или null
+ * @private
+ */
+function getCachedWallImageKey(biomeId, isCracked, seed) {
+  // Для босс-арен игнорируем isCracked (разрушаемых стен нет)
+  const actualIsCracked = (biomeId === 'boss' || biomeId === 'bossArena') ? false : isCracked;
+  const type = actualIsCracked ? 'cracked' : 'wall';
+  
+  // Получаем конфигурацию биома
+  const biome = WALL_IMAGES[biomeId];
+  if (!biome) return null;
+  
+  const images = actualIsCracked ? biome.cracked : biome.wall;
+  if (!images || images.length === 0) return null;
+  
+  // ДИНАМИЧЕСКИ определяем количество вариаций
+  const maxIndex = images.length;
+  const index = Math.floor(seed * maxIndex) % maxIndex;
+  const cacheKey = `${biomeId}_${type}_${index}`;
+  
+  // Проверяем, что такое изображение действительно существует
+  const imagePath = getWallImage(biomeId, actualIsCracked, null, seed);
+  if (!imagePath) {
+    return null;
+  }
+  
+  return cacheKey;
+}
 
 /**
  * Основной рендерер стен
@@ -51,6 +88,20 @@ export function drawWalls(ctx, visibleRange) {
     clearTreasureCrackCache();
   }
   previousWallType = wallType;
+
+  // Определяем биом для стен
+  let wallBiome = state.currentBiome || 'cave';
+
+  // Для тайных комнат и безопасной комнаты — ОТКЛЮЧАЕМ ИЗОБРАЖЕНИЯ
+  const useImageWalls = !(
+    state.inTreasureRoom ||
+    state.inShrineRoom ||
+    state.inTrapRoom ||
+    state.inSafeRoom
+  );
+  
+  // Для босс-арен
+  if (state.isBossLevel) wallBiome = 'boss';
   
   const color = getWallColor(wallType);
   const borderColor = getWallBorderColor(wallType);
@@ -73,21 +124,46 @@ export function drawWalls(ctx, visibleRange) {
       }
       
       if (cell.isWall) {
-        // Основная заливка
+        // Пытаемся загрузить изображение стены
+        if (useImageWalls) {
+          const seed = ((x * 31 + y * 17) % 100) / 100;
+          let imageKey = getCachedWallImageKey(wallBiome, cell.isBreakable, seed);
+          
+          // ===== ДЛЯ БОСС-АРЕН: если ключ не найден, используем boss_wall_0 =====
+          if (state.isBossLevel && (!imageKey || !isImageLoaded(imageKey))) {
+            imageKey = 'boss_wall_0';
+          }
+          
+          if (imageKey && isImageLoaded(imageKey)) {
+            const img = getImage(imageKey);
+            if (img) {
+              ctx.save();
+              ctx.drawImage(img, dx, dy, CONFIG.cellSize, CONFIG.cellSize);
+              ctx.restore();
+              
+              drawWallFeatures(ctx, dx, dy, features);
+              
+              if (cell.hasNote && cell.noteId) {
+                drawNoteOnWall(ctx, dx, dy, cell.noteId);
+              }
+              
+              continue;
+            }
+          }
+        }
+        
+        // ===== FALLBACK: Рисуем стены цветом =====
         ctx.fillStyle = color;
         ctx.fillRect(dx, dy, CONFIG.cellSize, CONFIG.cellSize);
         
-        // Обводка
         ctx.strokeStyle = borderColor;
         ctx.lineWidth = borderWidth;
         ctx.strokeRect(dx, dy, CONFIG.cellSize, CONFIG.cellSize);
         
-        // Трещины на разрушаемой стене
         if (cell.isBreakable) {
           const seed = ((x * 31 + y * 17) % 100) / 100;
           let crackColor = '#242d38';
           
-          // Для сокровищницы — золотые трещины
           if (wallType === 'TREASURE_ROOM') {
             crackColor = '#d4a800';
           }
@@ -95,10 +171,8 @@ export function drawWalls(ctx, visibleRange) {
           drawCracks(ctx, dx, dy, seed, crackColor, wallType);
         }
         
-        // Особенности стен
         drawWallFeatures(ctx, dx, dy, features);
         
-        // Метка записки на стене
         if (cell.hasNote && cell.noteId) {
           drawNoteOnWall(ctx, dx, dy, cell.noteId);
         }
@@ -106,6 +180,10 @@ export function drawWalls(ctx, visibleRange) {
     }
   }
 }
+
+// ============================================================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// ============================================================
 
 /**
  * Отрисовка особенностей стен
@@ -208,7 +286,6 @@ function drawBookshelf(ctx, dx, dy, gridX, gridY) {
     ctx.lineTo(startX + shelfWidth - 4, yPos);
     ctx.stroke();
     
-    // Тень под полкой
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -261,7 +338,6 @@ function drawBookshelf(ctx, dx, dy, gridX, gridY) {
       totalBookWidth += w;
     }
     
-    // Корректировка ширин при нестандартной последней книге
     if (bookWidths[bookCount - 1] < 2 || bookWidths[bookCount - 1] > bookWidth * 1.8) {
       for (let b = 0; b < bookCount; b++) {
         const wOffset = seededRandom(shelf * 1000 + b * 50 + 10);
@@ -280,7 +356,6 @@ function drawBookshelf(ctx, dx, dy, gridX, gridY) {
     
     let leaningIndices = [];
     
-    // Выбор книг для наклона
     if (allowLeaning) {
       const leaningCount = 1 + Math.floor(seededRandom(shelf * 100 + 200) * 1.5);
       
@@ -342,12 +417,8 @@ function drawBookshelf(ctx, dx, dy, gridX, gridY) {
     }
   }
   
-  // Нижняя планка
   ctx.fillStyle = '#2a1a0a';
   ctx.fillRect(startX, startY + shelfCount * shelfHeight, shelfWidth, 2);
-  
-  // Верхняя планка
-  ctx.fillStyle = '#2a1a0a';
   ctx.fillRect(startX, startY, shelfWidth, 2);
   
   ctx.restore();
@@ -383,16 +454,13 @@ function drawNormalBook(ctx, bookX, bookY, bookW, bookH, color, bookRadius, seed
   ctx.closePath();
   ctx.fill();
   
-  // Светлая полоса на корешке
   ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
   ctx.fillRect(bookX + 1, bookY + 2, 1.5, bookH - 4);
   
-  // Горизонтальные линии (декор)
   ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
   ctx.fillRect(bookX + 1, bookY + 2, bookW - 2, 1);
   ctx.fillRect(bookX + 1, bookY + bookH - 3, bookW - 2, 1);
   
-  // Текст на корешке (вертикальные линии)
   if (seededRandom(shelf * 1000 + b * 50 + 40) > 0.5) {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
     const lineCount = 2 + Math.floor(seededRandom(shelf * 1000 + b * 50 + 50) * 2);
@@ -402,7 +470,6 @@ function drawNormalBook(ctx, bookX, bookY, bookW, bookH, color, bookRadius, seed
     }
   }
   
-  // Декоративная точка (орнамент)
   if (seededRandom(shelf * 1000 + b * 50 + 60) > 0.4) {
     ctx.fillStyle = 'rgba(200, 180, 100, 0.12)';
     const dotX = bookX + bookW / 2 - 1.5;
@@ -452,7 +519,6 @@ function drawLeaningBook(ctx, bookX, bookY, bookW, bookH, color, bookRadius, see
   ctx.fill();
   ctx.shadowBlur = 0;
   
-  // Светлая полоса
   ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
   ctx.fillRect(-bookW / 2 + 2, -bookH + 2, 1.5, bookH - 4);
   
@@ -535,7 +601,6 @@ function drawNoteOnWall(ctx, dx, dy, noteId) {
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   
-  // Горизонтальная линия (крест)
   const lineGradient = ctx.createLinearGradient(-halfSize, 0, halfSize, 0);
   lineGradient.addColorStop(0, `rgba(200, 200, 100, ${0.05 * alpha})`);
   lineGradient.addColorStop(0.15, `rgba(200, 200, 100, ${0.3 * alpha})`);
@@ -550,7 +615,6 @@ function drawNoteOnWall(ctx, dx, dy, noteId) {
   ctx.lineTo(halfSize, 0);
   ctx.stroke();
   
-  // Вертикальная линия
   const lineGradientV = ctx.createLinearGradient(0, -halfSize, 0, halfSize);
   lineGradientV.addColorStop(0, `rgba(200, 200, 100, ${0.05 * alpha})`);
   lineGradientV.addColorStop(0.15, `rgba(200, 200, 100, ${0.3 * alpha})`);
@@ -565,7 +629,6 @@ function drawNoteOnWall(ctx, dx, dy, noteId) {
   ctx.lineTo(0, halfSize);
   ctx.stroke();
   
-  // Дополнительное свечение
   ctx.shadowBlur = 20 * pulse;
   ctx.shadowColor = `rgba(200, 200, 100, ${0.12 * pulse})`;
   

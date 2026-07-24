@@ -1,6 +1,6 @@
 /**
  * @fileoverview Точка входа утилит.
- * Экспортирует все вспомогательные функции: кэширование, загрузчик, HTML-загрузчик и выход в меню.
+ * Экспортирует все вспомогательные функции: кэширование, загрузчик, HTML-загрузчик, выход в меню и логирование.
  * 
  * @module utils
  */
@@ -9,10 +9,6 @@
 // КЭШИРОВАНИЕ
 // ============================================================
 
-/**
- * Экспорт кэшей и функций управления кэшами
- * @see module:utils/cache
- */
 export { 
   pathCache, 
   distanceCache, 
@@ -26,28 +22,47 @@ export {
 // ЗАГРУЗЧИК ИГРЫ
 // ============================================================
 
-/**
- * Экспорт функций управления прелоадером
- * @see module:utils/gameLoader
- */
 export { showLoader, updateLoader, hideLoader } from './gameLoader.js';
 
 // ============================================================
 // ЗАГРУЗЧИК HTML-ШАБЛОНОВ
 // ============================================================
 
-/**
- * Экспорт функций загрузки HTML-шаблонов
- * @see module:utils/htmlLoader
- */
-export { loadTemplate, loadAllTemplates } from './htmlLoader.js';
+export { 
+  loadTemplate, 
+  loadEssentialTemplates,
+  loadTemplateIfNeeded,
+  isTemplateLoaded,
+  isTemplateInitialized,
+  initTemplateHandlers,
+  getTemplateContent
+} from './htmlLoader.js';
 
 // ============================================================
 // ВЫХОД В ГЛАВНОЕ МЕНЮ
 // ============================================================
 
-/**
- * Экспорт функции выхода в главное меню
- * @see module:utils/exitToMainMenu
- */
 export { exitToMainMenu } from './exitToMainMenu.js';
+
+// ============================================================
+// ЛОГИРОВАНИЕ
+// ============================================================
+
+export { 
+  logger,
+  log,
+  info,
+  success,
+  warn,
+  error,
+  debug,
+  game,
+  save,
+  achievement,
+  group,
+  table,
+  time,
+  isDebugMode,
+  setLogLevel,
+  setDebugMode
+} from './logger.js';

@@ -1,11 +1,13 @@
 /**
  * @fileoverview Спавнер ловушек.
- * Размещает ловушки на уровне с учётом типа комнаты и уровня сложности.
+ * Размещает ловушки на уровне с учётом типа комнаты, уровня сложности и биома.
  * 
  * @module entities/objects/spawners/trapSpawner
  */
 
 import { CONFIG, state } from '../../../core/config/index.js';
+import { getTrapTypesByLevel } from '../../../core/config/biomes.js';
+import { logger } from '../../../utils/logger.js';
 import { getRandomFreeCells, markCellUsed, isPortalCell } from '../utils/spawnUtils.js';
 
 /**
@@ -17,6 +19,12 @@ import { getRandomFreeCells, markCellUsed, isPortalCell } from '../utils/spawnUt
  */
 export function spawnTraps(isTreasureRoom = false, isProtectedCell = () => false) {
   state.traps = [];
+
+  // ===== ПОЛУЧЕНИЕ ТИПОВ ЛОВУШЕК ПО БИОМУ И УРОВНЮ =====
+  const availableTrapTypes = getTrapTypesByLevel(state.gameLevel);
+
+  // Если нет доступных ловушек — выходим
+  if (availableTrapTypes.length === 0) return;
 
   // ===== РАСЧЁТ КОЛИЧЕСТВА ЛОВУШЕК =====
   let trapCount;
@@ -54,14 +62,8 @@ export function spawnTraps(isTreasureRoom = false, isProtectedCell = () => false
   for (const cell of cells) {
     if (state.traps.length >= trapCount) break;
 
-    // ===== ВЫБОР ТИПА ЛОВУШКИ =====
-    let availableTypes = ['spike'];
-    if (state.gameLevel >= 3) availableTypes.push('ice');
-    if (state.gameLevel >= 6) availableTypes.push('acid');
-    if (state.gameLevel >= 8) availableTypes.push('lightning');
-    if (state.gameLevel >= 11) availableTypes.push('psionic');
-
-    const chosenType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+    // Выбираем случайный тип из доступных
+    const chosenType = availableTrapTypes[Math.floor(Math.random() * availableTrapTypes.length)];
     const baseDmg = Math.floor(12 + state.gameLevel * 3);
 
     // Проверка, есть ли монстр на этой клетке
@@ -99,6 +101,6 @@ export function spawnTraps(isTreasureRoom = false, isProtectedCell = () => false
   }
 
   if (state.traps.length < trapCount) {
-    console.log(`⚠️ Размещено только ${state.traps.length} из ${trapCount} ловушек`);
+    logger.warn(`⚠️ Размещено только ${state.traps.length} из ${trapCount} ловушек`);
   }
 }

@@ -1,12 +1,13 @@
 /**
  * @fileoverview Хранилище сохранений в localStorage.
- * Управляет сохранением, загрузкой, проверкой и удалением игровых сохранений.
  * 
  * @module save/saveStorage
  */
 
+import { logger } from '../utils/logger.js';
+import { compressData, decompressData, compressWithStats, isCompressed } from '../utils/compression.js';
 import { formatPlayTime } from './timeFormatter.js';
-import { COLORS } from '../core/config/colors.js';
+import { deleteNotesStorage } from './notesStorage.js';
 
 /** @type {string} - Ключ для хранения сохранения в localStorage */
 const SAVE_KEY = 'labirithria_save';
@@ -20,27 +21,30 @@ const SAVE_MAX_AGE = 30 * 24 * 60 * 60 * 1000;
  * @returns {void}
  */
 export function saveToLocalStorage(data) {
-  localStorage.setItem(SAVE_KEY, JSON.stringify(data));
-  console.log('💾 Игра сохранена!');
+  try {
+    const result = compressWithStats(data);
+    localStorage.setItem(SAVE_KEY, result.compressed);
+    logger.save(`💾 Игра сохранена! (${result.originalSize} байт)`);
+  } catch (e) {
+    logger.error('❌ Ошибка сохранения:', e);
+  }
 }
 
 /**
  * Загрузка данных игры из localStorage
  * 
- * @returns {Object|null} - Загруженные данные или null, если сохранение отсутствует или повреждено
+ * @returns {Object|null} - Загруженные данные или null
  */
 export function loadFromLocalStorage() {
   const raw = localStorage.getItem(SAVE_KEY);
   if (!raw) return null;
 
   try {
-    const save = JSON.parse(raw);
-    if (isSaveExpired(save.saveDate)) {
-      deleteSave();
-      return null;
-    }
-    return save;
-  } catch {
+    const data = JSON.parse(raw);
+    logger.save('📀 Данные загружены');
+    return data;
+  } catch (e) {
+    logger.error('❌ Ошибка загрузки сохранения:', e);
     return null;
   }
 }
@@ -63,6 +67,7 @@ function isSaveExpired(saveDate) {
  */
 export function deleteSave() {
   localStorage.removeItem(SAVE_KEY);
+  logger.save('🗑️ Сохранение удалено');
 }
 
 /**
@@ -76,6 +81,8 @@ export function hasSave() {
 
   try {
     const save = JSON.parse(raw);
+    
+    if (!save) return false;
 
     if (isSaveExpired(save.saveDate)) {
       deleteSave();
@@ -94,7 +101,7 @@ export function hasSave() {
     }
 
     return true;
-  } catch {
+  } catch (e) {
     deleteSave();
     return false;
   }
@@ -111,7 +118,7 @@ export function getSaveInfo() {
 
   try {
     const save = JSON.parse(rawSave);
-
+    
     if (!save || save.hp === undefined || save.hp <= 0 || !save.gameLevel) {
       deleteSave();
       return null;
@@ -131,7 +138,7 @@ export function getSaveInfo() {
       playTime: playTime,
       playTimeFormatted: formattedTime
     };
-  } catch {
+  } catch (e) {
     deleteSave();
     return null;
   }
@@ -147,20 +154,22 @@ export function showSaveNotification() {
   if (!notification) {
     notification = document.createElement('div');
     notification.id = 'save-notification';
-    notification.style.position = 'fixed';
-    notification.style.bottom = '80px';
-    notification.style.right = '20px';
-    notification.style.backgroundColor = 'rgba(46, 204, 113, 0.95)';
-    notification.style.color = COLORS.player.shadow;
-    notification.style.padding = '10px 20px';
-    notification.style.borderRadius = '8px';
-    notification.style.fontFamily = 'Courier New, monospace';
-    notification.style.fontWeight = 'bold';
-    notification.style.fontSize = '14px';
-    notification.style.zIndex = '999';
-    notification.style.pointerEvents = 'none';
-    notification.style.userSelect = 'none';
-    notification.style.transition = 'opacity 0.3s ease';
+    notification.style.cssText = `
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background: rgba(46, 204, 113, 0.95);
+      color: #ffffff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      font-size: 14px;
+      z-index: 999;
+      pointer-events: none;
+      user-select: none;
+      transition: opacity 0.3s ease;
+    `;
     document.body.appendChild(notification);
   }
 
@@ -190,5 +199,5 @@ export function showSaveNotification() {
 export function deleteAllSaveData() {
   localStorage.removeItem(SAVE_KEY);
   deleteNotesStorage();
-  console.log('🗑️ Все данные игры удалены (включая записки)');
+  logger.save('🗑️ Все данные игры удалены (включая записки)');
 }

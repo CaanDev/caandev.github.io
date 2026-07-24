@@ -9,6 +9,7 @@
 import { state } from '../../core/config/index.js';
 import { Game } from '../../core/game.js';
 import { audio } from '../../audio/audioManager.js';
+import { logger } from '../../utils/logger.js';
 import { getAllNotes, getNoteById } from '../../data/notes.js';
 import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../../utils/htmlLoader.js';
 
@@ -38,7 +39,7 @@ export function initBookshelfHandlers() {
 function doOpenBookshelf() {
   const ui = document.getElementById('bookshelf-ui');
   if (!ui) {
-    console.warn('❌ bookshelf-ui не найдено в DOM!');
+    logger.warn('❌ bookshelf-ui не найдено в DOM!');
     return;
   }
   
@@ -148,8 +149,22 @@ function renderBookshelf() {
   if (totalCountEl) totalCountEl.textContent = allNotes.length;
   
   const sortedNotes = [...allNotes].sort((a, b) => {
-    if (a.level !== b.level) return a.level - b.level;
-    return a.id - b.id;
+    const aFound = foundNotes.includes(a.id);
+    const bFound = foundNotes.includes(b.id);
+    
+    // 1. Сначала найденные записки (в порядке нахождения)
+    if (aFound && !bFound) return -1;
+    if (!aFound && bFound) return 1;
+    
+    // 2. Если обе найдены — сортируем по убыванию порядка нахождения
+    if (aFound && bFound) {
+      const aIndex = foundNotes.indexOf(a.id);
+      const bIndex = foundNotes.indexOf(b.id);
+      return bIndex - aIndex;
+    }
+    
+    // 3. Если обе не найдены — сортируем по уровню (по возрастанию)
+    return a.level - b.level;
   });
   
   let html = '';
@@ -199,13 +214,13 @@ function renderBookshelf() {
 window.openNoteFromBookshelf = function(noteId) {
   const note = getNoteById(noteId);
   if (!note) {
-    console.warn(`📜 Записка #${noteId} не найдена!`);
+    logger.warn(`📜 Записка #${noteId} не найдена!`);
     return;
   }
   
   const foundNotes = state.notes.found || [];
   if (!foundNotes.includes(noteId)) {
-    console.warn(`📜 Записка #${noteId} ещё не найдена!`);
+    logger.warn(`📜 Записка #${noteId} ещё не найдена!`);
     return;
   }
   

@@ -6,7 +6,9 @@
  */
 
 import { CONFIG, state, player, updateMapSize } from '../core/config/index.js';
+import { getBiomeByLevel, getBiomeConfig } from '../core/config/biomes.js';
 import { COLORS } from '../core/config/colors.js';
+import { logger } from '../utils/logger.js';
 import { generateMaze, clearPortalFlags } from '../world/maze.js';
 import { EMOJIS } from '../emojis.js';
 import { clearEventEffects, generateRandomEvent, showEventMessage } from '../systems/events/index.js';
@@ -204,6 +206,12 @@ async function executeLevelTransition() {
   // ===== ПОВЫШЕНИЕ УРОВНЯ =====
   state.gameLevel++;
 
+  // ===== ОПРЕДЕЛЕНИЕ БИОМА =====
+  const biomeId = getBiomeByLevel(state.gameLevel);
+  const biomeConfig = getBiomeConfig(biomeId);
+  state.currentBiome = biomeId;
+  logger.game(`🌍 БИОМ: ${biomeConfig.name} (${biomeId}) | Уровень ${state.gameLevel}`);
+
   player.hasMap = false;
   
   // ===== ПРОВЕРКА ДОСТИЖЕНИЙ =====
@@ -316,8 +324,22 @@ async function executeLevelTransition() {
   generateRandomEvent();
   
   // ===== УСТАНОВКА ПОЗИЦИИ ИГРОКА =====
-  player.px = CONFIG.cellSize + CONFIG.cellSize / 2;
-  player.py = CONFIG.cellSize + CONFIG.cellSize / 2;
+  // На уровнях 2-4 игрок появляется на (2, 1), чтобы не стоять на лавке
+  // На остальных уровнях — на (1, 1)
+  const isInSecretRoom = state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom;
+  const isBossLevel = state.gameLevel > 0 && state.gameLevel % 5 === 0;
+
+  if (state.gameLevel >= 2 && state.gameLevel <= 4 && !isInSecretRoom && !isBossLevel) {
+    player.x = 2;
+    player.y = 1;
+    player.px = 2 * CONFIG.cellSize + CONFIG.cellSize / 2;
+    player.py = 1 * CONFIG.cellSize + CONFIG.cellSize / 2;
+  } else {
+    player.x = 1;
+    player.y = 1;
+    player.px = CONFIG.cellSize + CONFIG.cellSize / 2;
+    player.py = CONFIG.cellSize + CONFIG.cellSize / 2;
+  }
 
   if (pendingUICallback) {
     pendingUICallback();

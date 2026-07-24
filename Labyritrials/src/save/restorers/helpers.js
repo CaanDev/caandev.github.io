@@ -5,6 +5,7 @@
  */
 
 import { state, CONFIG } from '../../core/config/index.js';
+import { logger } from '../../utils/logger.js';
 import { Cell } from '../../world/cells/cell.js';
 import {
   PhaseSummonAbility,
@@ -29,7 +30,7 @@ import { getBossByLevel, BOSS_TYPES } from '../../entities/monsters/bosses/confi
  */
 export function restoreMazeGrid(gridData) {
   if (!gridData || !Array.isArray(gridData)) {
-    console.warn('⚠️ Нет данных о лабиринте в сохранении');
+    logger.warn('⚠️ Нет данных о лабиринте в сохранении');
     return false;
   }
 
@@ -302,25 +303,25 @@ export function restoreNotesOnGrid() {
     const y = pos.y;
 
     if (x === undefined || y === undefined) {
-      console.warn(`📜 Записка #${noteId} имеет невалидные координаты:`, pos);
+      logger.warn(`📜 Записка #${noteId} имеет невалидные координаты:`, pos);
       continue;
     }
 
     if (!state.grid[y] || !state.grid[y][x]) {
-      console.warn(`📜 Записка #${noteId} — клетка (${x}, ${y}) не существует`);
+      logger.warn(`📜 Записка #${noteId} — клетка (${x}, ${y}) не существует`);
       continue;
     }
 
     const cell = state.grid[y][x];
 
     if (!cell.isWall) {
-      console.warn(`📜 Записка #${noteId} — клетка (${x}, ${y}) не является стеной (isWall: ${cell.isWall})`);
+      logger.warn(`📜 Записка #${noteId} — клетка (${x}, ${y}) не является стеной (isWall: ${cell.isWall})`);
       delete state.notes.positions[noteIdStr];
       continue;
     }
 
     if (cell.hasNote) {
-      console.warn(`📜 Записка #${noteId} — клетка (${x}, ${y}) уже содержит записку #${cell.noteId}`);
+      logger.warn(`📜 Записка #${noteId} — клетка (${x}, ${y}) уже содержит записку #${cell.noteId}`);
       continue;
     }
 

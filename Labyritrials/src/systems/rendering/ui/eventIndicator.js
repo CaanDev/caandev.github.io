@@ -27,9 +27,11 @@ export function drawEventIndicator(ctx, canvas) {
   const indicatorWidth = 160;
   const indicatorHeight = 40;
   const radius = 8;
-  const padding = 20;
-  const indicatorX = canvas.width - indicatorWidth - padding;
-  const indicatorY = 190;
+  const paddingRight = 21;
+  const paddingTop = 192;
+
+  const indicatorX = canvas.width - indicatorWidth - paddingRight;
+  const indicatorY = paddingTop;
   
   ctx.save();
   

@@ -6,6 +6,8 @@
  */
 
 import { state, player, CONFIG } from '../../core/config/index.js';
+import { getBiomeByLevel, getBiomeConfig } from '../../core/config/biomes.js';
+import { logger } from '../../utils/logger.js';
 import { audio } from '../../audio/audioManager.js';
 import { resetMimicStreak } from './interaction.js';
 import { updateProgress } from '../../systems/achievements/index.js';
@@ -77,7 +79,7 @@ export function triggerGameOver() {
   // ===== УДАЛЕНИЕ СОХРАНЕНИЯ =====
   import('../../save/saveStorage.js').then(({ deleteSave }) => {
     deleteSave();
-    console.log('🗑️ Сохранение удалено');
+    logger.info('🗑️ Сохранение удалено');
   });
   
   // ===== ПОКАЗ ОКНА СМЕРТИ =====
@@ -331,6 +333,11 @@ async function startNewGameAfterDeath() {
     resetGameFull();
     resetAdaptations();
     clearPlayerTrails();
+
+    // ===== ОПРЕДЕЛЕНИЕ БИОМА ПОСЛЕ СБРОСА =====
+    state.currentBiome = getBiomeByLevel(state.gameLevel);
+    const biomeConfig = getBiomeConfig(state.currentBiome);
+    logger.game(`🌍 БИОМ: ${biomeConfig.name} (${state.currentBiome}) | Уровень ${state.gameLevel}`);
     
     // ===== ГЕНЕРАЦИЯ =====
     generateMaze(true);
@@ -357,10 +364,10 @@ async function startNewGameAfterDeath() {
     const chargeVal = document.getElementById('charge-val');
     if (chargeVal) chargeVal.innerText = 'Обычный';
     
-    console.log('🔄 Игра перезапущена после смерти');
+    logger.info('🔄 Игра перезапущена после смерти');
     
   } catch (err) {
-    console.error('❌ Ошибка при перезапуске игры:', err);
+    logger.error('❌ Ошибка при перезапуске игры:', err);
     alert('❌ Произошла ошибка при перезапуске! Перезагрузите страницу.');
     window.location.reload();
   }
