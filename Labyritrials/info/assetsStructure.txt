@@ -1,4 +1,4 @@
-﻿assets/
+assets/
 ├── audio/
 │   ├── sounds/
 │   │   ├── achievementCompleted.ogg
@@ -14,69 +14,159 @@
 │   │   ├── trapLightningEffect.ogg
 │   │   ├── trapSpikeActivate.ogg
 │   │   └── wallDestroy.ogg
+│   │
 │   └── themes/
 │       ├── gameBackground.ogg
 │       ├── mainMenu.ogg
 │       └── safeRoom.ogg
+│
 ├── icons/
 │   ├── apple-touch-icon.png
 │   ├── favicon.ico
 │   └── favicon.svg
+│
 └── images/
+    ├── inventory/
+    │   ├── equipment/
+    │   │   └── talismanFire.png
+    │   │
+    │   ├── items/
+    │   │   ├── mapLevel.png
+    │   │   └── mapLevelIce.png
+    │   │
+    │   └── weapon/
+    │       ├── fireball.png
+    │       ├── staffDefault.png
+    │       ├── staffThunder.png
+    │       └── staffVampire.png
+    │
     ├── items/
     │   ├── artifacts/
-    │   │   ├── artifact-1.png
-    │   │   ├── artifact-2.png
-    │   │   └── artifact-3.png
+    │   │   ├── artifactCave-1.png
+    │   │   ├── artifactCave-2.png
+    │   │   ├── artifactCave-3.png
+    │   │   ├── artifactIce-1.png
+    │   │   ├── artifactIce-2.png
+    │   │   ├── artifactIce-3.png
+    │   │   ├── artifactSand-1.png
+    │   │   ├── artifactSand-2.png
+    │   │   ├── artifactSand-3.png
+    │   │   ├── artifactTreasureRoom-1.png
+    │   │   ├── artifactTreasureRoom-2.png
+    │   │   └── artifactTreasureRoom-3.png
+    │   │
     │   ├── chests/
-    │   │   ├── chestClosed-1.png
-    │   │   ├── chestMimicAttack-1.png
-    │   │   └── chestOpen-1.png
-    │   ├── gold/
-    │   │   ├── bagOfGold-1.png
-    │   │   ├── bagOfGold-2.png
-    │   │   ├── bagOfGold-3.png
-    │   │   └── bagOfGold-4.png
-    │   └── potions/
-    │       ├── healthPotion-1.png
-    │       ├── healthPotion-2.png
-    │       └── healthPotion-3.png
-    ├── objects/
-    │   ├── shopStand.png
-    │   ├── torches/
-    │   │   ├── torchNormal-1.png
-    │   │   ├── torchNormal-2.png
-    │   │   ├── bossArena/
-    │   │   │   ├── torchBossArenaLvl10-1.png
-    │   │   │   ├── torchBossArenaLvl10-2.png
-    │   │   │   ├── torchBossArenaLvl15-1.png
-    │   │   │   └── torchBossArenaLvl5-1.png
+    │   │   ├── biomes/
+    │   │   │   ├── chestCaveClosed-1.png
+    │   │   │   ├── chestCaveEmpty-1.png
+    │   │   │   ├── chestCaveMimicAttack-1.png
+    │   │   │   ├── chestCaveOpen-1.png
+    │   │   │   ├── chestIceClosed-1.png
+    │   │   │   ├── chestIceEmpty-1.png
+    │   │   │   ├── chestIceMimicAttack-1.png
+    │   │   │   ├── chestIceOpen-1.png
+    │   │   │   ├── chestSandClosed-1.png
+    │   │   │   ├── chestSandEmpty-1.png
+    │   │   │   ├── chestSandMimicAttack-1.png
+    │   │   │   └── chestSandOpen-1.png
+    │   │   │
     │   │   └── rooms/
-    │   │       ├── torchShrineRoom-1.png
-    │   │       ├── torchShrineRoom-2.png
-    │   │       ├── torchShrineRoom-3.png
-    │   │       └── torchTrapRoom-1.png
+    │   │       ├── chestSafeRoomClosed-1.png
+    │   │       ├── chestSafeRoomOpen-1.png
+    │   │       ├── chestTreasureRoomClosed-1.png
+    │   │       ├── chestTreasureRoomEmpty-1.png
+    │   │       ├── chestTreasureRoomMimicAttack-1.png
+    │   │       └── chestTreasureRoomOpen-1.png
+    │   │
+    │   ├── gold/
+    │   │   ├── bagOfGoldCave-1.png
+    │   │   ├── bagOfGoldCave-2.png
+    │   │   ├── bagOfGoldCave-3.png
+    │   │   ├── bagOfGoldCave-4.png
+    │   │   ├── bagOfGoldIce-1.png
+    │   │   ├── bagOfGoldIce-2.png
+    │   │   ├── bagOfGoldIce-3.png
+    │   │   ├── bagOfGoldIce-4.png
+    │   │   ├── bagOfGoldSand-1.png
+    │   │   ├── bagOfGoldSand-2.png
+    │   │   ├── bagOfGoldSand-3.png
+    │   │   ├── bagOfGoldSand-4.png
+    │   │   ├── bagOfGoldTreasureRoom-1.png
+    │   │   ├── bagOfGoldTreasureRoom-2.png
+    │   │   ├── bagOfGoldTreasureRoom-3.png
+    │   │   └── bagOfGoldTreasureRoom-4.png
+    │   │
+    │   └── potions/
+    │       ├── healthPotionCave-1.png
+    │       ├── healthPotionCave-2.png
+    │       ├── healthPotionCave-3.png
+    │       ├── healthPotionCave-4.png
+    │       ├── healthPotionIce-1.png
+    │       ├── healthPotionIce-2.png
+    │       ├── healthPotionIce-3.png
+    │       ├── healthPotionIce-4.png
+    │       ├── healthPotionSand-1.png
+    │       ├── healthPotionSand-2.png
+    │       ├── healthPotionSand-3.png
+    │       ├── healthPotionSand-4.png
+    │       ├── healthPotionTreasureRoom-1.png
+    │       ├── healthPotionTreasureRoom-2.png
+    │       ├── healthPotionTreasureRoom-3.png
+    │       └── healthPotionTreasureRoom-4.png
+    │
+    ├── objects/
+    │   ├── bookshelf.png
+    │   ├── shopStand.png
+    │   │
+    │   ├── torches/
+    │   │   ├── biomes/
+    │   │   │   ├── cave/
+    │   │   │   │   ├── torchCaveLvl1.png
+    │   │   │   │   ├── torchCaveLvl2.png
+    │   │   │   │   ├── torchCaveLvl3.png
+    │   │   │   │   └── torchCaveLvl4.png
+    │   │   │   │
+    │   │   │   ├── ice/
+    │   │   │   │   ├── torchIceLvl6.png
+    │   │   │   │   ├── torchIceLvl7.png
+    │   │   │   │   ├── torchIceLvl8.png
+    │   │   │   │   └── torchIceLvl9.png
+    │   │   │   │
+    │   │   │   └── sand/
+    │   │   │       ├── torchSandLvl11.png
+    │   │   │       ├── torchSandLvl12.png
+    │   │   │       ├── torchSandLvl13.png
+    │   │   │       └── torchSandLvl14.png
+    │   │   │
+    │   │   ├── bossArena/
+    │   │   │   ├── torchBossArenaLvl10.png
+    │   │   │   ├── torchBossArenaLvl15.png
+    │   │   │   └── torchBossArenaLvl5.png
+    │   │   │
+    │   │   └── rooms/
+    │   │       ├── torchSafeRoom.png
+    │   │       ├── torchShrineRoom.png
+    │   │       ├── torchTrapRoom.png
+    │   │       └── torchTreasureRoom.png
+    │   │
     │   └── traps/
     │       ├── trapAcid.png
     │       ├── trapExplosion.png
     │       ├── trapIce.png
     │       ├── trapLightning.png
     │       └── trapPsionic.png
+    │
     ├── shop/
     │   ├── goldCoin.png
     │   ├── stackOfGoldCoins.png
-    │   ├── improvements/
-    │   │   ├── damageIncrease.png
-    │   │   └── heartOfHealth.png
-    │   ├── items/
-    │   │   └── map.png
-    │   └── weapon/
-    │       ├── fireball.png
-    │       ├── staffDefault.png
-    │       ├── staffThunder.png
-    │       └── staffVampire.png
+    │   │
+    │   └── improvements/
+    │       ├── damageIncrease.png
+    │       └── heartOfHealth.png
+    │
     ├── ui/
     │   ├── miniMap.png
+    │   │
     │   └── achievements/
     │       ├── collection/
     │       │   ├── artifactor.png
@@ -86,44 +176,105 @@
     │       │   ├── goldHoarder.png
     │       │   ├── goldMillionaire.png
     │       │   └── storyCollector.png
+    │       │
     │       ├── combat/
+    │       │   ├── bossConqueror.png
+    │       │   ├── bossHunter10.png
     │       │   ├── fireMage.png
     │       │   ├── thunderer.png
     │       │   └── vampireLord.png
+    │       │
     │       ├── exploration/
+    │       │   ├── adventurer.png
     │       │   ├── cartographer.png
     │       │   ├── daredevil.png
     │       │   ├── explorer.png
+    │       │   ├── mystic.png
     │       │   └── treasureHunter.png
+    │       │
     │       ├── secret/
     │       │   ├── cleaner.png
+    │       │   ├── dodgeMaster.png
     │       │   ├── mimicParanoid.png
     │       │   ├── potionGlutton.png
     │       │   ├── secretMeeting.png
     │       │   ├── shadow.png
+    │       │   ├── trapMaster.png
     │       │   └── unlucky.png
+    │       │
     │       └── survival/
-    │           └── ironMan.png
+    │           ├── ironMan.png
+    │           ├── labyrinthMaster.png
+    │           ├── survivor.png
+    │           └── veteran.png
+    │
     └── walls/
+        ├── biomes/
+        │   ├── cave/
+        │   │   ├── wall-1.png
+        │   │   ├── wall-2.png
+        │   │   ├── wall-3.png
+        │   │   ├── wallCracked-1.png
+        │   │   ├── wallCracked-2.png
+        │   │   ├── wallCracked-3.png
+        │   │   ├── wallCracked-4.png
+        │   │   └── wallCracked-5.png
+        │   │
+        │   ├── ice/
+        │   │   ├── wall-1.png
+        │   │   ├── wall-2.png
+        │   │   ├── wall-3.png
+        │   │   ├── wallCracked-1.png
+        │   │   └── wallCracked-2.png
+        │   │
+        │   └── sand/
+        │       ├── wall-1.png
+        │       ├── wall-2.png
+        │       ├── wallCracked-1.png
+        │       └── wallCracked-2.png
+        │
         ├── bossArena/
         │   └── wallBossArena.png
-        ├── cave/
-        │   ├── wall-1.png
-        │   ├── wall-2.png
-        │   ├── wall-3.png
-        │   ├── wallCracked-1.png
-        │   ├── wallCracked-2.png
-        │   ├── wallCracked-3.png
-        │   ├── wallCracked-4.png
-        │   └── wallCracked-5.png
-        ├── ice/
-        │   ├── wall-1.png
-        │   ├── wall-2.png
-        │   ├── wall-3.png
-        │   ├── wallCracked-1.png
-        │   └── wallCracked-2.png
-        └── sand/
-            ├── wall-1.png
-            ├── wall-2.png
-            ├── wallCracked-1.png
-            └── wallCracked-2.png
+        │
+        └── rooms/
+            ├── safeRoom/
+            │   ├── wall-1.png
+            │   ├── wall-2.png
+            │   ├── wall-3.png
+            │   ├── wall-4.png
+            │   ├── wall-5.png
+            │   ├── wall-6.png
+            │   └── wall-7.png
+            │
+            ├── shrineRoom/
+            │   ├── wall-1.png
+            │   ├── wall-2.png
+            │   ├── wall-3.png
+            │   ├── wall-4.png
+            │   ├── wall-5.png
+            │   ├── wall-6.png
+            │   ├── wall-7.png
+            │   ├── wall-8.png
+            │   └── wall-9.png
+            │
+            ├── trapRoom/
+            │   ├── wall-1.png
+            │   ├── wall-2.png
+            │   ├── wall-3.png
+            │   ├── wall-4.png
+            │   ├── wall-5.png
+            │   ├── wall-6.png
+            │   └── wall-7.png
+            │
+            └── treasureRoom/
+                ├── wall-1.png
+                ├── wall-2.png
+                ├── wall-3.png
+                ├── wall-4.png
+                ├── wall-5.png
+                ├── wall-6.png
+                ├── wall-7.png
+                ├── wallCracked-1.png
+                ├── wallCracked-2.png
+                ├── wallCracked-3.png
+                └── wallCracked-4.png
