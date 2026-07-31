@@ -1,7 +1,6 @@
 /**
  * @fileoverview Точка входа для рендеринга стен.
- * Экспортирует основной рендерер стен, конфигурацию типов стен,
- * особенности стен и шаблоны трещин.
+ * Экспортирует основной рендерер стен, конфигурацию, особенности и шаблоны.
  * 
  * @module systems/rendering/maze/walls/index
  */
@@ -62,3 +61,23 @@ export {
  * @see module:systems/rendering/maze/walls/crackTemplates
  */
 export { getCrackTemplate } from './crackTemplates.js';
+
+// ============================================================
+// КНИЖНЫЕ ПОЛКИ
+// ============================================================
+
+/**
+ * Экспорт рендерера книжных полок
+ * @see module:systems/rendering/maze/walls/bookshelfRenderer
+ */
+export { drawBookshelf } from './bookshelfRenderer.js';
+
+// ============================================================
+// ЗАПИСКИ
+// ============================================================
+
+/**
+ * Экспорт рендерера записок
+ * @see module:systems/rendering/maze/walls/noteRenderer
+ */
+export { drawNoteOnWall } from './noteRenderer.js';

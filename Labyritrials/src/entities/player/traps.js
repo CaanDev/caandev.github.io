@@ -31,7 +31,7 @@ export function checkTraps() {
     
     // Проверка активации (только если ловушка не активна и не на перезарядке)
     if (!t.triggered && t.resetTimer <= 0) {
-      if (Math.hypot(player.px - t.x, player.py - t.y) < 30) {
+      if (Math.hypot(player.px - t.x, player.py - t.y) < 38) {
         activateTrap(t);
       }
     }

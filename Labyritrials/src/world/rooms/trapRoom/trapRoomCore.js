@@ -131,6 +131,7 @@ export function generateTrapRoom() {
   state.originalTorches = [...state.torches];
   state.originalMapCols = CONFIG.cols;
   state.originalMapRows = CONFIG.rows;
+  state.originalBonusGiven = state.bonusGiven;
 
   // ===== СОХРАНЯЕМ РАСКРЫТЫЕ КЛЕТКИ (для мини-карты) =====
   state.originalRevealedCells = [];
@@ -443,6 +444,11 @@ export function returnFromTrapRoom() {
   
   if (state.originalHadMonsters && state.monsters.length === 0) {
     state.bonusGiven = false;
+  }
+
+  if (state.originalBonusGiven !== undefined) {
+    state.bonusGiven = state.originalBonusGiven;
+    state.originalBonusGiven = undefined;
   }
 
   state.inTrapRoom = false;

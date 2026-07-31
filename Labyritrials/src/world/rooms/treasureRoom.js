@@ -122,6 +122,7 @@ export function generateTreasureMap() {
   state.originalMonsters = [...state.monsters];
   state.originalHadMonsters = state.hadMonsters;
   state.originalTraps = [...state.traps];
+  state.originalBonusGiven = state.bonusGiven;
 
   // ===== СОХРАНЯЕМ РАСКРЫТЫЕ КЛЕТКИ (для мини-карты) =====
   state.originalRevealedCells = [];
@@ -519,6 +520,11 @@ export function returnFromTreasureRoom() {
 
   if (state.originalHadMonsters && state.monsters.length === 0) {
     state.bonusGiven = false;
+  }
+
+  if (state.originalBonusGiven !== undefined) {
+    state.bonusGiven = state.originalBonusGiven;
+    state.originalBonusGiven = undefined;
   }
 
   state.originalGrid = null;

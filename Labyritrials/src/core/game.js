@@ -231,7 +231,7 @@ export const Game = {
    * @returns {void}
    */
   showFinalScreen() {
-    import('./finalScreen.js').then(module => {
+    import('../game/finalScreen.js').then(module => {
       module.showFinalScreen();
     });
   },

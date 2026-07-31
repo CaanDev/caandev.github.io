@@ -25,7 +25,8 @@ export function collectPlayerData() {
     hasMap: player.hasMap || false,
     artifactsCollected: player.artifactsCollected || 0,
     goldMultiplier: player.goldMultiplier || 1.0,
-    vampMultiplier: player.vampMultiplier || 1.0
+    vampMultiplier: player.vampMultiplier || 1.0,
+    inventory: player.inventory || null,
   };
 }
 

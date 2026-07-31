@@ -84,7 +84,7 @@ export function drawMonsters(ctx, camX, camY, canvas) {
     } else {
       // Полная отрисовка
       ctx.fillStyle = COLORS.player.shadow;
-      ctx.font = `${m.radius * 1.5}px Arial`;
+      ctx.font = `${m.radius * 1.6}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(m.emoji, m.x, m.y);
@@ -185,7 +185,7 @@ function drawBossPhaseGlow(ctx, m) {
   ctx.shadowColor = glowColor;
   
   ctx.fillStyle = COLORS.player.shadow;
-  ctx.font = `${m.radius * 1.5}px Arial`;
+  ctx.font = `${m.radius * 1.6}px Arial`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(m.emoji, m.x, m.y);
@@ -224,7 +224,7 @@ function drawBossPhaseGlow(ctx, m) {
   
   // Повторная отрисовка эмодзи поверх градиента
   ctx.fillStyle = COLORS.player.shadow;
-  ctx.font = `${m.radius * 1.5}px Arial`;
+  ctx.font = `${m.radius * 1.6}px Arial`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(m.emoji, m.x, m.y);
@@ -242,8 +242,8 @@ function drawBossPhaseGlow(ctx, m) {
  */
 function drawGlowingEyes(ctx, m, distToPlayer, visibility) {
   let eyeColor = COLORS.monsters.eyes.normal;
-  let eyeSize = m.radius * 0.3;
-  let eyeOffset = m.radius * 0.4;
+  let eyeSize = m.radius * 0.35;
+  let eyeOffset = m.radius * 0.45;
   
   // Определение цвета глаз в зависимости от типа монстра
   if (m.isGhost) {

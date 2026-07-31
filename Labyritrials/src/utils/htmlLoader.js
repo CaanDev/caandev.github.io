@@ -40,6 +40,7 @@ const TEMPLATE_MAP = {
   'achievements': 'windows/achievements',
   'settings': 'windows/settings',
   'shop': 'windows/shop',
+  'inventory': 'windows/inventory',
   'bookshelf': 'windows/bookshelf',
   'pause': 'windows/pause',
   'gameOver': 'windows/gameOver',
@@ -157,6 +158,11 @@ export async function initTemplateHandlers(name) {
       if (typeof initShopHandlers === 'function') {
         initShopHandlers();
       }
+      success = true;
+      break;
+
+    case 'inventory':
+      // Пока без дополнительной логики, только базовое открытие/закрытие
       success = true;
       break;
       

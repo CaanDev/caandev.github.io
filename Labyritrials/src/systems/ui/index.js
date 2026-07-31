@@ -1,7 +1,7 @@
 /**
  * @fileoverview Точка входа для UI-системы.
  * Экспортирует функции обновления UI, управления кнопками,
- * настройками и магазином.
+ * настройками, магазином и инвентарём.
  * 
  * @module systems/ui/index
  */
@@ -55,3 +55,20 @@ export {
  * @see module:systems/ui/shop/index
  */
 export { initShopHandlers, updateShopUIForExternal } from './shop/index.js';
+
+// ============================================================
+// ИНВЕНТАРЬ
+// ============================================================
+
+/**
+ * Экспорт функций управления инвентарём
+ * @see module:systems/ui/inventory/index
+ */
+export {
+  initInventory,
+  openInventory,
+  closeInventory,
+  toggleInventory,
+  getInventoryState,
+  handleInventoryKey
+} from './inventory/index.js';

@@ -105,6 +105,9 @@ export function resetGameFull() {
     positions: state.notes?.positions || {}
   };
 
+   // ===== СБРОС БИОМА =====
+  state.currentBiome = 'cave';
+  
   // ===== СБРОС СОСТОЯНИЯ ИГРЫ =====
   state.gameLevel = 1;
   state.isBossLevel = false;
@@ -302,5 +305,29 @@ export function resetGameFull() {
   // ===== СБРОС СЕРИИ УРОВНЕЙ БЕЗ СМЕРТИ =====
   import('../../game/levelTransition.js').then(module => {
     module.resetLevelStreak();
+  });
+
+  // ===== УДАЛЕНИЕ ЛЕДЯНОЙ МАСКИ =====
+  const iceOverlay = document.getElementById('hp-ice-overlay');
+  if (iceOverlay && iceOverlay.parentNode) {
+    iceOverlay.parentNode.removeChild(iceOverlay);
+  }
+
+  // Сброс стилей HP бара
+  const hpBarBg = document.getElementById('hp-bar-bg');
+  if (hpBarBg) {
+    hpBarBg.style.position = 'relative';
+    hpBarBg.style.overflow = 'hidden';
+    hpBarBg.style.height = '';
+    hpBarBg.style.display = '';
+    hpBarBg.style.alignItems = '';
+    hpBarBg.style.padding = '';
+    hpBarBg.style.margin = '';
+    hpBarBg.style.border = '';
+  }
+
+  // Сброс состояния заморозки
+  import('../../systems/weather/frostSystem.js').then(module => {
+    module.resetFrost();
   });
 }

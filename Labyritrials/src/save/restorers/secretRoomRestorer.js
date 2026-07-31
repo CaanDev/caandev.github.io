@@ -228,14 +228,14 @@ export function restoreTrapRoomData(save) {
       if (state.trapWave >= 3) {
         if (!state.trapExitRevealed) {
           state.trapExitRevealed = true;
-          import('../../world/rooms/trapRoom.js').then(module => {
+          import('../../world/rooms/trapRoom/index.js').then(module => {
             setTimeout(() => {
               module.showRealExitPortal();
             }, 300);
           });
         }
       } else {
-        import('../../world/rooms/trapRoom.js').then(module => {
+        import('../../world/rooms/trapRoom/index.js').then(module => {
           setTimeout(() => {
             if (state.trapMonsters.filter(m => m.hp > 0).length === 0) {
               module.startNextWave();

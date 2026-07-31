@@ -83,6 +83,7 @@ export function generateSafeRoom() {
   state.originalLootItems = state.lootItems.map(l => ({ ...l }));
   state.originalFlies = state.flies ? [...state.flies] : [];
   state.originalFireflies = state.fireflies ? [...state.fireflies] : [];
+  state.originalBonusGiven = state.bonusGiven;
 
   if (state.originalHadMap === undefined) {
     state.originalHadMap = player.hasMap;
@@ -540,6 +541,11 @@ export function returnFromSafeRoom() {
 
   if (state.originalHadMonsters && state.monsters.length === 0) {
     state.bonusGiven = false;
+  }
+
+  if (state.originalBonusGiven !== undefined) {
+    state.bonusGiven = state.originalBonusGiven;
+    state.originalBonusGiven = undefined;
   }
 
   state.chests = state.chests.filter(c => c.type !== 'potion_chest');

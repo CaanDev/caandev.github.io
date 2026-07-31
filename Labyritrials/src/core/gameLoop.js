@@ -17,6 +17,8 @@ import { resetGameFull } from './config/index.js';
 import { clearBloodPuddles } from '../entities/objects/utils/bloodSystem.js';
 import { generateMaze } from '../world/maze.js';
 import { Game } from './game.js';
+import { updateSnowfall, updateSnowOpacity } from '../systems/weather/snowManager.js';
+import { updateFrost } from '../systems/weather/frostSystem.js';
 import { updateFireflies, clearFireflies } from '../entities/objects/firefly.js';
 import { updateBossExplosions, clearBossExplosions } from '../systems/particles/bossExplosion.js';
 import { updateBossLightFade } from '../systems/rendering/maze/bossLightFade.js';
@@ -66,6 +68,13 @@ export function createGameLoop(updateUICallback, ctx, canvas) {
     updateMonsters();
     updateBossSummonCircle();
     updateBossLightFade();
+
+    // Обновляем снегопад (проверка на старт/остановку)
+    if (frameCounter % 30 === 0) updateSnowfall();
+    // Обновляем прозрачность снега
+    updateSnowOpacity();
+    // Обновляем заморозку
+    updateFrost();
 
     spawnPlayerTrail();
     updatePlayerTrails();

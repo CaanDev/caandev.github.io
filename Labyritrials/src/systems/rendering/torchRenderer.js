@@ -19,15 +19,31 @@ import { getDistanceVisibility } from '../fog/index.js';
  * @private
  */
 function getTorchType() {
+  // ===== КОМНАТЫ =====
+  if (state.inSafeRoom) return 'safe';
   if (state.inShrineRoom) return 'shrine';
   if (state.inTrapRoom) return 'trap';
+  if (state.inTreasureRoom) return 'treasure';
   
+  // ===== БОСС-АРЕНЫ =====
   if (state.isBossLevel) {
     const bossLevel = Math.floor(state.gameLevel / 5) * 5;
     if (bossLevel === 5) return 'boss5';
     if (bossLevel === 10) return 'boss10';
     if (bossLevel === 15) return 'boss15';
   }
+  
+  // ===== БИОМЫ (по уровням) =====
+  const level = state.gameLevel;
+  const biome = state.currentBiome || 'cave';
+  
+  // Босс-уровни уже обработаны выше
+  if (level % 5 === 0) return 'boss' + level;
+  
+  // Возвращаем ID биома для уровней 1-4, 6-9, 11-14
+  if (level >= 1 && level <= 4) return 'cave';
+  if (level >= 6 && level <= 9) return 'ice';
+  if (level >= 11 && level <= 14) return 'sand';
   
   return 'normal';
 }
@@ -42,6 +58,14 @@ export function drawTorches(ctx) {
   if (!state.torches) return;
 
   const torchType = getTorchType();
+  
+  // ===== ОПРЕДЕЛЯЕМ, НУЖНО ЛИ ИСПОЛЬЗОВАТЬ ЦВЕТ БИОМА =====
+  const isSpecialRoom = state.inSafeRoom || state.inShrineRoom || state.inTreasureRoom;
+  const isTrapRoom = state.inTrapRoom;
+  const isBossLevel = state.isBossLevel;
+  
+  // Ледяной цвет ТОЛЬКО для обычных уровней 6-9 (не в комнатах и не на боссах)
+  const useIceColor = !isSpecialRoom && !isTrapRoom && !isBossLevel && state.gameLevel >= 6 && state.gameLevel <= 9;
   
   for (let torch of state.torches) {
     if (!torch.active) continue;
@@ -69,7 +93,6 @@ export function drawTorches(ctx) {
     
     // ===== ВЫБИРАЕМ ИЗОБРАЖЕНИЕ СЛУЧАЙНО =====
     if (!torch.imageKey) {
-      // Просто случайный выбор для всех типов факелов
       const imagePath = getRandomTorchImage(torchType);
       const cacheKey = Object.keys(OBJECT_IMAGES).find(key => OBJECT_IMAGES[key] === imagePath);
       torch.imageKey = cacheKey;
@@ -77,32 +100,115 @@ export function drawTorches(ctx) {
     }
     
     const cacheKey = torch.imageKey;
-    const size = 46;
     
     ctx.save();
     ctx.globalAlpha = Math.min(1, visibility * 0.8 + 0.1);
     
+    // ===== ОПРЕДЕЛЯЕМ ЦВЕТА ДЛЯ ФАКЕЛА =====
+    let flameColor, glowColor, particleColor;
+    
+    if (isSpecialRoom && state.inSafeRoom) {
+      // 🏠 Безопасная комната — тёплый уютный свет
+      flameColor = '#ffaa66';
+      glowColor = '#ff8844';
+      particleColor = '#ffaa66';
+    } else if (isSpecialRoom && state.inShrineRoom) {
+      // 🔮 Комната с алтарём — магический фиолетовый
+      flameColor = '#bb88ff';
+      glowColor = '#9966dd';
+      particleColor = '#bb88ff';
+    } else if (isSpecialRoom && state.inTreasureRoom) {
+      // 💰 Сокровищница — золотистый
+      flameColor = '#ffdd44';
+      glowColor = '#ffaa00';
+      particleColor = '#ffdd44';
+    } else if (isTrapRoom) {
+      // ===== КОМНАТА-ЛОВУШКА =====
+      if (state.trapActivated && !state.trapExitRevealed) {
+        // ⚠️ Активна — зловещий красный
+        flameColor = '#ff4444';
+        glowColor = '#cc2222';
+        particleColor = '#ff4444';
+      } else {
+        // ✅ Не активна или пройдена — обычный тёплый свет
+        flameColor = torch.flameColor || COLORS.torches.flame;
+        glowColor = torch.glowColor || COLORS.torches.glow;
+        particleColor = torch.particleColor || COLORS.torches.particle;
+      }
+    } else if (isBossLevel) {
+      // 👹 Босс-арены — в зависимости от уровня
+      const bossLevel = Math.floor(state.gameLevel / 5) * 5;
+      if (bossLevel === 5) {
+        // Демон — красный/оранжевый
+        flameColor = '#ff6633';
+        glowColor = '#ff4400';
+        particleColor = '#ff6633';
+      } else if (bossLevel === 10) {
+        // Разум — магический синий
+        flameColor = '#66ccff';
+        glowColor = '#4488ff';
+        particleColor = '#66ccff';
+      } else if (bossLevel === 15) {
+        // Стражи — золотистый
+        flameColor = '#ffdd44';
+        glowColor = '#ffaa00';
+        particleColor = '#ffdd44';
+      } else {
+        // Fallback
+        flameColor = torch.flameColor || COLORS.torches.flame;
+        glowColor = torch.glowColor || COLORS.torches.glow;
+        particleColor = torch.particleColor || COLORS.torches.particle;
+      }
+    } else if (useIceColor) {
+      // ❄️ Ледяной цвет для уровней 6-9
+      flameColor = '#66ccff';
+      glowColor = '#4488ff';
+      particleColor = '#66ccff';
+    } else {
+      // 🔥 Тёплый цвет для остальных уровней
+      flameColor = torch.flameColor || COLORS.torches.flame;
+      glowColor = torch.glowColor || COLORS.torches.glow;
+      particleColor = torch.particleColor || COLORS.torches.particle;
+    }
+    
     // ===== СВЕТ ОТ ФАКЕЛА =====
-    const flameColor = torch.flameColor || COLORS.torches.flame;
-    const glowColor = torch.glowColor || COLORS.torches.glow;
-    
-    const gradient = ctx.createRadialGradient(torchX, torchY, 0, torchX, torchY, 80);
-    gradient.addColorStop(0, `rgba(${hexToRgb(flameColor)}, ${0.5 * flicker * visibility})`);
-    gradient.addColorStop(0.3, `rgba(${hexToRgb(flameColor)}, ${0.3 * flicker * visibility})`);
-    gradient.addColorStop(0.6, `rgba(${hexToRgb(glowColor)}, ${0.15 * flicker * visibility})`);
+    const glowRadius = 140;
+
+    // Основной градиент
+    const gradient = ctx.createRadialGradient(torchX, torchY, 0, torchX, torchY, glowRadius);
+    gradient.addColorStop(0, `rgba(${hexToRgb(flameColor)}, ${0.35 * flicker * visibility})`);
+    gradient.addColorStop(0.15, `rgba(${hexToRgb(flameColor)}, ${0.25 * flicker * visibility})`);
+    gradient.addColorStop(0.35, `rgba(${hexToRgb(flameColor)}, ${0.15 * flicker * visibility})`);
+    gradient.addColorStop(0.6, `rgba(${hexToRgb(glowColor)}, ${0.08 * flicker * visibility})`);
+    gradient.addColorStop(0.8, `rgba(${hexToRgb(glowColor)}, ${0.03 * flicker * visibility})`);
     gradient.addColorStop(1, `rgba(${hexToRgb(glowColor)}, 0)`);
-    
+
     ctx.globalCompositeOperation = 'lighter';
     ctx.fillStyle = gradient;
     ctx.beginPath();
-    ctx.arc(torchX, torchY, 80, 0, Math.PI * 2);
+    ctx.arc(torchX, torchY, glowRadius, 0, Math.PI * 2);
     ctx.fill();
+
+    // ===== ВНЕШНЕЕ МЯГКОЕ СВЕЧЕНИЕ =====
+    const outerGlowRadius = glowRadius * 1.8;
+    const outerGradient = ctx.createRadialGradient(torchX, torchY, glowRadius * 0.3, torchX, torchY, outerGlowRadius);
+    outerGradient.addColorStop(0, `rgba(${hexToRgb(glowColor)}, ${0.04 * flicker * visibility})`);
+    outerGradient.addColorStop(0.4, `rgba(${hexToRgb(glowColor)}, ${0.02 * flicker * visibility})`);
+    outerGradient.addColorStop(0.7, `rgba(${hexToRgb(glowColor)}, ${0.01 * flicker * visibility})`);
+    outerGradient.addColorStop(1, `rgba(${hexToRgb(glowColor)}, 0)`);
+
+    ctx.fillStyle = outerGradient;
+    ctx.beginPath();
+    ctx.arc(torchX, torchY, outerGlowRadius, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.globalCompositeOperation = 'source-over';
     
     // ===== ИЗОБРАЖЕНИЕ ФАКЕЛА =====
     if (cacheKey && isImageLoaded(cacheKey)) {
       const img = getImage(cacheKey);
       if (img) {
+        const size = 56;
         ctx.save();
         ctx.shadowBlur = 15 * appearProgress * visibility;
         ctx.shadowColor = flameColor;
@@ -117,12 +223,31 @@ export function drawTorches(ctx) {
       ctx.shadowColor = flameColor;
       ctx.globalAlpha = 0.7 * appearProgress * visibility;
       ctx.fillStyle = flameColor;
-      ctx.font = '32px Arial';
+      ctx.font = '40px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
       let emoji = torch.emoji || EMOJIS.torches.normal;
-      if (torchType === 'boss10') emoji = EMOJIS.torches.magic;
+      if (isSpecialRoom && state.inSafeRoom) {
+        emoji = '🏠';
+      } else if (isSpecialRoom && state.inShrineRoom) {
+        emoji = '🔮';
+      } else if (isSpecialRoom && state.inTreasureRoom) {
+        emoji = '💰';
+      } else if (isTrapRoom) {
+        if (state.trapActivated && !state.trapExitRevealed) {
+          emoji = '⚠️';
+        } else {
+          emoji = '🕯️';
+        }
+      } else if (isBossLevel) {
+        const bossLevel = Math.floor(state.gameLevel / 5) * 5;
+        if (bossLevel === 5) emoji = '👹';
+        else if (bossLevel === 10) emoji = '🧠';
+        else if (bossLevel === 15) emoji = '🗿';
+      } else if (useIceColor) {
+        emoji = '❄️';
+      }
       ctx.fillText(emoji, torchX, torchY);
       ctx.restore();
     }
@@ -186,7 +311,7 @@ export function updateTorchParticles(ctx, camX, camY) {
     
     if (state.fireParticles.length < maxFireParticles && Math.random() < 0.08 * visibility) {
       const angle = Math.random() * Math.PI * 2;
-      const distance = 15 + Math.random() * 30;
+      const distance = 20 + Math.random() * 40;
       const offsetX = Math.cos(angle) * distance;
       const offsetY = Math.sin(angle) * distance;
       
@@ -195,7 +320,7 @@ export function updateTorchParticles(ctx, camX, camY) {
         y: torchY + offsetY,
         life: 60,
         maxLife: 60,
-        size: 1 + Math.random() * 2.5,
+        size: 1.5 + Math.random() * 3,
         flickerPhase: Math.random() * Math.PI * 2,
         flickerSpeed: 0.05 + Math.random() * 0.07,
         visibility: visibility,

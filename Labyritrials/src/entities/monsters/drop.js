@@ -54,7 +54,12 @@ export function handleMonsterDrop(m) {
         : Math.floor((Math.random() * 12) + 6 + state.gameLevel);
       amount = Math.floor(amount * player.goldMultiplier);
       
-      const imagePath = getRandomGoldImage();
+      // ===== ОПРЕДЕЛЯЕМ БИОМ ДЛЯ ЗОЛОТА =====
+      let goldBiome = state.currentBiome || 'cave';
+      // В сокровищнице используем treasure
+      if (state.inTreasureRoom) goldBiome = 'treasure';
+      
+      const imagePath = getRandomGoldImage(goldBiome);
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       
       state.lootItems.push({
@@ -64,6 +69,7 @@ export function handleMonsterDrop(m) {
         value: getEventGoldMultiplier(amount),
         imageKey: cacheKey,
         imagePath: imagePath,
+        goldBiome: goldBiome, // Сохраняем биом для информации
       });
     } else {
       // Зелье: количество зависит от уровня
@@ -71,8 +77,13 @@ export function handleMonsterDrop(m) {
         ? Math.floor(10 + state.gameLevel)
         : Math.floor(20 + state.gameLevel * 2);
       
-      // Выбираем случайное изображение для зелья
-      const imagePath = getRandomPotionImage();
+      // ===== ОПРЕДЕЛЯЕМ БИОМ ДЛЯ ЗЕЛЬЯ =====
+      let potionBiome = state.currentBiome || 'cave';
+      // В сокровищнице используем treasure
+      if (state.inTreasureRoom) potionBiome = 'treasure';
+      
+      // Выбираем случайное изображение для зелья с учётом биома
+      const imagePath = getRandomPotionImage(potionBiome);
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       
       // Добавляем зелье на пол
@@ -83,6 +94,7 @@ export function handleMonsterDrop(m) {
         value: amount,
         imageKey: cacheKey,
         imagePath: imagePath,
+        potionBiome: potionBiome, // Сохраняем биом для информации
       });
     }
     return true;

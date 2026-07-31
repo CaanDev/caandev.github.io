@@ -12,6 +12,7 @@ import { audio } from '../../audio/audioManager.js';
 import { logger } from '../../utils/logger.js';
 import { getAllNotes, getNoteById } from '../../data/notes.js';
 import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../../utils/htmlLoader.js';
+import { registerModalOpen, registerModalClose } from './modalManager.js';
 
 /** @type {boolean} - Открыта ли библиотека */
 let bookshelfOpen = false;
@@ -45,20 +46,18 @@ function doOpenBookshelf() {
   
   bookshelfOpen = true;
   
-  // ===== ПАУЗА ИГРЫ =====
   Game.stopLoop();
   Game.pauseTime();
   audio.pause();
   audio.isGameActive = false;
+  registerModalOpen('bookshelf');
   
-  // ===== СКРЫТИЕ UI =====
   const gameUI = document.getElementById('ui');
   if (gameUI) gameUI.style.display = 'none';
   
   const controlButtons = document.getElementById('control-buttons-container');
   if (controlButtons) controlButtons.style.display = 'none';
   
-  // ===== ОТОБРАЖЕНИЕ БИБЛИОТЕКИ =====
   renderBookshelf();
   ui.style.display = 'flex';
 }
@@ -71,10 +70,8 @@ function doOpenBookshelf() {
 export function openBookshelf() {
   if (bookshelfOpen) return;
   
-  // ==== ЗАГРУЗКА ШАБЛОНА (ЕСЛИ НУЖНО) =====
   if (!isTemplateLoaded('bookshelf')) {
     loadTemplateIfNeeded('bookshelf').then(() => {
-      // Инициализируем обработчики ТОЛЬКО ПОСЛЕ того, как HTML вставлен в DOM
       initTemplateHandlers('bookshelf').then(() => {
         doOpenBookshelf();
       });
@@ -82,7 +79,6 @@ export function openBookshelf() {
     return;
   }
   
-  // Если шаблон загружен, но не инициализирован — инициализируем
   if (!isTemplateInitialized('bookshelf')) {
     initTemplateHandlers('bookshelf').then(() => {
       doOpenBookshelf();
@@ -105,8 +101,8 @@ export function closeBookshelf() {
   }
   
   bookshelfOpen = false;
+  registerModalClose('bookshelf');
   
-  // ===== ВОЗОБНОВЛЕНИЕ ИГРЫ =====
   audio.isGameActive = true;
   audio.resume();
   Game.resumeTime();
@@ -152,18 +148,15 @@ function renderBookshelf() {
     const aFound = foundNotes.includes(a.id);
     const bFound = foundNotes.includes(b.id);
     
-    // 1. Сначала найденные записки (в порядке нахождения)
     if (aFound && !bFound) return -1;
     if (!aFound && bFound) return 1;
     
-    // 2. Если обе найдены — сортируем по убыванию порядка нахождения
     if (aFound && bFound) {
       const aIndex = foundNotes.indexOf(a.id);
       const bIndex = foundNotes.indexOf(b.id);
       return bIndex - aIndex;
     }
     
-    // 3. Если обе не найдены — сортируем по уровню (по возрастанию)
     return a.level - b.level;
   });
   
@@ -228,10 +221,8 @@ window.openNoteFromBookshelf = function(noteId) {
   
   setTimeout(() => {
     import('../input/keyboard.js').then(module => {
-      // ==== ЗАГРУЗКА ШАБЛОНА (ЕСЛИ НУЖНО) =====
       if (!isTemplateLoaded('noteWindow')) {
         loadTemplateIfNeeded('noteWindow').then(() => {
-          // Инициализируем обработчики ПОСЛЕ вставки в DOM
           initTemplateHandlers('noteWindow').then(() => {
             showNoteFromBookshelf(note, foundNotes, module);
           });
@@ -239,7 +230,6 @@ window.openNoteFromBookshelf = function(noteId) {
         return;
       }
       
-      // Если шаблон загружен, но не инициализирован
       if (!isTemplateInitialized('noteWindow')) {
         initTemplateHandlers('noteWindow').then(() => {
           showNoteFromBookshelf(note, foundNotes, module);
@@ -278,6 +268,7 @@ function showNoteFromBookshelf(note, foundNotes, module) {
   if (countEl) countEl.textContent = `${foundNotes.length}/12`;
   
   module.pauseGameForNote();
+  registerModalOpen('note');
   
   noteWindow.style.display = 'flex';
 }

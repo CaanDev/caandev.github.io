@@ -75,10 +75,11 @@ function getHPCounterPosition() {
  * @param {number} x - Координата X источника (пиксели)
  * @param {number} y - Координата Y источника (пиксели)
  * @param {number} value - Количество золота (влияет на количество частиц)
+ * @param {string} [biome='cave'] - Биом ('cave', 'ice', 'sand', 'treasure')
  * @param {boolean} [simple=true] - Упрощённый режим (меньше частиц)
  * @returns {void}
  */
-export function createGoldParticles(x, y, value, simple = true) {
+export function createGoldParticles(x, y, value, biome = 'cave', simple = true) {
   const activeCount = goldParticlePool.getActiveCount();
   const maxAllowed = CONFIG.maxParticles.gold;
   
@@ -96,7 +97,7 @@ export function createGoldParticles(x, y, value, simple = true) {
   count = Math.min(count, availableSlots);
   
   for (let i = 0; i < count; i++) {
-    const particle = goldParticlePool.createGoldParticle(x, y, value, simple);
+    const particle = goldParticlePool.createGoldParticle(x, y, value, biome, simple);
     particle.targetX = target.x;
     particle.targetY = target.y;
     particle.attractionDelay = simple ? 2 + i * 0.5 + Math.random() * 5 : 3 + i * 0.8 + Math.random() * 8;

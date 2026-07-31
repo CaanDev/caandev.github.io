@@ -46,7 +46,7 @@ export function drawShop(ctx) {
   if (isImageLoaded(imageKey)) {
     const img = getImage(imageKey);
     if (img) {
-      const size = 110;
+      const size = 130;
       ctx.save();
       ctx.globalAlpha = Math.min(1, visibility * 0.85 + 0.1);
       ctx.drawImage(img, shopCenterX - size / 2, shopCenterY - size / 2, size, size);
@@ -79,7 +79,7 @@ export function drawShop(ctx) {
   ctx.save();
   ctx.globalAlpha = Math.min(1, visibility * 0.8 + 0.1);
   ctx.fillStyle = COLORS.player.shadow;
-  ctx.font = '36px Arial';
+  ctx.font = '44px Arial';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(EMOJIS.items.shop, shopCenterX, shopCenterY);

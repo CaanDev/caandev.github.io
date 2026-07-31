@@ -1,0 +1,1182 @@
+/**
+ * Стили для окна инвентаря
+ */
+
+/* ============ ОСНОВНОЕ ОКНО ============ */
+
+#inventory-ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg-overlay);
+  backdrop-filter: blur(8px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2500;
+  animation: fadeInPause 0.3s ease forwards;
+}
+
+.inventory-content {
+  background: var(--color-ui-panel);
+  background: var(--gradient-panel);
+  border: 1.5px solid var(--color-border-primary);
+  border-radius: 12px;
+  padding: 20px 30px 18px;
+  max-width: 780px;
+  width: 95%;
+  max-height: 94vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--color-text-primary);
+  font-family: 'Courier New', Courier, monospace;
+  box-shadow: 0 0 80px rgba(80, 20, 120, 0.12),
+              0 0 40px rgba(40, 10, 80, 0.08),
+              inset 0 0 60px rgba(40, 10, 80, 0.03);
+  animation: pauseSlideIn 0.3s ease forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.inventory-content::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  border-top: 2px solid var(--color-border-primary);
+  border-left: 2px solid var(--color-border-primary);
+  pointer-events: none;
+}
+
+.inventory-content::after {
+  content: '';
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-bottom: 2px solid var(--color-border-primary);
+  border-right: 2px solid var(--color-border-primary);
+  pointer-events: none;
+}
+
+/* ============ ЗАГОЛОВОК ============ */
+
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(100, 60, 140, 0.2);
+  flex-shrink: 0;
+}
+
+.inventory-header h2 {
+  margin: 0;
+  color: var(--color-text-light);
+  font-size: 18px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 30px rgba(140, 80, 180, 0.2);
+  font-weight: bold;
+  padding-left: 0;
+}
+
+.inventory-close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-dark);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 4px 8px;
+  border-radius: 4px;
+  line-height: 1;
+  pointer-events: auto;
+  flex-shrink: 0;
+}
+
+.inventory-close-btn:hover {
+  color: var(--color-text-red);
+  background: rgba(231, 76, 60, 0.1);
+  transform: rotate(90deg);
+}
+
+/* ============ ВКЛАДКИ ============ */
+
+.inventory-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.inventory-tab {
+  padding: 8px 18px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-dark);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+  border-radius: 8px 8px 0 0;
+}
+
+.inventory-tab:hover {
+  color: var(--color-text-light);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.inventory-tab.active {
+  color: var(--color-text-gold);
+  background: rgba(241, 196, 15, 0.08);
+  border-bottom-color: var(--color-text-gold);
+}
+
+/* ============ СОДЕРЖИМОЕ ВКЛАДОК ============ */
+
+.inventory-tab-content {
+  display: none;
+  animation: fadeInText 0.3s ease forwards;
+  flex: 1;
+  min-height: 0;
+}
+
+.inventory-tab-content.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Вкладка "Экипировка" */
+.inventory-equip-wrapper {
+  display: flex;
+  gap: 30px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Вкладка "Предметы" */
+.inventory-items-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.inventory-items-container .inventory-section {
+  flex: 1;
+  padding: 6px;
+}
+
+/* ============ ТЕЛО ============ */
+
+.inventory-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.inventory-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.inventory-body::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.inventory-body::-webkit-scrollbar-thumb {
+  background: rgba(100, 60, 140, 0.3);
+  border-radius: 2px;
+}
+
+.inventory-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 60, 140, 0.5);
+}
+
+/* ============ ЛЕВАЯ ЧАСТЬ: ЭКИПИРОВКА ============ */
+
+.inventory-equip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 14px;
+  flex: 0 0 auto;
+  align-content: center;
+  justify-items: center;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* ===== РУНЫ В ПУСТЫХ КЛЕТКАХ ===== */
+
+.inventory-equip .inventory-empty-cell-top-left {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inventory-equip .inventory-empty-cell-top-left::before {
+  content: 'ᚠ';
+  font-size: 28px;
+  color: #9b59b6;
+  opacity: 0.3;
+  animation: runePulse 4s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(155, 89, 182, 0.15);
+}
+
+.inventory-equip .inventory-empty-cell-top-right {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inventory-equip .inventory-empty-cell-top-right::before {
+  content: 'ᚢ';
+  font-size: 28px;
+  color: #9b59b6;
+  opacity: 0.3;
+  animation: runePulse 4.5s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(155, 89, 182, 0.15);
+}
+
+.inventory-equip .inventory-empty-cell-bottom-left {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inventory-equip .inventory-empty-cell-bottom-left::before {
+  content: 'ᚦ';
+  font-size: 28px;
+  color: #9b59b6;
+  opacity: 0.3;
+  animation: runePulse 3.8s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(155, 89, 182, 0.15);
+}
+
+.inventory-equip .inventory-empty-cell-bottom-right {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-width: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inventory-equip .inventory-empty-cell-bottom-right::before {
+  content: 'ᚨ';
+  font-size: 28px;
+  color: #9b59b6;
+  opacity: 0.3;
+  animation: runePulse 5s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(155, 89, 182, 0.15);
+}
+
+@keyframes runePulse {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.03);
+  }
+}
+
+/* ===== СЛОТЫ ЭКИПИРОВКИ ===== */
+
+.inventory-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 8px;
+  transition: all 0.3s ease;
+  min-height: 90px;
+  width: 100%;
+  max-width: 96px;
+  cursor: default;
+  position: relative;
+  aspect-ratio: 1 / 1;
+}
+
+.inventory-slot.weapon-slot {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.inventory-slot .inventory-slot-icon {
+  font-size: 36px;
+  line-height: 1.2;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Стили для изображений в слотах */
+.inventory-slot .inventory-slot-icon img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  image-rendering: auto;
+  display: block;
+}
+
+.inventory-slot-primary .inventory-slot-icon img {
+  width: 110px;
+  height: 110px;
+}
+
+.inventory-slot-secondary .inventory-slot-icon img {
+  width: 90px;
+  height: 90px;
+}
+
+/* ===== СЛОТЫ СНАРЯЖЕНИЯ (уменьшенные) ===== */
+
+.inventory-slot-equipment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 8px;
+  transition: all 0.3s ease;
+  min-height: 70px;
+  width: 100%;
+  max-width: 76px;
+  cursor: default;
+  position: relative;
+  aspect-ratio: 1 / 1;
+}
+
+.inventory-slot-equipment .inventory-slot-icon {
+  font-size: 22px;
+  line-height: 1.2;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.inventory-slot-equipment .inventory-slot-icon img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  image-rendering: auto;
+  display: block;
+}
+
+.inventory-slot-equipment.empty {
+  border-color: rgba(100, 180, 255, 0.15);
+  background: rgba(100, 180, 255, 0.04);
+}
+
+.inventory-slot-equipment.empty .inventory-slot-icon {
+  color: rgba(100, 180, 255, 0.3);
+}
+
+.inventory-slot-equipment.has-item {
+  border-color: rgba(52, 152, 219, 0.5) !important;
+  background: rgba(52, 152, 219, 0.08) !important;
+}
+
+.inventory-slot-equipment.has-item:hover {
+  border-color: rgba(52, 152, 219, 0.7) !important;
+  background: rgba(52, 152, 219, 0.15) !important;
+}
+
+.inventory-slot-equipment.has-item.active {
+  border-color: rgba(52, 152, 219, 0.8) !important;
+  background: rgba(52, 152, 219, 0.15) !important;
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.2) !important;
+}
+
+/* ===== КУРСОР ДЛЯ ЗАПОЛНЕННЫХ СЛОТОВ (КРОМЕ ОСНОВНОГО ОРУЖИЯ) ===== */
+
+.inventory-slot-secondary.has-item {
+  cursor: pointer;
+}
+
+.inventory-slot-secondary.has-item:hover {
+  transform: scale(1.02);
+}
+
+.inventory-slot-secondary.has-item .inventory-slot-icon {
+  transform: scale(1.05);
+}
+
+.inventory-slot-equipment.has-item {
+  cursor: pointer;
+}
+
+.inventory-slot-equipment.has-item:hover {
+  transform: scale(1.02);
+}
+
+.inventory-slot-equipment.has-item .inventory-slot-icon {
+  transform: scale(1.05);
+}
+
+.inventory-slot-primary {
+  cursor: default;
+}
+
+.inventory-slot.empty {
+  cursor: default;
+}
+
+.inventory-slot.empty:hover {
+  transform: none;
+}
+
+/* ===== ПОЗИЦИОНИРОВАНИЕ СЛОТОВ ===== */
+
+.inventory-slot-equipment[data-slot="item2"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.inventory-slot-equipment[data-slot="item1"] {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.inventory-slot-primary {
+  grid-column: 2;
+  grid-row: 2;
+  min-height: 110px;
+  max-width: 110px;
+}
+
+.inventory-slot-primary .inventory-slot-icon {
+  font-size: 50px;
+}
+
+.inventory-slot-equipment[data-slot="item3"] {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.inventory-slot-secondary {
+  grid-column: 2;
+  grid-row: 3;
+  min-height: 90px;
+  max-width: 96px;
+}
+
+.inventory-slot-secondary .inventory-slot-icon {
+  font-size: 36px;
+}
+
+/* ===== ПУСТЫЕ КЛЕТКИ ДЛЯ РУН ===== */
+
+.inventory-empty-cell-top-left {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.inventory-empty-cell-top-right {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.inventory-empty-cell-bottom-left {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.inventory-empty-cell-bottom-right {
+  grid-column: 3;
+  grid-row: 3;
+}
+
+/* ===== СОСТОЯНИЯ СЛОТОВ ===== */
+
+.inventory-slot.empty .inventory-slot-icon {
+  font-size: 28px;
+  opacity: 0.7;
+}
+
+.inventory-slot.weapon-slot.empty {
+  border-color: rgba(212, 160, 23, 0.25);
+  background: rgba(212, 160, 23, 0.05);
+}
+
+.inventory-slot.weapon-slot.empty .inventory-slot-icon {
+  color: rgba(212, 160, 23, 0.4);
+}
+
+.inventory-slot.has-item {
+  border-color: rgba(212, 160, 23, 0.55);
+  background: rgba(212, 160, 23, 0.10);
+}
+
+.inventory-slot.active,
+.inventory-slot.has-item.active {
+  border-color: rgba(212, 160, 23, 0.8) !important;
+  background: rgba(212, 160, 23, 0.14) !important;
+  box-shadow: 0 0 20px rgba(212, 160, 23, 0.15) !important;
+}
+
+.inventory-slot.active .inventory-slot-icon,
+.inventory-slot.has-item.active .inventory-slot-icon {
+  transform: scale(1.05);
+}
+
+/* ===== ВЫБРАННОЕ ОРУЖИЕ ===== */
+
+/* Ячейка оружия в сетке (экипированная) */
+.inventory-grid .inventory-item-cell.equipped {
+  border-color: rgba(212, 160, 23, 0.7) !important;
+  background: rgba(212, 160, 23, 0.10) !important;
+  box-shadow: 0 0 15px rgba(212, 160, 23, 0.12) !important;
+}
+
+.inventory-grid .inventory-item-cell.equipped .item-icon {
+  transform: scale(1.05);
+}
+
+.inventory-grid .inventory-item-cell.equipped:hover {
+  border-color: rgba(212, 160, 23, 0.9) !important;
+  background: rgba(212, 160, 23, 0.15) !important;
+  box-shadow: 0 0 20px rgba(212, 160, 23, 0.18) !important;
+}
+
+.inventory-slot-primary.has-item {
+  border-color: rgba(212, 160, 23, 0.55) !important;
+  background: rgba(212, 160, 23, 0.10) !important;
+}
+
+.inventory-slot-secondary.has-item {
+  border-color: rgba(212, 160, 23, 0.55) !important;
+  background: rgba(212, 160, 23, 0.10) !important;
+}
+
+.inventory-slot-primary.has-item.active,
+.inventory-slot-secondary.has-item.active {
+  border-color: rgba(212, 160, 23, 0.8) !important;
+  background: rgba(212, 160, 23, 0.14) !important;
+  box-shadow: 0 0 20px rgba(212, 160, 23, 0.15) !important;
+}
+
+/* ===== ВЫБРАННОЕ СНАРЯЖЕНИЕ ===== */
+
+/* Ячейка снаряжения в сетке (экипированная) */
+#inventory-equipment-grid .inventory-item-cell.equipped {
+  border-color: rgba(52, 152, 219, 0.7) !important;
+  background: rgba(52, 152, 219, 0.12) !important;
+  box-shadow: 0 0 15px rgba(52, 152, 219, 0.15) !important;
+}
+
+#inventory-equipment-grid .inventory-item-cell.equipped .item-icon {
+  transform: scale(1.05);
+}
+
+#inventory-equipment-grid .inventory-item-cell.equipped:hover {
+  border-color: rgba(52, 152, 219, 0.9) !important;
+  background: rgba(52, 152, 219, 0.18) !important;
+  box-shadow: 0 0 25px rgba(52, 152, 219, 0.25) !important;
+}
+
+#inventory-equipment-grid .inventory-item-cell.equipped .item-icon-img {
+  filter: brightness(1.05);
+}
+
+/* ===== СЕТКА СНАРЯЖЕНИЯ ===== */
+#inventory-equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5px;
+  min-height: 140px;
+  align-content: flex-start;
+}
+
+/* ===== ЯЧЕЙКИ СНАРЯЖЕНИЯ (уменьшенные) ===== */
+#inventory-equipment-grid .inventory-item-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  justify-self: center;
+}
+
+#inventory-equipment-grid .inventory-item-cell .item-icon-img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  image-rendering: auto;
+  display: block;
+}
+
+/* ============ ПРАВАЯ ЧАСТЬ: СПИСКИ ============ */
+
+.inventory-items {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.inventory-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 2px 2px 2px;
+}
+
+.inventory-section-header .line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.inventory-section-header .label {
+  font-size: 12px;
+  color: var(--color-text-dark);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.inventory-section {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  padding: 6px;
+}
+
+.inventory-section:last-child {
+  flex: 1;
+  padding: 12px;
+}
+
+/* ===== СЕТКА ОРУЖИЯ ===== */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  min-height: 48px;
+  align-content: flex-start;
+}
+
+/* ===== СЕТКА ПРЕДМЕТОВ ===== */
+#inventory-item-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 5px;
+  min-height: 280px;
+  align-content: flex-start;
+}
+
+/* ============ КЛЕТКА ПРЕДМЕТА (ОБЩАЯ) ============ */
+
+.inventory-item-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  justify-self: center;
+}
+
+/* ===== ЯЧЕЙКИ ОРУЖИЯ ===== */
+.inventory-grid .inventory-item-cell {
+  width: 90%;
+}
+
+.inventory-grid .inventory-item-cell .item-icon-img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  image-rendering: auto;
+  display: block;
+}
+
+.inventory-item-cell .item-icon {
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inventory-item-cell .item-name {
+  display: none;
+}
+
+.inventory-item-cell.empty {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.inventory-item-cell.empty:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.inventory-item-cell.active {
+  border-color: rgba(212, 160, 23, 0.7) !important;
+  background: rgba(212, 160, 23, 0.08) !important;
+  box-shadow: 0 0 15px rgba(212, 160, 23, 0.08) !important;
+}
+
+.inventory-item-cell.active .item-icon {
+  transform: scale(1.05);
+}
+
+.inventory-item-cell.locked {
+  opacity: 0.2;
+  cursor: default;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.03);
+}
+
+.inventory-item-cell.locked:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.03);
+}
+
+.inventory-item-cell.locked .item-icon {
+  opacity: 0.3;
+}
+
+#inventory-item-grid .inventory-item-cell {
+  width: 85%;
+}
+
+#inventory-item-grid .inventory-item-cell .item-icon-img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  image-rendering: auto;
+  display: block;
+}
+
+#inventory-item-grid .inventory-item-cell .item-icon {
+  font-size: 32px;
+}
+
+/* ============ БЛОК С ОПИСАНИЕМ ============ */
+
+.inventory-description {
+  flex-shrink: 0;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(100, 60, 140, 0.12);
+  min-height: 48px;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.inventory-description.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.inventory-description-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.inventory-description-icon {
+  display: none;
+}
+
+.inventory-description-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.inventory-description-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--color-text-light);
+}
+
+.inventory-description-title .equipped-status {
+  color: var(--color-text-dark);
+  font-weight: normal;
+}
+
+.inventory-description-sub {
+  font-size: 12px;
+  color: var(--color-text-dark);
+  margin-top: 3px;
+}
+
+/* ============ АДАПТАЦИЯ ============ */
+
+@media (max-width: 700px) {
+  .inventory-content {
+    padding: 16px 16px 14px;
+    max-width: 100%;
+    max-height: 95vh;
+  }
+  
+  .inventory-header h2 {
+    padding-left: 8px;
+  }
+  
+  .inventory-equip-wrapper {
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .inventory-body {
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-y: auto;
+    width: 100%;
+  }
+  
+  .inventory-equip {
+    flex: 0 0 auto;
+    gap: 10px;
+  }
+  
+  .inventory-equip .inventory-empty-cell-top-left::before,
+  .inventory-equip .inventory-empty-cell-top-right::before,
+  .inventory-equip .inventory-empty-cell-bottom-left::before,
+  .inventory-equip .inventory-empty-cell-bottom-right::before {
+    font-size: 20px;
+  }
+  
+  .inventory-slot {
+    min-height: 70px;
+    max-width: 76px;
+    padding: 6px;
+  }
+  
+  .inventory-slot .inventory-slot-icon img {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .inventory-slot-primary {
+    min-height: 86px;
+    max-width: 86px;
+  }
+  
+  .inventory-slot-primary .inventory-slot-icon img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .inventory-slot-secondary {
+    min-height: 70px;
+    max-width: 76px;
+  }
+  
+  .inventory-slot-secondary .inventory-slot-icon img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .inventory-slot .inventory-slot-icon {
+    font-size: 28px;
+  }
+  
+  .inventory-slot-primary .inventory-slot-icon {
+    font-size: 38px;
+  }
+  
+  .inventory-slot-secondary .inventory-slot-icon {
+    font-size: 28px;
+  }
+  
+  .inventory-slot-equipment {
+    min-height: 56px;
+    max-width: 60px;
+    padding: 4px;
+  }
+  
+  .inventory-slot-equipment .inventory-slot-icon {
+    font-size: 18px;
+  }
+  
+  .inventory-slot-equipment .inventory-slot-icon img {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .inventory-items {
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .inventory-section {
+    flex: none;
+    min-width: 80px;
+    padding: 6px;
+  }
+  
+  .inventory-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    width: 100%;
+  }
+  
+  .inventory-grid .inventory-item-cell {
+    width: 90%;
+    min-height: 64px;
+    max-width: 68px;
+    border-radius: 6px;
+  }
+  
+  .inventory-grid .inventory-item-cell .item-icon-img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .inventory-item-cell .item-icon {
+    font-size: 22px;
+  }
+  
+  #inventory-equipment-grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    min-height: 120px;
+    width: 100%;
+  }
+  
+  #inventory-equipment-grid .inventory-item-cell .item-icon-img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  #inventory-item-grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 5px;
+    min-height: 200px;
+    width: 100%;
+  }
+  
+  #inventory-item-grid .inventory-item-cell {
+    width: 85%;
+    min-height: 68px;
+    max-width: 72px;
+  }
+  
+  #inventory-item-grid .inventory-item-cell .item-icon-img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  #inventory-item-grid .inventory-item-cell .item-icon {
+    font-size: 24px;
+  }
+  
+  .inventory-description-title {
+    font-size: 14px;
+  }
+  
+  .inventory-description-sub {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 400px) {
+  .inventory-content {
+    padding: 10px 8px 8px;
+    max-height: 98vh;
+  }
+  
+  .inventory-header h2 {
+    font-size: 15px;
+    letter-spacing: 1px;
+    padding-left: 4px;
+  }
+  
+  .inventory-equip .inventory-empty-cell-top-left::before,
+  .inventory-equip .inventory-empty-cell-top-right::before,
+  .inventory-equip .inventory-empty-cell-bottom-left::before,
+  .inventory-equip .inventory-empty-cell-bottom-right::before {
+    font-size: 16px;
+  }
+  
+  .inventory-slot {
+    min-height: 56px;
+    max-width: 60px;
+    border-radius: 8px;
+  }
+  
+  .inventory-slot .inventory-slot-icon img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .inventory-slot-primary {
+    min-height: 68px;
+    max-width: 68px;
+  }
+  
+  .inventory-slot-primary .inventory-slot-icon img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .inventory-slot-secondary {
+    min-height: 56px;
+    max-width: 60px;
+  }
+  
+  .inventory-slot-secondary .inventory-slot-icon img {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .inventory-slot .inventory-slot-icon {
+    font-size: 22px;
+  }
+  
+  .inventory-slot-primary .inventory-slot-icon {
+    font-size: 30px;
+  }
+  
+  .inventory-slot-secondary .inventory-slot-icon {
+    font-size: 22px;
+  }
+  
+  .inventory-slot-equipment {
+    min-height: 44px;
+    max-width: 48px;
+    padding: 3px;
+  }
+  
+  .inventory-slot-equipment .inventory-slot-icon {
+    font-size: 14px;
+  }
+  
+  .inventory-slot-equipment .inventory-slot-icon img {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .inventory-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    width: 100%;
+  }
+  
+  .inventory-grid .inventory-item-cell {
+    width: 90%;
+    min-height: 56px;
+    max-width: 58px;
+    border-radius: 6px;
+  }
+  
+  .inventory-grid .inventory-item-cell .item-icon-img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .inventory-item-cell .item-icon {
+    font-size: 20px;
+  }
+  
+  #inventory-equipment-grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    min-height: 100px;
+    width: 100%;
+  }
+  
+  #inventory-equipment-grid .inventory-item-cell .item-icon-img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  #inventory-item-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 5px;
+    min-height: 180px;
+    width: 100%;
+  }
+  
+  #inventory-item-grid .inventory-item-cell {
+    width: 85%;
+    min-height: 58px;
+    max-width: 60px;
+  }
+  
+  #inventory-item-grid .inventory-item-cell .item-icon-img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  #inventory-item-grid .inventory-item-cell .item-icon {
+    font-size: 20px;
+  }
+  
+  .inventory-section {
+    min-width: 60px;
+    padding: 6px;
+  }
+}

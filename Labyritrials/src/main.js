@@ -8,7 +8,9 @@
 
 import { Input } from './systems/input/index.js';
 import { Game } from './core/game.js';
+import { initModalManager } from './systems/ui/modalManager.js';
 import { getBiomeByLevel, getBiomeConfig } from './core/config/biomes.js';
+import { initSnowManager, cleanupSnowManager } from './systems/weather/snowManager.js';
 import { audio } from './audio/audioManager.js';
 import { initPauseMenu } from './game/pauseMenu.js';
 import { initAchievements, initAchievementsUI, openAchievementsWindow } from './systems/achievements/index.js';
@@ -21,11 +23,13 @@ import { showLoader, updateLoader, hideLoader } from './utils/gameLoader.js';
 import { clearAllCaches } from './utils/cache.js';
 import { logger } from './utils/logger.js';
 import { openSettings, initSettings, getSettings } from './systems/ui/settings/index.js';
+import { initInventory, handleInventoryKey } from './systems/ui/inventory/index.js';
 // Импорты для изображений
 import { registerImages, loadAllImages } from './utils/imageLoader.js';
 import { SHOP_IMAGES } from './images/shopImages.js';
 import { ITEM_IMAGES } from './images/itemImages.js';
 import { OBJECT_IMAGES } from './images/objectImages.js';
+import { INVENTORY_IMAGES } from './images/inventoryImages.js';
 import { getAllWallImagesForRegistration } from './images/wallImages.js';
 import { UI_IMAGES } from './images/uiImages.js';
 
@@ -110,6 +114,10 @@ async function startNewGame() {
     // Удаляем старое сохранение
     const { deleteSave } = await import('./save/saveSystem.js');
     deleteSave();
+
+    // Сбрасываем биом
+    const { state } = await import('./core/config/state.js');
+    state.currentBiome = 'cave';
     
     updateLoader('Генерация лабиринта...', '🗺️', 'Создание подземелий...', 50);
     
@@ -118,6 +126,16 @@ async function startNewGame() {
     const { generateMaze } = await import('./world/maze.js');
     generateMaze(true);
     Game.updateUI();
+
+    // Удаление ледяной маски
+    const iceOverlay = document.getElementById('hp-ice-overlay');
+    if (iceOverlay && iceOverlay.parentNode) {
+      iceOverlay.parentNode.removeChild(iceOverlay);
+    }
+    
+    // Сброс состояния заморозки
+    const { resetFrost } = await import('./systems/weather/frostSystem.js');
+    resetFrost();
     
     clearInterval(progressInterval);
     
@@ -460,6 +478,7 @@ async function init() {
   registerImages(SHOP_IMAGES);
   registerImages(ITEM_IMAGES);
   registerImages(OBJECT_IMAGES);
+  registerImages(INVENTORY_IMAGES);
   registerImages(getAllWallImagesForRegistration());
   registerImages(UI_IMAGES);
 
@@ -504,6 +523,9 @@ async function init() {
   
   await new Promise(resolve => setTimeout(resolve, 300));
 
+  // Принудительно устанавливаем биом
+  state.currentBiome = 'cave';
+
   // Определение биома
   state.currentBiome = getBiomeByLevel(state.gameLevel);
   const biomeConfig = getBiomeConfig(state.currentBiome);
@@ -532,6 +554,22 @@ async function init() {
   } else {
     state.notes = { found: [], spawned: {}, positions: {} };
   }
+
+  // Инициализация системы погоды
+  initSnowManager();
+
+  // Инициализация инвентаря
+  initInventory();
+
+  initModalManager();
+
+  // Добавляем обработчик клавиатуры для инвентаря
+  document.addEventListener('keydown', handleInventoryKey);
+
+  // При выходе из игры очищаем ресурсы
+  window.addEventListener('beforeunload', () => {
+    cleanupSnowManager();
+  });
 
   updateLoader('Завершение...', '✨', 'Подготовка к запуску...', 85);
 

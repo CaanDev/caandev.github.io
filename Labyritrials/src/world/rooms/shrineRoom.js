@@ -119,6 +119,7 @@ export function generateShrineRoom() {
   state.originalMonsters = [...state.monsters];
   state.originalHadMonsters = state.hadMonsters;
   state.originalTraps = [...state.traps];
+  state.originalBonusGiven = state.bonusGiven;
   
   // Сохраняем открытые клетки для мини-карты
   state.originalRevealedCells = [];
@@ -586,6 +587,11 @@ export function returnFromShrineRoom() {
 
   if (state.originalHadMonsters && state.monsters.length === 0) {
     state.bonusGiven = false;
+  }
+
+  if (state.originalBonusGiven !== undefined) {
+    state.bonusGiven = state.originalBonusGiven;
+    state.originalBonusGiven = undefined;
   }
 
   // ===== ОЧИСТКА СОХРАНЁННЫХ ДАННЫХ =====

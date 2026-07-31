@@ -156,6 +156,14 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
 export function spawnArtifacts(isTreasureRoom = false, isProtectedCell = () => false) {
   state.artifacts = [];
 
+  // Определяем биом для артефактов
+  let artifactBiome;
+  if (isTreasureRoom || state.inTreasureRoom) {
+    artifactBiome = 'treasure';
+  } else {
+    artifactBiome = state.currentBiome || 'cave';
+  }
+
   const artifactCount = isTreasureRoom ? 2 : 3;
 
   const cells = getRandomFreeCells(artifactCount * 2, (x, y) => {
@@ -164,7 +172,6 @@ export function spawnArtifacts(isTreasureRoom = false, isProtectedCell = () => f
     if (x === 1 && y === 1) return false;
     if (x === CONFIG.goal.x && y === CONFIG.goal.y) return false;
 
-    // Проверка, нет ли уже артефакта на этой клетке
     const existing = state.artifacts.some(a =>
       Math.floor(a.x / CONFIG.cellSize) === x &&
       Math.floor(a.y / CONFIG.cellSize) === y
@@ -176,7 +183,7 @@ export function spawnArtifacts(isTreasureRoom = false, isProtectedCell = () => f
 
   for (let i = 0; i < Math.min(artifactCount, cells.length); i++) {
     const cell = cells[i];
-    const imagePath = getRandomArtifactImage();
+    const imagePath = getRandomArtifactImage(artifactBiome);
     const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
     
     state.artifacts.push({
@@ -184,6 +191,7 @@ export function spawnArtifacts(isTreasureRoom = false, isProtectedCell = () => f
       y: cell.y * CONFIG.cellSize + CONFIG.cellSize / 2,
       imageKey: cacheKey,
       imagePath: imagePath,
+      biome: artifactBiome,
     });
     
     markCellUsed(cell.x, cell.y);

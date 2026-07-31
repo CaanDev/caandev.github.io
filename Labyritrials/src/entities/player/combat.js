@@ -75,8 +75,8 @@ export function executeAttack(isStrong) {
   breakWall(targetX, targetY, isStrong);
   
   const damage = isStrong ? player.baseDamage * 3 : player.baseDamage;
-  const attackWorldX = player.px + attackDirX * 78;
-  const attackWorldY = player.py + attackDirY * 78;
+  const attackWorldX = player.px + attackDirX * 100;
+  const attackWorldY = player.py + attackDirY * 100;
   
   dealDamageToMonsters(attackWorldX, attackWorldY, damage, isStrong, attackDirX, attackDirY);
 }

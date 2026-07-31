@@ -127,7 +127,7 @@ function drawPortalGate(ctx, portal, baseColor, emoji, customOptions = null) {
     const alpha = (0.6 + Math.sin(Date.now() * 0.004) * 0.2) * visibility;
     ctx.globalAlpha = Math.min(1, alpha);
     ctx.fillStyle = COLORS.player.shadow;
-    ctx.font = '36px Arial';
+    ctx.font = '40px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(emoji, centerX, centerY);
@@ -293,12 +293,12 @@ function drawExitPortal(ctx) {
             ctx.globalAlpha = Math.min(1, visibility * 0.85 + 0.1);
             
             ctx.beginPath();
-            ctx.roundRect(gdx + 20, gdy + 20, CONFIG.cellSize - 40, CONFIG.cellSize - 40, 12);
+            ctx.roundRect(gdx + 26, gdy + 26, CONFIG.cellSize - 52, CONFIG.cellSize - 52, 12);
             ctx.fillStyle = COLORS.portals.exit;
             ctx.fill();
             
             ctx.beginPath();
-            ctx.roundRect(gdx + 20, gdy + 20, CONFIG.cellSize - 40, CONFIG.cellSize - 40, 12);
+            ctx.roundRect(gdx + 26, gdy + 26, CONFIG.cellSize - 52, CONFIG.cellSize - 52, 12);
             ctx.strokeStyle = COLORS.portals.shrine;
             ctx.lineWidth = 3;
             ctx.stroke();

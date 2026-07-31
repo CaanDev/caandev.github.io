@@ -65,6 +65,28 @@ export const state = {
   showShopPrompt: false,
   /** @type {number} - Сила тряски экрана */
   screenShake: 0,
+
+  /** @type {boolean|undefined} - Оригинальный флаг бонуса (для восстановления) */
+  originalBonusGiven: undefined,
+
+  // ПОГОДА (ЛЕДЯНОЙ БИОМ)
+  /** @type {Object} - Состояние погоды для сохранения */
+  weatherState: {
+    /** @type {boolean} - Активен ли снегопад */
+    snowActive: false,
+    /** @type {number} - Время начала снегопада */
+    snowStartTime: 0,
+    /** @type {number} - Время окончания последнего снегопада */
+    lastSnowfallEnd: 0,
+    /** @type {number} - Время начала уровня */
+    levelStartTime: 0,
+    /** @type {number} - Прогресс заморозки (0-100) */
+    frostProgress: 0,
+    /** @type {boolean} - Полностью ли замёрз игрок */
+    frostFrozen: false,
+    /** @type {number} - Таймер потери HP */
+    frostDamageTimer: 0,
+  },
   
   // ============================================================
   // ЧАСТИЦЫ

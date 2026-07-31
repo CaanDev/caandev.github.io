@@ -70,9 +70,12 @@ import {
   restoreRunesData,
   restoreGameStatsData,
   restoreAchievementsData,
+  restoreWeatherData,
   restoreNotesData,
   restoreFlags
 } from './restorers/index.js';
+import { snowState } from '../systems/weather/snowManager.js';
+import { frostState } from '../systems/weather/frostSystem.js';
 
 /**
  * Сохранение текущего состояния игры
@@ -92,6 +95,15 @@ export function saveGame() {
     ...collectPositionData(),
     ...collectMazeData(),
     ...collectBossData(),
+    weatherState: {
+      snowActive: snowState.active,
+      snowStartTime: snowState.startTime,
+      lastSnowfallEnd: snowState.lastSnowfallEnd,
+      levelStartTime: snowState.levelStartTime,
+      frostProgress: frostState.progress,
+      frostFrozen: frostState.frozen,
+      frostDamageTimer: frostState.damageTimer,
+    },
     monsters: collectMonstersData(),
     traps: collectTrapsData(),
     artifacts: collectArtifactsData(),
@@ -139,6 +151,23 @@ export async function loadGame() {
       CONFIG.rows = save.mazeRows;
     }
 
+    // ===== ВОССТАНАВЛИВАЕМ ПОГОДУ ПОСЛЕ ВСЕХ ДАННЫХ =====
+    let weatherRestored = false;
+    if (save.weatherState) {
+      const ws = save.weatherState;
+      snowState.active = ws.snowActive || false;
+      snowState.startTime = ws.snowStartTime || 0;
+      snowState.lastSnowfallEnd = ws.lastSnowfallEnd || 0;
+      snowState.levelStartTime = ws.levelStartTime || Date.now();
+      
+      frostState.progress = ws.frostProgress || 0;
+      frostState.frozen = ws.frostFrozen || false;
+      frostState.damageTimer = ws.frostDamageTimer || 0;
+      
+      weatherRestored = true;
+    }
+
+    // ===== ВОССТАНАВЛИВАЕМ ВСЁ ОСТАЛЬНОЕ =====
     restoreMazeData(save);
     restorePlayerData(save);
     restoreWeaponData(save);
@@ -164,6 +193,53 @@ export async function loadGame() {
     restoreAchievementsData(save);
     restoreNotesData(save);
     restoreFlags(save);
+
+    // ===== ВОССТАНАВЛИВАЕМ СНЕГОПАД ПОСЛЕ ВСЕГО =====
+    if (weatherRestored && snowState.active) {
+      // Проверяем, что мы в ледяном биоме и не в тайной комнате
+      const isIceBiome = state.currentBiome === 'ice' && state.gameLevel >= 6 && state.gameLevel <= 9;
+      const isInSecretRoom = state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom || state.inSafeRoom;
+      
+      if (isIceBiome && !isInSecretRoom && !state.isBossLevel) {
+        // Импортируем функцию для создания снежинок
+        const { createSnowflakes } = await import('../systems/weather/snowRenderer.js');
+        createSnowflakes();
+        
+        // Устанавливаем прозрачность на максимум
+        snowState.targetOpacity = 1;
+        snowState.opacity = 1;
+        
+        // Восстанавливаем таймер остановки снегопада
+        const elapsed = Date.now() - snowState.startTime;
+        // Используем значения из snowState или значения по умолчанию
+        const minDuration = snowState.minDuration || 60000;
+        const maxDuration = snowState.maxDuration || 180000;
+        const avgDuration = (minDuration + maxDuration) / 2;
+        const remaining = Math.max(0, avgDuration - elapsed);
+        
+        if (remaining > 0) {
+          if (snowState.stopTimer) {
+            clearTimeout(snowState.stopTimer);
+            snowState.stopTimer = null;
+          }
+          snowState.stopTimer = setTimeout(() => {
+            import('../systems/weather/snowManager.js').then(module => {
+              module.stopSnowfall();
+            });
+          }, remaining);
+        } else {
+          snowState.active = false;
+          snowState.targetOpacity = 0;
+          snowState.opacity = 0;
+        }
+      } else {
+        // Если не подходит биом — отключаем снегопад
+        snowState.active = false;
+        snowState.targetOpacity = 0;
+        snowState.opacity = 0;
+        logger.info('❄️ Снегопад отключен при загрузке: не подходит биом или комната');
+      }
+    }
 
     logger.save('📀 Игра загружена! Уровень:', state.gameLevel);
     logger.save(`🏆 Достижений разблокировано: ${state.achievements.unlocked.length}`);

@@ -66,6 +66,7 @@ export {
   restoreEventData,
   restoreGameStatsData,
   restoreAchievementsData,
+  restoreWeatherData,
   restoreNotesData
 } from './systemRestorer.js';
 

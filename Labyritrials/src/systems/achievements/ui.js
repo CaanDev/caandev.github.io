@@ -21,6 +21,7 @@ import { logger } from '../../utils/logger.js';
 import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../../utils/htmlLoader.js';
 import { getImage, isImageLoaded } from '../../utils/imageLoader.js';
 import { UI_IMAGES } from '../../images/uiImages.js';
+import { registerModalOpen, registerModalClose } from '../ui/modalManager.js';
 
 /** @type {number|null} - Таймаут скрытия уведомления */
 let notificationTimeout = null;
@@ -39,10 +40,10 @@ let achievementsOpen = false;
  * @private
  */
 function getAchievementImageKey(id) {
-  // Строгое соответствие: ID достижения → ключ в UI_IMAGES
-  // Если картинки нет — возвращаем null (будет использован эмодзи)
   const imageMap = {
     // Combat
+    'boss_hunter_10': 'bossHunter10',
+    'boss_conqueror': 'bossConqueror',
     'fire_mage': 'fire_mage',
     'vampire_lord': 'vampire_lord',
     'thunderer': 'thunderer',
@@ -61,10 +62,13 @@ function getAchievementImageKey(id) {
     'gold_millionaire': 'gold_millionaire',
     'collector': 'collector',
     'artifactor': 'artifactor',
-    'fully_equipped': 'fully_equipped',
+    'fully_equipped': 'fullyEquipped',
     'story_collector': 'story_collector',
     
     // Survival
+    'survivor': 'survivor',
+    'veteran': 'veteran',
+    'labyrinth_master': 'labyrinthMaster',
     'iron_man': 'iron_man',
     
     // Secret
@@ -73,11 +77,11 @@ function getAchievementImageKey(id) {
     'dodge_master': 'dodge_master',
     'unlucky': 'unlucky',
     'cleaner': 'cleaner',
+    'trap_master': 'trapMaster',
     'shadow': 'shadow',
     'mimic_paranoid': 'mimic_paranoid',
   };
   
-  // Возвращаем ключ только если он есть в imageMap И картинка загружена
   const key = imageMap[id];
   if (key && isImageLoaded(key)) {
     return key;
@@ -164,7 +168,6 @@ function showNextNotification() {
   
   nameEl.textContent = achievement.name;
   
-  // Обновляем иконку уведомления
   if (iconEl) {
     const imageKey = getAchievementImageKey(id);
     if (imageKey && isImageLoaded(imageKey)) {
@@ -225,6 +228,7 @@ function showAchievementsWindow() {
   
   achievementsOpen = true;
   window.style.display = 'flex';
+  registerModalOpen('achievements');
   currentCategory = 'all';
 
   document.querySelectorAll('.achievements-tab').forEach(tab => {
@@ -279,6 +283,7 @@ export function closeAchievementsWindow() {
   
   achievementsOpen = false;
   window.style.display = 'none';
+  registerModalClose('achievements');
   
   import('../../core/game.js').then(({ Game }) => {
     if (Game && !Game.isRunning) {
@@ -338,25 +343,21 @@ export function renderAchievements(categoryId) {
     const aUnlocked = a.unlocked;
     const bUnlocked = b.unlocked;
     
-    // 1. Сначала разблокированные достижения
     if (aUnlocked && !bUnlocked) return -1;
     if (!aUnlocked && bUnlocked) return 1;
     
-    // 2. Если оба разблокированы — по порядку получения (сначала последние)
     if (aUnlocked && bUnlocked) {
       const aIndex = unlockedList.indexOf(a.id);
       const bIndex = unlockedList.indexOf(b.id);
       return bIndex - aIndex;
     }
     
-    // 3. Если оба заблокированы — по прогрессу (чем ближе к разблокировке, тем выше)
     const aProgress = a.current / a.max;
     const bProgress = b.current / b.max;
     if (aProgress !== bProgress) {
       return bProgress - aProgress;
     }
     
-    // 4. Если прогресс одинаков — по категории
     const categoryOrder = ['combat', 'exploration', 'collection', 'survival', 'secret'];
     const aCatIndex = categoryOrder.indexOf(a.category);
     const bCatIndex = categoryOrder.indexOf(b.category);

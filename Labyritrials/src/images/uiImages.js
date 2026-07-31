@@ -10,6 +10,8 @@
 export const ACHIEVEMENT_IMAGES = {
   // Боевые
   combat: {
+    bossHunter10: 'assets/images/ui/achievements/combat/bossHunter10.png',
+    bossConqueror: 'assets/images/ui/achievements/combat/bossConqueror.png',
     fire_mage: 'assets/images/ui/achievements/combat/fireMage.png',
     vampire_lord: 'assets/images/ui/achievements/combat/vampireLord.png',
     thunderer: 'assets/images/ui/achievements/combat/thunderer.png',
@@ -38,6 +40,9 @@ export const ACHIEVEMENT_IMAGES = {
   
   // Выживание
   survival: {
+    survivor: 'assets/images/ui/achievements/survival/survivor.png',
+    veteran: 'assets/images/ui/achievements/survival/veteran.png',
+    labyrinthMaster: 'assets/images/ui/achievements/survival/labyrinthMaster.png',
     iron_man: 'assets/images/ui/achievements/survival/ironMan.png',
   },
   
@@ -48,6 +53,7 @@ export const ACHIEVEMENT_IMAGES = {
     dodge_master: 'assets/images/ui/achievements/secret/dodgeMaster.png',
     unlucky: 'assets/images/ui/achievements/secret/unlucky.png',
     cleaner: 'assets/images/ui/achievements/secret/cleaner.png',
+    trapMaster: 'assets/images/ui/achievements/secret/trapMaster.png',
     shadow: 'assets/images/ui/achievements/secret/shadow.png',
     mimic_paranoid: 'assets/images/ui/achievements/secret/mimicParanoid.png',
   },
@@ -63,6 +69,8 @@ export const UI_IMAGES = {
   // ============================================================
 
   // Combat
+  bossHunter10: 'assets/images/ui/achievements/combat/bossHunter10.png',
+  bossConqueror: 'assets/images/ui/achievements/combat/bossConqueror.png',
   fire_mage: 'assets/images/ui/achievements/combat/fireMage.png',
   vampire_lord: 'assets/images/ui/achievements/combat/vampireLord.png',
   thunderer: 'assets/images/ui/achievements/combat/thunderer.png',
@@ -85,6 +93,9 @@ export const UI_IMAGES = {
   story_collector: 'assets/images/ui/achievements/collection/storyCollector.png',
   
   // Survival
+  survivor: 'assets/images/ui/achievements/survival/survivor.png',
+  veteran: 'assets/images/ui/achievements/survival/veteran.png',
+  labyrinthMaster: 'assets/images/ui/achievements/survival/labyrinthMaster.png',
   iron_man: 'assets/images/ui/achievements/survival/ironMan.png',
   
   // Secret
@@ -93,6 +104,7 @@ export const UI_IMAGES = {
   dodge_master: 'assets/images/ui/achievements/secret/dodgeMaster.png',
   unlucky: 'assets/images/ui/achievements/secret/unlucky.png',
   cleaner: 'assets/images/ui/achievements/secret/cleaner.png',
+  trapMaster: 'assets/images/ui/achievements/secret/trapMaster.png',
   shadow: 'assets/images/ui/achievements/secret/shadow.png',
   mimic_paranoid: 'assets/images/ui/achievements/secret/mimicParanoid.png',
 

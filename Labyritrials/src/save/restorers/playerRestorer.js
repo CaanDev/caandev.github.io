@@ -28,6 +28,10 @@ export function restorePlayerData(save) {
   player.emoji = EMOJIS.player.default;
   player.goldMultiplier = save.goldMultiplier || 1.0;
   player.vampMultiplier = save.vampMultiplier || 1.0;
+  
+  if (save.inventory) {
+    player.inventory = save.inventory;
+  }
 }
 
 /**

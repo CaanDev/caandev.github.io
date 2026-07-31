@@ -1,3 +1,5 @@
+// systems/ui/settings/settingsUI.js
+
 /**
  * @fileoverview UI окна настроек.
  * Управляет открытием, закрытием, инициализацией и обновлением
@@ -12,6 +14,7 @@ import { updateFpsLimit, updateFpsVisibility } from './settingsFps.js';
 import { initSliders, initToggles, initSelects, initButtons } from './settingsControls.js';
 import { updateFpsDisplay, shouldSkipFrame, getFrameInterval } from './settingsFps.js';
 import { loadTemplateIfNeeded, isTemplateLoaded } from '../../../utils/htmlLoader.js';
+import { registerModalOpen, registerModalClose } from '../modalManager.js';
 
 /** @type {boolean} - Открыты ли настройки */
 let settingsOpen = false;
@@ -36,12 +39,10 @@ export function isSettingsOpen() {
 export function switchSettingsTab(tabId) {
   currentTab = tabId;
   
-  // Обновляем классы у вкладок
   document.querySelectorAll('.settings-tab').forEach(tab => {
     tab.classList.toggle('active', tab.dataset.tab === tabId);
   });
   
-  // Обновляем классы у содержимого
   document.querySelectorAll('.settings-tab-content').forEach(content => {
     content.classList.toggle('active', content.id === `settings-tab-${tabId}`);
   });
@@ -61,18 +62,16 @@ function showSettings() {
   loadSettings();
   updateSettingsUI();
   settingsUI.style.display = 'flex';
+  registerModalOpen('settings');
 
-  // Устанавливаем активную вкладку по умолчанию
   switchSettingsTab('audio');
 
-  // ===== ПАУЗА ИГРЫ =====
   import('../../../core/game.js').then(({ Game }) => {
     if (Game.isRunning) {
       Game.stopLoop();
     }
   });
 
-  // ===== ПАУЗА МУЗЫКИ =====
   if (!audio.isMainMenu) {
     audio.pause();
   }
@@ -84,10 +83,8 @@ function showSettings() {
  * @returns {void}
  */
 export function openSettings() {
-  // ==== ЗАГРУЗКА ШАБЛОНА НАСТРОЕК (ЕСЛИ НУЖНО) =====
   if (!isTemplateLoaded('settings')) {
     loadTemplateIfNeeded('settings').then(() => {
-      // Инициализируем обработчики ПОСЛЕ вставки в DOM
       initSettingsHandlers();
       showSettings();
     });
@@ -109,13 +106,12 @@ export function closeSettings() {
   const settings = getSettings();
   settingsOpen = false;
   settingsUI.style.display = 'none';
+  registerModalClose('settings');
 
-  // ===== ВОЗОБНОВЛЕНИЕ МУЗЫКИ =====
   if (!audio.isMainMenu && settings.musicEnabled) {
     audio.resume();
   }
 
-  // ===== ВОЗОБНОВЛЕНИЕ ИГРЫ =====
   import('../../../core/game.js').then(({ Game }) => {
     if (!Game.isRunning) {
       Game.startLoop();
@@ -135,7 +131,6 @@ function updateSettingsUI() {
   const musicSlider = document.getElementById('settings-music-volume');
   const soundSlider = document.getElementById('settings-sound-volume');
 
-  // ===== СЛАЙДЕРЫ =====
   if (musicSlider) {
     musicSlider.value = settings.musicVolume;
     document.getElementById('settings-music-value').textContent = `${settings.musicVolume}%`;
@@ -145,7 +140,6 @@ function updateSettingsUI() {
     document.getElementById('settings-sound-value').textContent = `${settings.soundVolume}%`;
   }
 
-  // ===== ПЕРЕКЛЮЧАТЕЛИ =====
   const musicToggle = document.getElementById('settings-music-toggle');
   const soundToggle = document.getElementById('settings-sound-toggle');
   const fpsToggle = document.getElementById('settings-show-fps');
@@ -167,7 +161,6 @@ function updateSettingsUI() {
  * @returns {void}
  */
 export function initSettingsHandlers() {
-  // ===== ВКЛАДКИ =====
   document.querySelectorAll('.settings-tab').forEach(tab => {
     const newTab = tab.cloneNode(true);
     tab.parentNode.replaceChild(newTab, tab);
@@ -177,7 +170,6 @@ export function initSettingsHandlers() {
     });
   });
 
-  // ===== КНОПКА ЗАКРЫТИЯ =====
   const closeBtn = document.getElementById('settings-close-btn');
   if (closeBtn) {
     const newCloseBtn = closeBtn.cloneNode(true);
@@ -189,15 +181,11 @@ export function initSettingsHandlers() {
 /**
  * Инициализация системы настроек
  * 
- * Загружает настройки, применяет их, настраивает обработчики
- * и отслеживает изменения видимости UI для FPS-счётчика.
- * 
  * @returns {void}
  */
 export function initSettings() {
   const settings = loadSettings();
 
-  // ===== ПРИМЕНЕНИЕ НАСТРОЕК =====
   updateFpsLimit();
 
   audio.setMusicEnabled(settings.musicEnabled);
@@ -216,19 +204,15 @@ export function initSettings() {
     updateFpsVisibility();
   }
 
-  // ===== ИНИЦИАЛИЗАЦИЯ ЭЛЕМЕНТОВ УПРАВЛЕНИЯ =====
   initSliders();
   initToggles();
   initSelects();
   initButtons();
 
-  // ===== ИНИЦИАЛИЗАЦИЯ ОБРАБОТЧИКОВ ВКЛАДОК =====
-  // (если шаблон уже загружен)
   if (document.querySelector('.settings-tab')) {
     initSettingsHandlers();
   }
 
-  // ===== ОТСЛЕЖИВАНИЕ ИЗМЕНЕНИЯ ВИДИМОСТИ UI =====
   const observer = new MutationObserver(() => {
     updateFpsVisibility();
   });
@@ -252,5 +236,4 @@ export function initSettings() {
   }
 }
 
-// ===== РЕЭКСПОРТ ДЛЯ ОБРАТНОЙ СОВМЕСТИМОСТИ =====
 export { updateFpsDisplay, shouldSkipFrame, getFrameInterval, updateFpsLimit };

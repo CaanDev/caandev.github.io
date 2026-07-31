@@ -8,6 +8,7 @@ import { COLORS } from './config/colors.js';
 import { getSettings } from '../systems/ui/settings/index.js';
 import { drawFloor, drawWalls } from '../systems/rendering/mazeRenderer.js';
 import { drawBackground, drawBossSummonCircle, drawBossLightFade } from '../systems/rendering/maze/index.js';
+import { drawSnow } from '../systems/weather/snowRenderer.js';
 import { drawBloodPuddles } from '../systems/rendering/bloodRenderer.js';
 import { drawTorches, updateTorchParticles } from '../systems/rendering/torchRenderer.js';
 import { drawAllPortals, drawShop } from '../systems/rendering/index.js';
@@ -216,6 +217,7 @@ export const Renderer = {
 
     // Наложения поверх всего
     drawFogOfWar(ctx, canvas);
+    drawSnow(ctx, canvas, camX, camY);
     drawBossLightFade(ctx, canvas, camX, camY);
     drawRealityShift(ctx, canvas);
     

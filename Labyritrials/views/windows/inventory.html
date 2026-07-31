@@ -1,0 +1,127 @@
+<!-- Окно инвентаря -->
+<div id="inventory-ui" style="display: none;">
+  <div class="inventory-content">
+    <!-- Заголовок -->
+    <div class="inventory-header">
+      <h2>ИНВЕНТАРЬ</h2>
+      <button id="inventory-close-btn" class="inventory-close-btn">✕</button>
+    </div>
+    
+    <!-- Вкладки -->
+    <div class="inventory-tabs">
+      <button class="inventory-tab active" data-tab="equipment">⚔️ Экипировка</button>
+      <button class="inventory-tab" data-tab="items">🎒 Предметы</button>
+    </div>
+    
+    <!-- Содержимое вкладок -->
+    <div class="inventory-body">
+      
+      <!-- ===== ВКЛАДКА: ЭКИПИРОВКА ===== -->
+      <div class="inventory-tab-content active" id="inventory-tab-equipment">
+        <div class="inventory-equip-wrapper">
+          <!-- Левая часть: Экипировка -->
+          <div class="inventory-equip">
+            <!-- Пустая клетка (1, 1) — верхний левый угол -->
+            <div class="inventory-empty-cell-top-left"></div>
+            
+            <!-- Слот 2 (предмет) - сверху по центру -->
+            <div class="inventory-slot inventory-slot-equipment empty" data-slot="item2">
+              <div class="inventory-slot-icon">+</div>
+            </div>
+            
+            <!-- Пустая клетка (1, 3) — верхний правый угол -->
+            <div class="inventory-empty-cell-top-right"></div>
+            
+            <!-- Слот 1 (предмет) - слева по центру -->
+            <div class="inventory-slot inventory-slot-equipment empty" data-slot="item1">
+              <div class="inventory-slot-icon">+</div>
+            </div>
+            
+            <!-- Основное оружие (центр) -->
+            <div class="inventory-slot inventory-slot-primary weapon-slot" data-slot="primary">
+              <div class="inventory-slot-icon" id="inventory-primary-weapon">🧙</div>
+            </div>
+            
+            <!-- Слот 3 (предмет) - справа по центру -->
+            <div class="inventory-slot inventory-slot-equipment empty" data-slot="item3">
+              <div class="inventory-slot-icon">+</div>
+            </div>
+            
+            <!-- Пустая клетка (3, 1) — нижний левый угол -->
+            <div class="inventory-empty-cell-bottom-left"></div>
+            
+            <!-- Второе оружие - нижний центр -->
+            <div class="inventory-slot inventory-slot-secondary weapon-slot empty" data-slot="secondary">
+              <div class="inventory-slot-icon" id="inventory-secondary-weapon">+</div>
+            </div>
+            
+            <!-- Пустая клетка (3, 3) — нижний правый угол -->
+            <div class="inventory-empty-cell-bottom-right"></div>
+          </div>
+          
+          <!-- Правая часть: Списки оружия -->
+          <div class="inventory-items">
+            <!-- Заголовок: Оружие -->
+            <div class="inventory-section-header">
+              <span class="line"></span>
+              <span class="label">Оружие</span>
+              <span class="line"></span>
+            </div>
+            
+            <!-- Секция: Ближнее оружие -->
+            <div class="inventory-section">
+              <div class="inventory-grid" id="inventory-weapon-grid">
+                <!-- Заполняется через JS -->
+              </div>
+            </div>
+            
+            <!-- Секция: Дальнее оружие -->
+            <div class="inventory-section">
+              <div class="inventory-grid" id="inventory-ranged-grid">
+                <!-- Заполняется через JS -->
+              </div>
+            </div>
+            
+            <!-- Заголовок: Снаряжение -->
+            <div class="inventory-section-header">
+              <span class="line"></span>
+              <span class="label">Снаряжение</span>
+              <span class="line"></span>
+            </div>
+            
+            <!-- Секция: Снаряжение -->
+            <div class="inventory-section">
+              <div class="inventory-grid" id="inventory-equipment-grid">
+                <!-- Заполняется через JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- ===== ВКЛАДКА: ПРЕДМЕТЫ ===== -->
+      <div class="inventory-tab-content" id="inventory-tab-items">
+        <div class="inventory-items-container">
+          <!-- Сетка предметов -->
+          <div class="inventory-section">
+            <div class="inventory-grid inventory-items-grid" id="inventory-item-grid">
+              <!-- Заполняется через JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Блок с описанием -->
+    <div class="inventory-description" id="inventory-description">
+      <div class="inventory-description-content">
+        <span class="inventory-description-icon" id="inv-desc-icon"></span>
+        <div class="inventory-description-text">
+          <div class="inventory-description-title" id="inv-desc-title"></div>
+          <div class="inventory-description-sub" id="inv-desc-sub"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -46,8 +46,12 @@ function handleGoldPickup(item) {
   
   Game.updateUI();
 
+  // Определяем биом для частиц золота
+  let goldBiome = state.currentBiome || 'cave';
+  if (state.inTreasureRoom) goldBiome = 'treasure';
+  
   import('../../systems/particles/goldParticles.js').then(module => {
-    module.createGoldParticles(item.x, item.y, goldAmount);
+    module.createGoldParticles(item.x, item.y, goldAmount, goldBiome);
   });
 }
 

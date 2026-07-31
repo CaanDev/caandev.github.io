@@ -128,6 +128,29 @@ export function restoreGameStatsData(save) {
 }
 
 /**
+ * Восстановление данных о погоде
+ * 
+ * @param {Object} save - Объект сохранения
+ * @returns {void}
+ */
+export function restoreWeatherData(save) {
+  if (save.weatherState) {
+    const ws = save.weatherState;
+    import('../../systems/weather/snowManager.js').then(({ snowState }) => {
+      snowState.active = ws.snowActive || false;
+      snowState.startTime = ws.snowStartTime || 0;
+      snowState.lastSnowfallEnd = ws.lastSnowfallEnd || 0;
+      snowState.levelStartTime = ws.levelStartTime || Date.now();
+    });
+    import('../../systems/weather/frostSystem.js').then(({ frostState }) => {
+      frostState.progress = ws.frostProgress || 0;
+      frostState.frozen = ws.frostFrozen || false;
+      frostState.damageTimer = ws.frostDamageTimer || 0;
+    });
+  }
+}
+
+/**
  * Восстановление данных о достижениях
  * 
  * @param {Object} save - Объект сохранения

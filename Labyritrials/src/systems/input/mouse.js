@@ -8,6 +8,7 @@
 import { state, player } from '../../core/config/index.js';
 import { executeAttack } from '../../entities/player/index.js';
 import { isPauseMenuOpen } from '../../game/pauseMenu.js';
+import { isAnyModalOpen } from '../ui/modalManager.js';
 
 /** @type {number} - Мировая координата X курсора */
 let mouseWorldX = 0;
@@ -39,6 +40,32 @@ function isClickOnControlButton(target) {
 }
 
 /**
+ * Проверка, является ли клик внутри модального окна
+ * 
+ * @param {EventTarget} target - Цель события
+ * @returns {boolean} - true, если клик внутри модального окна
+ * @private
+ */
+function isClickInsideModal(target) {
+  const modalSelectors = [
+    '.inventory-content', '.achievements-content', '.settings-content',
+    '.shop-content', '.pause-content', '.note-reader-content',
+    '.bookshelf-content', '.final-screen-content', '.level-up-content'
+  ];
+  let element = target;
+  
+  while (element && element !== document.body) {
+    for (const selector of modalSelectors) {
+      if (element.matches && element.matches(selector)) {
+        return true;
+      }
+    }
+    element = element.parentElement;
+  }
+  return false;
+}
+
+/**
  * Обновление позиции курсора мыши
  * 
  * @param {MouseEvent} e - Событие движения мыши
@@ -46,6 +73,7 @@ function isClickOnControlButton(target) {
  */
 export function updateMousePosition(e) {
   if (isPauseMenuOpen()) return;
+  if (isAnyModalOpen()) return;
 
   const canvas = document.getElementById('gameCanvas');
   const rect = canvas.getBoundingClientRect();
@@ -81,6 +109,15 @@ export function updateMousePosition(e) {
  * @returns {void}
  */
 export function handleMouseDown(e) {
+  // Если открыто модальное окно — пропускаем клики вне окна
+  if (isAnyModalOpen()) {
+    if (!isClickInsideModal(e.target)) {
+      e.preventDefault();
+      return;
+    }
+    return;
+  }
+
   if (isPauseMenuOpen()) return;
   if (isClickOnControlButton(e.target)) return;
 
@@ -98,6 +135,15 @@ export function handleMouseDown(e) {
  * @returns {void}
  */
 export function handleMouseUp(e) {
+  // Если открыто модальное окно — пропускаем клики вне окна
+  if (isAnyModalOpen()) {
+    if (!isClickInsideModal(e.target)) {
+      e.preventDefault();
+      return;
+    }
+    return;
+  }
+
   if (isPauseMenuOpen()) return;
   if (isClickOnControlButton(e.target)) return;
 

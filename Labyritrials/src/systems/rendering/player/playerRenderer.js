@@ -120,7 +120,7 @@ export function drawPlayer(ctx) {
   
   // ===== ОТРИСОВКА ИГРОКА =====
   ctx.fillStyle = COLORS.player.shadow;
-  ctx.font = '42px Arial';
+  ctx.font = '52px Arial';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(player.emoji, player.px, player.py);

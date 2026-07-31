@@ -67,7 +67,7 @@ export function drawTraps(ctx) {
     const img = getImage(cacheKey);
     
     if (img && img.complete && img.naturalWidth > 0) {
-      const size = 38;
+      const size = 48;
       
       // Яркость: 10% если не сработала, 100% если сработала
       const alpha = t.hasDealtDamage ? 1.0 : 0.10;
@@ -91,7 +91,7 @@ export function drawTraps(ctx) {
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.fillStyle = COLORS.player.shadow;
-    ctx.font = '28px Arial';
+    ctx.font = '36px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(emoji, t.x, t.y);

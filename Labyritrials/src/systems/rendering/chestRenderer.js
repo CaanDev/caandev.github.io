@@ -14,7 +14,9 @@ import {
   CHEST_IMAGES, 
   getRandomArtifactImage, 
   getRandomPotionImage,
-  getRandomGoldImage 
+  getRandomGoldImage,
+  getChestImage,
+  getChestBiome
 } from '../../images/itemImages.js';
 
 /**
@@ -34,16 +36,20 @@ export function drawLoot(ctx) {
     if (!state.grid[iy][ix].revealed && !player.hasMap) continue;
     
     if (!item.imageKey) {
-      const imagePath = getRandomGoldImage();
+      let goldBiome = state.currentBiome || 'cave';
+      if (state.inTreasureRoom) goldBiome = 'treasure';
+      
+      const imagePath = getRandomGoldImage(goldBiome);
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       item.imageKey = cacheKey;
       item.imagePath = imagePath;
+      item.goldBiome = goldBiome;
     }
     
     if (item.imageKey && isImageLoaded(item.imageKey)) {
       const img = getImage(item.imageKey);
       if (img) {
-        const size = 28;
+        const size = 36;
         ctx.save();
         ctx.drawImage(img, item.x - size/2, item.y - size/2, size, size);
         ctx.restore();
@@ -52,7 +58,7 @@ export function drawLoot(ctx) {
     }
     
     ctx.fillStyle = COLORS.player.shadow;
-    ctx.font = '30px Arial';
+    ctx.font = '36px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(EMOJIS.items.gold, item.x, item.y);
@@ -68,7 +74,9 @@ export function drawLoot(ctx) {
     if (!state.grid[iy][ix].revealed && !player.hasMap) continue;
     
     if (!item.imageKey) {
-      const imagePath = getRandomPotionImage();
+      let potionBiome = state.currentBiome || 'cave';
+      if (state.inTreasureRoom) potionBiome = 'treasure';
+      const imagePath = getRandomPotionImage(potionBiome);
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       item.imageKey = cacheKey;
       item.imagePath = imagePath;
@@ -77,7 +85,7 @@ export function drawLoot(ctx) {
     if (item.imageKey && isImageLoaded(item.imageKey)) {
       const img = getImage(item.imageKey);
       if (img) {
-        const size = 28;
+        const size = 36;
         ctx.save();
         ctx.drawImage(img, item.x - size/2, item.y - size/2, size, size);
         ctx.restore();
@@ -86,7 +94,7 @@ export function drawLoot(ctx) {
     }
     
     ctx.fillStyle = COLORS.player.shadow;
-    ctx.font = '30px Arial';
+    ctx.font = '36px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(EMOJIS.items.potion, item.x, item.y);
@@ -101,16 +109,20 @@ export function drawLoot(ctx) {
     if (!state.grid[ay][ax].revealed && !player.hasMap) continue;
     
     if (!art.imageKey) {
-      const imagePath = getRandomArtifactImage();
+      let artifactBiome = state.currentBiome || 'cave';
+      if (state.inTreasureRoom) artifactBiome = 'treasure';
+      
+      const imagePath = getRandomArtifactImage(artifactBiome);
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       art.imageKey = cacheKey;
       art.imagePath = imagePath;
+      art.biome = artifactBiome;
     }
     
     if (art.imageKey && isImageLoaded(art.imageKey)) {
       const img = getImage(art.imageKey);
       if (img) {
-        const size = 32;
+        const size = 40;
         ctx.save();
         ctx.drawImage(img, art.x - size/2, art.y - size/2, size, size);
         ctx.restore();
@@ -119,7 +131,7 @@ export function drawLoot(ctx) {
     }
     
     ctx.fillStyle = COLORS.player.shadow;
-    ctx.font = '30px Arial';
+    ctx.font = '36px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(EMOJIS.items.artifact, art.x, art.y);
@@ -134,6 +146,11 @@ export function drawLoot(ctx) {
  */
 export function drawChests(ctx) {
   if (!state.chests) return;
+
+  // Определяем биом для сундуков
+  let chestBiome = state.currentBiome || 'cave';
+  if (state.inSafeRoom) chestBiome = 'safe';
+  else if (state.inTreasureRoom) chestBiome = 'treasure';
   
   for (let ch of state.chests) {
     let cx = Math.floor(ch.x / CONFIG.cellSize);
@@ -142,56 +159,102 @@ export function drawChests(ctx) {
     if (!state.grid[cy] || !state.grid[cy][cx]) continue;
     if (!state.grid[cy][cx].revealed && !player.hasMap) continue;
     
-    const size = 48;
+    const size = 64;
     const yOffset = -5;
-    const goldSize = 30;
-    const artSize = 34;
-    const potionSize = 30;
-    const mimicSize = 54;
+    const itemSize = 38;
+    const mimicSize = 70;
+    
+    // ===== АНИМАЦИЯ ИСЧЕЗНОВЕНИЯ =====
+    // Инициализируем таймер анимации, если его нет
+    if (ch.fadeTimer === undefined || ch.fadeComplete === undefined || ch.fadeDelay === undefined) {
+      ch.fadeTimer = 0;
+      ch.fadeComplete = false;
+      ch.fadeDelay = 0;
+    }
+
+    // Если сундук открыт и не мимик — запускаем анимацию исчезновения
+    if (ch.opened && ch.type !== 'mimic' && !ch.fadeComplete) {
+      // Сначала задержка (сундук остаётся видимым)
+      if (ch.fadeDelay < 30) {
+        ch.fadeDelay++;
+      } else {
+        ch.fadeTimer += 0.012;
+        
+        if (ch.fadeTimer >= 1) {
+          ch.fadeComplete = true;
+          setTimeout(() => {
+            const index = state.chests.indexOf(ch);
+            if (index !== -1) {
+              state.chests.splice(index, 1);
+            }
+          }, 150);
+        }
+      }
+    }
+
+    // Если сундук должен быть скрыт — пропускаем отрисовку
+    if (ch.opened && ch.type !== 'mimic' && ch.fadeComplete) {
+      continue;
+    }
+
+    // Расчёт прозрачности для анимации исчезновения
+    let alpha = 1;
+    if (ch.opened && ch.type !== 'mimic' && ch.fadeTimer !== undefined && ch.fadeTimer < 1) {
+      // Плавное затухание с лёгкой задержкой в начале
+      const progress = ch.fadeTimer;
+      alpha = 1 - Math.pow(progress, 1.8);
+      alpha = Math.max(0, alpha);
+    }
+    
+    ctx.save();
+    ctx.globalAlpha = alpha;
     
     if (!ch.opened) {
-      const imageKey = CHEST_IMAGES.closed;
-      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imageKey);
+      // Закрытый сундук
+      const imagePath = getChestImage('closed', chestBiome);
+      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       
       if (cacheKey && isImageLoaded(cacheKey)) {
         const img = getImage(cacheKey);
         if (img) {
-          ctx.save();
           ctx.drawImage(img, ch.x - size/2, ch.y - size/2 + yOffset, size, size);
           ctx.restore();
           continue;
         }
       }
       ctx.fillStyle = COLORS.player.shadow;
-      ctx.font = '36px Arial';
+      ctx.font = '42px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(EMOJIS.items.chestClosed, ch.x, ch.y);
       
     } else {
-      const openImageKey = CHEST_IMAGES.open;
-      const openCacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === openImageKey);
+      // Открытый сундук — выбираем тип (open, empty, mimic)
+      let imageType = 'open';
+      if (ch.type === 'empty') imageType = 'empty';
+      else if (ch.type === 'mimic') imageType = 'mimic';
       
-      if (openCacheKey && isImageLoaded(openCacheKey)) {
-        const img = getImage(openCacheKey);
+      const imagePath = getChestImage(imageType, chestBiome);
+      const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
+      
+      if (cacheKey && isImageLoaded(cacheKey)) {
+        const img = getImage(cacheKey);
         if (img) {
-          ctx.save();
-          ctx.drawImage(img, ch.x - size/2, ch.y - size/2 + yOffset, size, size);
-          ctx.restore();
+          const imgSize = ch.type === 'mimic' ? mimicSize : size;
+          ctx.drawImage(img, ch.x - imgSize/2, ch.y - imgSize/2 + yOffset, imgSize, imgSize);
         }
       }
       
+      // Предметы внутри сундука (тоже с учётом прозрачности)
       if (ch.type === 'gold') {
         if (ch.goldImageKey && isImageLoaded(ch.goldImageKey)) {
           const img = getImage(ch.goldImageKey);
           if (img) {
-            ctx.save();
-            ctx.drawImage(img, ch.x - goldSize/2, ch.y - goldSize/2 - 8, goldSize, goldSize);
-            ctx.restore();
+            ctx.drawImage(img, ch.x - itemSize/2, ch.y - itemSize/2 - 8, itemSize, itemSize);
           }
         } else {
           ctx.fillStyle = COLORS.player.shadow;
-          ctx.font = '24px Arial';
+          ctx.font = '28px Arial';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(EMOJIS.items.chestGold, ch.x, ch.y - 10);
@@ -201,13 +264,11 @@ export function drawChests(ctx) {
         if (ch.artifactImageKey && isImageLoaded(ch.artifactImageKey)) {
           const img = getImage(ch.artifactImageKey);
           if (img) {
-            ctx.save();
-            ctx.drawImage(img, ch.x - artSize/2, ch.y - artSize/2 - 8, artSize, artSize);
-            ctx.restore();
+            ctx.drawImage(img, ch.x - itemSize/2, ch.y - itemSize/2 - 8, itemSize, itemSize);
           }
         } else {
           ctx.fillStyle = COLORS.player.shadow;
-          ctx.font = '24px Arial';
+          ctx.font = '28px Arial';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(EMOJIS.items.chestArtifact, ch.x, ch.y - 10);
@@ -217,52 +278,19 @@ export function drawChests(ctx) {
         if (ch.potionImageKey && isImageLoaded(ch.potionImageKey)) {
           const img = getImage(ch.potionImageKey);
           if (img) {
-            ctx.save();
-            ctx.drawImage(img, ch.x - potionSize/2, ch.y - potionSize/2 - 8, potionSize, potionSize);
-            ctx.restore();
+            ctx.drawImage(img, ch.x - itemSize/2, ch.y - itemSize/2 - 8, itemSize, itemSize);
           }
         } else {
           ctx.fillStyle = COLORS.player.shadow;
-          ctx.font = '24px Arial';
+          ctx.font = '28px Arial';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText(EMOJIS.items.potion, ch.x, ch.y - 10);
         }
-        
-      } else if (ch.type === 'mimic') {
-        const mimicImageKey = CHEST_IMAGES.mimic;
-        const mimicCacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === mimicImageKey);
-        
-        if (mimicCacheKey && isImageLoaded(mimicCacheKey)) {
-          const img = getImage(mimicCacheKey);
-          if (img) {
-            ctx.save();
-            ctx.drawImage(img, ch.x - mimicSize/2, ch.y - mimicSize/2 + yOffset, mimicSize, mimicSize);
-            ctx.restore();
-          }
-        } else {
-          ctx.fillStyle = COLORS.player.shadow;
-          ctx.font = '42px Arial';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(EMOJIS.items.chestMimic, ch.x, ch.y);
-        }
-        
-      } else if (ch.type === 'empty') {
-        const emptyImageKey = CHEST_IMAGES.empty;
-        const emptyCacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === emptyImageKey);
-        
-        if (emptyCacheKey && isImageLoaded(emptyCacheKey)) {
-          const img = getImage(emptyCacheKey);
-          if (img) {
-            const size = 48;
-            ctx.save();
-            ctx.drawImage(img, ch.x - size/2, ch.y - size/2 + yOffset, size, size);
-            ctx.restore();
-          }
-        }
       }
     }
+    
+    ctx.restore();
   }
 }
 

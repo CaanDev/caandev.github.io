@@ -18,6 +18,7 @@ import { isSettingsOpen } from '../ui/settings/index.js';
 import { updateProgress } from '../../systems/achievements/index.js';
 import { isAchievementsOpen } from '../../systems/achievements/ui.js';
 import { openBookshelf } from '../ui/bookshelfUI.js';
+import { isAnyModalOpen } from '../ui/modalManager.js';
 import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../../utils/htmlLoader.js';
 
 /**
@@ -74,6 +75,13 @@ function isModalOpen() {
  * @returns {void}
  */
 export function handleKeyDown(e) {
+  // Если открыто любое модальное окно — блокируем все клавиши
+  if (isAnyModalOpen()) {
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+
   if (!e.key) return;
 
   if (isModalOpen()) {
@@ -144,6 +152,13 @@ export function handleKeyDown(e) {
  * @returns {void}
  */
 export function handleKeyUp(e) {
+  // Если открыто любое модальное окно — блокируем все клавиши
+  if (isAnyModalOpen()) {
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+
   if (!e.key) return;
 
   if (isModalOpen()) {
@@ -218,6 +233,10 @@ async function handleShopToggle() {
     if (shopUI) shopUI.style.display = state.isShopOpen ? 'block' : 'none';
 
     if (state.isShopOpen) {
+      // Регистрируем открытие модального окна
+      const { registerModalOpen } = await import('../ui/modalManager.js');
+      registerModalOpen('shop');
+      
       // Обновляем UI магазина (включая изображения)
       if (shopModule.updateShopUIForExternal) {
         setTimeout(shopModule.updateShopUIForExternal, 50);
@@ -226,6 +245,9 @@ async function handleShopToggle() {
       audio.pause();
       audio.isGameActive = false;
     } else {
+      const { registerModalClose } = await import('../ui/modalManager.js');
+      registerModalClose('shop');
+      
       Game.resumeTime();
       audio.isGameActive = true;
       audio.resume();
@@ -265,6 +287,12 @@ function isNearBookshelf() {
  */
 export function initKeyboardHandlers() {
   window.addEventListener('keydown', e => {
+    if (isAnyModalOpen()) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
     if (isModalOpen()) {
       e.preventDefault();
       e.stopPropagation();
@@ -325,6 +353,10 @@ export async function openNoteWindow(noteId) {
     logger.warn(`📜 Записка #${noteId} не найдена!`);
     return;
   }
+
+  // Регистрируем открытие модального окна
+  const { registerModalOpen } = await import('../ui/modalManager.js');
+  registerModalOpen('note');
 
   if (!isTemplateLoaded('noteWindow')) {
     await loadTemplateIfNeeded('noteWindow');
@@ -411,13 +443,17 @@ export function pauseGameForNote() {
 /**
  * Закрытие окна с запиской
  * 
- * @returns {void}
+ * @returns {Promise<void>}
  */
-export function closeNoteWindow() {
+export async function closeNoteWindow() {
   const window = document.getElementById('note-reader');
   if (window) {
     window.style.display = 'none';
   }
+
+  // Регистрируем закрытие модального окна
+  const { registerModalClose } = await import('../ui/modalManager.js');
+  registerModalClose('note');
 
   resumeGameAfterNote();
 }

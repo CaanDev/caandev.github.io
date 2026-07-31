@@ -230,3 +230,29 @@
 @keyframes fadeEyeInOut18 { 0%, 100% { opacity: 0; } 13%, 87% { opacity: 1; } }
 @keyframes fadeEyeInOut19 { 0%, 100% { opacity: 0; } 21%, 79% { opacity: 1; } }
 @keyframes fadeEyeInOut20 { 0%, 100% { opacity: 0; } 9%, 91% { opacity: 1; } }
+
+/* ============================================================
+   ИНДИКАТОРЫ ПОГОДЫ (СНЕГОПАД)
+   ============================================================ */
+
+@keyframes snowIndicatorPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes frostProtectionPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}

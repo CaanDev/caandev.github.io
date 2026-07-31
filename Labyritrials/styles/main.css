@@ -72,19 +72,22 @@
 /* 5.3. Магазин */
 @import url('windows/shop.css');
 
-/* 5.4. Библиотека */
+/* 5.4. Инвентарь */
+@import url('windows/inventory.css');
+
+/* 5.5. Библиотека */
 @import url('windows/bookshelf.css');
 
-/* 5.5. Пауза */
+/* 5.6. Пауза */
 @import url('windows/pause.css');
 
-/* 5.6. Смерть */
+/* 5.7. Смерть */
 @import url('windows/gameOver.css');
 
-/* 5.7. Переход уровня */
+/* 5.8. Переход уровня */
 @import url('windows/levelUp.css');
 
-/* 5.8. Финал */
+/* 5.9. Финал */
 @import url('windows/final.css');
 
 /* ============================================================

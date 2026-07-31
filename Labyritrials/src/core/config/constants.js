@@ -34,11 +34,11 @@ export const CONFIG = {
   /** @type {Object} - Настройки тумана войны */
   fog: {
     /** @type {number} - Базовый радиус видимости */
-    baseRadius: 550,
+    baseRadius: 700,
     /** @type {number} - Минимальный радиус видимости */
-    minRadius: 300,
+    minRadius: 400,
     /** @type {number} - Максимальный радиус видимости */
-    maxRadius: 900,
+    maxRadius: 1100,
     /** @type {number} - Задержка затухания памяти о клетках */
     memoryFadeDelay: 900,
     /** @type {number} - Длительность затухания памяти */
@@ -78,20 +78,6 @@ export const CONFIG = {
     dmgCostMultiplier: 1.25,
     /** @type {number} - Максимальная цена урона */
     dmgMaxCost: 250,
-    /** @type {number} - Стоимость карты */
-    mapCost: 70,
-    /** @type {number} - Стоимость огненного шара */
-    fireballCost: 200,
-    /** @type {number} - Минимальный уровень для огненного шара */
-    fireballMinLevel: 10,
-    /** @type {number} - Стоимость посоха вампира */
-    vampireStaffCost: 400,
-    /** @type {number} - Минимальный уровень для посоха вампира */
-    vampireStaffMinLevel: 12,
-    /** @type {number} - Стоимость громового посоха */
-    stunStaffCost: 200,
-    /** @type {number} - Минимальный уровень для громового посоха */
-    stunMinLevel: 4,
   },
   
   // ============================================================
@@ -101,14 +87,14 @@ export const CONFIG = {
   /** @type {number} - Размер арены босса */
   bossArenaSize: 25,
   /** @type {number} - Размер одной клетки в пикселях */
-  cellSize: 120,
+  cellSize: 160,
   /** @type {number} - Толщина стен */
   wallThickness: 6,
   
   /** @type {Object} - Позиция магазина (обновляется динамически) */
   shopPos: { x: 1, y: 1 },
   /** @type {Object} - Позиция выхода с уровня */
-  goal: { x: 12, y: 12 },
+  goal: { x: 22, y: 22 },
   
   // ============================================================
   // НАСТРОЙКИ ПУТЕЙ (Pathfinding)
@@ -148,11 +134,11 @@ export const CONFIG = {
   /** @type {number} - Шанс появления факела */
   torchSpawnChance: 0.06,
   /** @type {number} - Радиус активации факела */
-  torchActivationRadius: 180,
+  torchActivationRadius: 280,
   /** @type {number} - Длительность появления факела (кадры) */
   torchFadeInDuration: 20,
   /** @type {number} - Радиус света от факела */
-  torchLightRadius: 140,
+  torchLightRadius: 220,
   /** @type {number} - Скорость мерцания факела */
   torchFlickerSpeed: 0.01,
   

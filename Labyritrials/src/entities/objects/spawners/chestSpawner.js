@@ -101,18 +101,22 @@ export function spawnChests(isTreasureRoom = false, isProtectedCell = () => fals
 
     // Если сундук с золотом — добавляем картинку
     if (chestType === 'gold') {
-      const imagePath = getRandomGoldImage();
+      const goldBiome = isTreasureRoom ? 'treasure' : (state.currentBiome || 'cave');
+      const imagePath = getRandomGoldImage(goldBiome);
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       chestData.goldImageKey = cacheKey;
       chestData.goldImagePath = imagePath;
+      chestData.goldBiome = goldBiome;
     }
 
     // Если сундук с артефактом — добавляем картинку
     if (chestType === 'artifact') {
-      const imagePath = getRandomArtifactImage();
+      const artifactBiome = isTreasureRoom ? 'treasure' : (state.currentBiome || 'cave');
+      const imagePath = getRandomArtifactImage(artifactBiome);
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       chestData.artifactImageKey = cacheKey;
       chestData.artifactImagePath = imagePath;
+      chestData.artifactBiome = artifactBiome;
     }
 
     state.chests.push(chestData);
@@ -140,7 +144,8 @@ export function spawnTreasureRoomLoot() {
       return !state.grid[y][x].isWall;
     });
     if (cell) {
-      const imagePath = getRandomGoldImage();
+      // Используем биом 'treasure' для сокровищницы
+      const imagePath = getRandomGoldImage('treasure');
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       
       state.lootItems.push({
@@ -163,7 +168,8 @@ export function spawnTreasureRoomLoot() {
       return !state.grid[y][x].isWall;
     });
     if (cell) {
-      const imagePath = getRandomArtifactImage();
+      // Используем биом 'treasure' для сокровищницы
+      const imagePath = getRandomArtifactImage('treasure');
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       
       state.artifacts.push({
@@ -184,7 +190,8 @@ export function spawnTreasureRoomLoot() {
       return !state.grid[y][x].isWall;
     });
     if (cell) {
-      const imagePath = getRandomGoldImage();
+      // Используем биом 'treasure' для сокровищницы
+      const imagePath = getRandomGoldImage('treasure');
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       
       state.chests.push({
@@ -208,7 +215,8 @@ export function spawnTreasureRoomLoot() {
       return !state.grid[y][x].isWall;
     });
     if (cell) {
-      const imagePath = getRandomPotionImage();
+      // Используем биом 'treasure' для сокровищницы
+      const imagePath = getRandomPotionImage('treasure');
       const cacheKey = Object.keys(ITEM_IMAGES).find(key => ITEM_IMAGES[key] === imagePath);
       
       state.lootItems.push({

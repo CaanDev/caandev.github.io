@@ -114,7 +114,7 @@ export function isPortalCell(x, y) {
  * @param {boolean} [isMonster=false] - Проверка для монстра (пропускает порталы)
  * @returns {boolean} - true, если есть столкновение
  */
-export function checkWallCollision(px, py, radius = 24, isMonster = false) {
+export function checkWallCollision(px, py, radius = 30, isMonster = false) {
   let points = [
     { x: px - radius, y: py - radius },
     { x: px + radius, y: py - radius },

@@ -92,6 +92,7 @@
   gap: 14px;
   align-items: center;
   flex: 1;
+  min-width: 0;
 }
 
 .shopkeeper-info {
@@ -99,6 +100,7 @@
   flex-direction: column;
   padding-top: 2px;
   flex: 1;
+  min-width: 0;
 }
 
 .shopkeeper-name {
@@ -126,6 +128,7 @@
   overflow: hidden;
   display: flex;
   align-items: center;
+  word-break: break-word;
 }
 
 .shopkeeper-speech::before {
@@ -297,7 +300,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.03);
   border: 1.5px solid rgba(255, 255, 255, 0.06);
@@ -308,6 +311,8 @@
   font-family: 'Courier New', Courier, monospace;
   position: relative;
   min-height: 52px;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .shop-item:hover {
@@ -344,6 +349,18 @@
   border-color: rgba(231, 76, 60, 0.3);
 }
 
+/* ===== СТАТУС "КУПЛЕНО" ===== */
+.shop-item.owned {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.shop-item.owned:hover {
+  transform: none !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
 .shop-item .shop-icon {
   font-size: 28px;
   width: 44px;
@@ -360,18 +377,58 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  overflow: hidden;
+  justify-content: center;
 }
 
 .shop-item .shop-name {
   font-size: 14px;
   font-weight: bold;
   color: var(--color-text-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  line-height: 1.4;
+}
+
+/* ===== БЕЙДЖ "НОВИНКА" ===== */
+.shop-item .new-badge {
+  display: inline-block;
+  font-size: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  background: rgba(243, 156, 18, 0.2);
+  color: #f1c40f;
+  padding: 2px 10px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(243, 156, 18, 0.15);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  margin-left: 4px;
+  line-height: 1.4;
+}
+
+.shop-item:hover .new-badge {
+  background: rgba(243, 156, 18, 0.35);
+  border-color: rgba(243, 156, 18, 0.3);
+}
+
+.shop-item.owned .new-badge {
+  background: rgba(243, 156, 18, 0.1);
+  color: rgba(241, 196, 15, 0.5);
+  border-color: rgba(243, 156, 18, 0.05);
 }
 
 .shop-item .shop-desc {
   font-size: 11px;
   color: var(--color-text-dark);
   margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .shop-item .shop-right {
@@ -382,6 +439,7 @@
   gap: 2px;
   justify-content: center;
   min-height: 40px;
+  min-width: 80px;
 }
 
 .shop-item .shop-price {
@@ -428,11 +486,14 @@
   color: #e74c3c;
 }
 
+.shop-item .shop-status.new {
+  background: rgba(243, 156, 18, 0.15);
+  color: #f39c12;
+}
+
 /* ============================================================
    СТИЛИ ДЛЯ ИЗОБРАЖЕНИЙ В МАГАЗИНЕ
    ============================================================ */
-
-/* === ИКОНКИ ТОВАРОВ === */
 
 .shop-item .shop-icon img.shop-item-icon {
   width: 36px;
@@ -450,7 +511,16 @@
   filter: brightness(1.15) drop-shadow(0 0 8px rgba(255, 255, 255, 0.1));
 }
 
-/* Заблокированные товары */
+.shop-item.owned .shop-icon img.shop-item-icon {
+  transform: none !important;
+  filter: none !important;
+}
+
+.shop-item.owned:hover .shop-icon img.shop-item-icon {
+  transform: none !important;
+  filter: none !important;
+}
+
 .shop-item.locked .shop-icon img.shop-item-icon {
   opacity: 0.5;
   filter: grayscale(0.6);
@@ -462,13 +532,10 @@
   opacity: 0.5;
 }
 
-/* Недостаточно золота */
 .shop-item.no-gold .shop-icon img.shop-item-icon {
   opacity: 0.55;
   filter: grayscale(0.5);
 }
-
-/* === МОНЕТА В ЦЕНЕ === */
 
 .shop-price img {
   display: inline-block;
@@ -479,8 +546,6 @@
   margin-right: 4px;
   image-rendering: pixelated;
 }
-
-/* === ИКОНКА ЗОЛОТА В БАЛАНСЕ === */
 
 .shop-gold-icon img {
   display: inline-block;
@@ -547,8 +612,8 @@
   }
 
   .shop-item {
-    padding: 8px 12px;
-    gap: 8px;
+    padding: 10px 14px;
+    gap: 10px;
   }
 
   .shop-item .shop-icon {
@@ -590,6 +655,21 @@
   .shop-gold-icon img {
     width: 20px;
     height: 20px;
+  }
+  
+  .shop-item .shop-right {
+    min-width: 60px;
+  }
+  
+  .shop-item .shop-desc {
+    font-size: 10px;
+    white-space: normal;
+  }
+
+  .shop-item .new-badge {
+    font-size: 7px;
+    padding: 1px 8px;
+    margin-left: 2px;
   }
 }
 
@@ -640,5 +720,15 @@
   .shop-gold-icon img {
     width: 18px;
     height: 18px;
+  }
+  
+  .shop-item .shop-right {
+    min-width: 50px;
+  }
+
+  .shop-item .new-badge {
+    font-size: 6px;
+    padding: 1px 6px;
+    margin-left: 2px;
   }
 }

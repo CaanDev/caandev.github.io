@@ -173,6 +173,16 @@ function handlePotionChest(ch) {
   const actualHeal = player.hp - oldHp;
   state.safeChestOpened = true;
 
+  ch.opened = true;
+
+  // Инициализируем анимацию
+  if (ch.fadeTimer === undefined) {
+    ch.fadeTimer = 0;
+    ch.fadeComplete = false;
+    ch.fadeDelay = 0;
+  }
+
+  // Создаём частицы
   import('../../systems/particles/potionParticles.js').then(module => {
     module.createPotionParticles(ch.x, ch.y, actualHeal);
   });
@@ -192,11 +202,6 @@ function handlePotionChest(ch) {
       size: 18, life: 40, speedy: 1.0
     });
   }
-
-  setTimeout(() => {
-    const index = state.chests.indexOf(ch);
-    if (index !== -1) state.chests.splice(index, 1);
-  }, 500);
 }
 
 /**

@@ -11,8 +11,10 @@ import { getBiomeByLevel, getBiomeConfig } from '../core/config/biomes.js';
 import { Cell } from './cells/cell.js';
 import { logger } from '../utils/logger.js';
 import { generateMazeOnly, addBreakableWalls, generateRandomSeed, setSeed, getSeed, seededRandom } from './mazeGenerator.js';
+import { resetLevelTimer, forceStopSnowfall } from '../systems/weather/snowManager.js';
 import { spawnMonsters, spawnArtifacts } from '../entities/objects/spawners/monsterSpawner.js';
 import { resetMonsterKillCounter, resetLevelStats, getTransitionStats, setTransitionStatsBonusGold } from '../game/levelTransition.js';
+import { removeMapFromInventory } from '../systems/ui/inventory/inventoryUtils.js';
 import { spawnTraps } from '../entities/objects/spawners/trapSpawner.js';
 import { spawnChests } from '../entities/objects/spawners/chestSpawner.js';
 import { spawnTorches } from '../entities/objects/spawners/torchSpawner.js';
@@ -76,7 +78,16 @@ export function generateMaze(isNewGame = true) {
     const biomeId = getBiomeByLevel(state.gameLevel);
     state.currentBiome = biomeId;
     const biomeConfig = getBiomeConfig(biomeId);
-    logger.game(`🌍 БИОМ (защита): ${biomeConfig.name} (${biomeId}) | Уровень ${state.gameLevel}`);
+    logger.game(`🌍 БИОМ: ${biomeConfig.name} (${biomeId}) | Уровень ${state.gameLevel}`);
+  }
+
+  // ===== ПРИНУДИТЕЛЬНАЯ ОСТАНОВКА СНЕГОПАДА ПРИ ПЕРЕХОДЕ МЕЖДУ УРОВНЯМИ =====
+  const isInSecretRoom = state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom || state.inSafeRoom;
+  
+  // Если мы не в тайной комнате и не босс-уровень — останавливаем снегопад
+  // (на босс-уровнях снегопада быть не должно)
+  if (!isInSecretRoom) {
+    forceStopSnowfall();
   }
 
   // ===== ИНИЦИАЛИЗАЦИЯ SEED =====
@@ -112,8 +123,14 @@ export function generateMaze(isNewGame = true) {
 
   const isBossLevel = state.gameLevel > 0 && state.gameLevel % 5 === 0;
 
+  // ===== СБРОС КАРТЫ НА НОВЫХ УРОВНЯХ (КРОМЕ ТАЙНЫХ КОМНАТ И БЕЗОПАСНОЙ) =====
+  // На босс-уровнях и при переходе на новый уровень (не в тайных комнатах) — сбрасываем карту
+  if (isBossLevel || (!isInSecretRoom && !state.justLoaded)) {
+    player.hasMap = false;
+    removeMapFromInventory();
+  }
+
   // ===== НАСТРОЙКА МАГАЗИНА =====
-  const isInSecretRoom = state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom;
   const isShopAvailable = !isInSecretRoom &&
                           !isBossLevel &&
                           state.gameLevel >= CONFIG.shop.minLevel &&
@@ -154,6 +171,9 @@ export function generateMaze(isNewGame = true) {
 
   generateMazeOnly();
   addBreakableWalls(0.18);
+
+  // Сбрасываем таймер уровня для системы погоды
+  if (!state.inTreasureRoom && !state.inShrineRoom && !state.inTrapRoom) resetLevelTimer();
 
   // ===== РАЗМЕЩЕНИЕ МАГАЗИНА =====
   if (CONFIG.shopPos.x >= 0 && CONFIG.shopPos.y >= 0) {

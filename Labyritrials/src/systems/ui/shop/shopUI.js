@@ -12,14 +12,25 @@ import { SPEECH } from './shopSpeech.js';
 import { isTemplateInitialized } from '../../../utils/htmlLoader.js';
 import { getImage, isImageLoaded } from '../../../utils/imageLoader.js';
 import { SHOP_IMAGES, SHOP_ITEM_IMAGES, SHOP_ICON_MAP } from '../../../images/shopImages.js';
+import { INVENTORY_IMAGES, WEAPON_IMAGE_MAP } from '../../../images/inventoryImages.js';
+import { 
+  getWeaponPrice, 
+  getWeaponMinLevel, 
+  getItemPrice, 
+  getItemMinLevel, 
+  getMapImageKeyByBiome, 
+  ITEMS_DATA, 
+  getItemData,
+  isItemHiddenInShop
+} from '../../../data/index.js';
 import {
   updateBuyHpStatus,
   updateBuyDamageStatus,
   updateMapStatus,
   updateVampireStaffStatus,
   updateStunStaffStatus,
-  updateDefaultStaffStatus,
   updateFireballStatus,
+  updateTalismanFireStatus,
 } from './shopStatus.js';
 import {
   initBuyHpHandler,
@@ -27,9 +38,10 @@ import {
   initBuyMapHandler,
   initBuyVampireStaffHandler,
   initBuyStunStaffHandler,
-  initBuyDefaultStaffHandler,
   initBuyFireballHandler,
+  initBuyTalismanFireHandler,
 } from './shopHandlers.js';
+import { registerModalOpen, registerModalClose } from '../modalManager.js';
 
 /** @type {string} - Текущая активная вкладка магазина */
 let currentShopTab = 'upgrades';
@@ -53,7 +65,6 @@ export function updateShopItemImage(itemElement, itemKey, defaultEmoji) {
   
   const imagePath = SHOP_ITEM_IMAGES[itemKey];
   
-  // Находим ключ в SHOP_IMAGES по пути (это ключ, под которым изображение загружено в кэш)
   const cacheKey = Object.keys(SHOP_IMAGES).find(key => SHOP_IMAGES[key] === imagePath);
   
   if (cacheKey && isImageLoaded(cacheKey)) {
@@ -68,17 +79,16 @@ export function updateShopItemImage(itemElement, itemKey, defaultEmoji) {
       imgElement.src = img.src;
       imgElement.alt = itemKey;
       imgElement.className = 'shop-item-icon';
-      imgElement.style.width = '36px';
-      imgElement.style.height = '36px';
+      imgElement.style.width = '50px';
+      imgElement.style.height = '50px';
       imgElement.style.objectFit = 'contain';
-      imgElement.style.imageRendering = 'pixelated';
+      imgElement.style.imageRendering = 'auto';
       
       iconContainer.appendChild(imgElement);
       return;
     }
   }
   
-  // Fallback: эмодзи
   iconContainer.innerHTML = defaultEmoji;
   iconContainer.style.display = '';
   iconContainer.style.fontSize = '28px';
@@ -96,10 +106,8 @@ export function updateShopGoldDisplay() {
   const goldAmount = document.getElementById('shop-gold');
   if (!goldAmount) return;
   
-  // Обновляем сумму
   goldAmount.textContent = player.gold;
   
-  // Обновляем иконку золота (если есть изображение)
   const iconContainer = goldDisplay.querySelector('.shop-gold-icon');
   if (iconContainer) {
     const imageKey = SHOP_IMAGES.stackOfGold;
@@ -123,38 +131,164 @@ export function updateShopGoldDisplay() {
 }
 
 /**
- * Обновление цен
+ * Обновление иконки оружия в магазине
+ * @param {HTMLElement} itemElement - Элемент товара
+ * @param {string} weaponId - ID оружия ('default', 'stun', 'vampire', 'fireball')
+ * @param {string} defaultEmoji - Эмодзи по умолчанию
+ * @returns {void}
+ */
+export function updateShopWeaponImage(itemElement, weaponId, defaultEmoji) {
+  if (!itemElement) return;
+  
+  const iconContainer = itemElement.querySelector('.shop-icon');
+  if (!iconContainer) return;
+  
+  const imageKey = WEAPON_IMAGE_MAP[weaponId] || 'staffDefault';
+  const imagePath = INVENTORY_IMAGES[imageKey];
+  
+  if (imagePath && isImageLoaded(imageKey)) {
+    const img = getImage(imageKey);
+    if (img) {
+      iconContainer.innerHTML = '';
+      iconContainer.style.display = 'flex';
+      iconContainer.style.alignItems = 'center';
+      iconContainer.style.justifyContent = 'center';
+      
+      const imgElement = document.createElement('img');
+      imgElement.src = img.src;
+      imgElement.alt = weaponId;
+      imgElement.className = 'shop-item-icon';
+      imgElement.style.width = '50px';
+      imgElement.style.height = '50px';
+      imgElement.style.objectFit = 'contain';
+      imgElement.style.imageRendering = 'auto';
+      
+      iconContainer.appendChild(imgElement);
+      return;
+    }
+  }
+  
+  // Fallback: эмодзи
+  iconContainer.innerHTML = defaultEmoji;
+  iconContainer.style.display = '';
+  iconContainer.style.fontSize = '28px';
+}
+
+/**
+ * Обновление иконки снаряжения в магазине
+ * @param {HTMLElement} itemElement - Элемент товара
+ * @param {string} itemId - ID предмета
+ * @param {string} defaultEmoji - Эмодзи по умолчанию
+ * @returns {void}
+ */
+function updateShopEquipmentImage(itemElement, itemId, defaultEmoji) {
+  if (!itemElement) return;
+  
+  const iconContainer = itemElement.querySelector('.shop-icon');
+  if (!iconContainer) return;
+  
+  const imageKey = 'talismanFire';
+  const imagePath = INVENTORY_IMAGES[imageKey];
+  
+  if (imagePath && isImageLoaded(imageKey)) {
+    const img = getImage(imageKey);
+    if (img) {
+      iconContainer.innerHTML = '';
+      iconContainer.style.display = 'flex';
+      iconContainer.style.alignItems = 'center';
+      iconContainer.style.justifyContent = 'center';
+      
+      const imgElement = document.createElement('img');
+      imgElement.src = img.src;
+      imgElement.alt = itemId;
+      imgElement.className = 'shop-item-icon';
+      imgElement.style.width = '50px';
+      imgElement.style.height = '50px';
+      imgElement.style.objectFit = 'contain';
+      imgElement.style.imageRendering = 'auto';
+      
+      iconContainer.appendChild(imgElement);
+      return;
+    }
+  }
+  
+  iconContainer.innerHTML = defaultEmoji;
+  iconContainer.style.display = '';
+  iconContainer.style.fontSize = '28px';
+}
+
+/**
+ * Обновление иконки карты в магазине с учётом биома
+ * @param {HTMLElement} itemElement - Элемент товара
+ * @param {string} defaultEmoji - Эмодзи по умолчанию
+ * @returns {void}
+ */
+function updateShopMapImage(itemElement, defaultEmoji) {
+  if (!itemElement) return;
+  
+  const iconContainer = itemElement.querySelector('.shop-icon');
+  if (!iconContainer) return;
+  
+  const biome = state.currentBiome || 'cave';
+  const imageKey = getMapImageKeyByBiome(biome);
+  const imagePath = INVENTORY_IMAGES[imageKey];
+  
+  if (imagePath && isImageLoaded(imageKey)) {
+    const img = getImage(imageKey);
+    if (img) {
+      iconContainer.innerHTML = '';
+      iconContainer.style.display = 'flex';
+      iconContainer.style.alignItems = 'center';
+      iconContainer.style.justifyContent = 'center';
+      
+      const imgElement = document.createElement('img');
+      imgElement.src = img.src;
+      imgElement.alt = 'map';
+      imgElement.className = 'shop-item-icon';
+      imgElement.style.width = '50px';
+      imgElement.style.height = '50px';
+      imgElement.style.objectFit = 'contain';
+      imgElement.style.imageRendering = 'auto';
+      
+      iconContainer.appendChild(imgElement);
+      return;
+    }
+  }
+  
+  iconContainer.innerHTML = defaultEmoji;
+  iconContainer.style.display = '';
+  iconContainer.style.fontSize = '28px';
+}
+
+/**
+ * Обновление цен с использованием данных из src/data/
  * 
  * @returns {void}
  */
 export function updateShopPrices() {
-  const priceElements = document.querySelectorAll('.shop-price');
+  const hpCostEl = document.getElementById('hp-cost');
+  const dmgCostEl = document.getElementById('dmg-cost');
+  
   const imageKey = SHOP_IMAGES.goldCoin;
   const cacheKey = Object.keys(SHOP_IMAGES).find(key => SHOP_IMAGES[key] === imageKey);
   const hasGoldCoin = cacheKey && isImageLoaded(cacheKey);
   const goldImg = hasGoldCoin ? getImage(cacheKey) : null;
   
-  for (const el of priceElements) {
-    // Получаем весь текст внутри элемента (включая эмодзи)
-    const fullText = el.textContent || '';
-    // Удаляем все эмодзи и лишние пробелы, оставляем только цифры
-    const cleanText = fullText.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim();
+  function replaceEmojiWithImage(element) {
+    if (!element) return;
     
-    // Проверяем, есть ли в тексте цифры
-    const priceMatch = cleanText.match(/\d+/);
-    if (!priceMatch) continue;
+    const existingImg = element.querySelector('img');
+    if (existingImg) return;
     
-    const priceText = priceMatch[0];
+    let text = element.textContent || '';
+    const cleanText = text.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim();
     
-    // Очищаем элемент
-    el.innerHTML = '';
+    element.innerHTML = '';
     
-    // Добавляем текст цены
-    const span = document.createElement('span');
-    span.textContent = priceText;
-    el.appendChild(span);
+    const textSpan = document.createElement('span');
+    textSpan.textContent = cleanText;
+    element.appendChild(textSpan);
     
-    // Добавляем изображение монеты
     if (hasGoldCoin && goldImg) {
       const imgElement = document.createElement('img');
       imgElement.src = goldImg.src;
@@ -165,34 +299,171 @@ export function updateShopPrices() {
       imgElement.style.verticalAlign = 'middle';
       imgElement.style.marginLeft = '4px';
       imgElement.style.imageRendering = 'pixelated';
-      el.appendChild(imgElement);
+      element.appendChild(imgElement);
+    }
+  }
+  
+  if (hpCostEl) {
+    hpCostEl.textContent = player.hpCost;
+    const parentEl = hpCostEl.parentElement;
+    if (parentEl && parentEl.classList.contains('shop-price')) {
+      const oldImg = parentEl.querySelector('img');
+      if (oldImg) oldImg.remove();
+      
+      if (hasGoldCoin && goldImg) {
+        const imgElement = document.createElement('img');
+        imgElement.src = goldImg.src;
+        imgElement.alt = '';
+        imgElement.style.width = '16px';
+        imgElement.style.height = '16px';
+        imgElement.style.objectFit = 'contain';
+        imgElement.style.verticalAlign = 'middle';
+        imgElement.style.marginLeft = '4px';
+        imgElement.style.imageRendering = 'pixelated';
+        parentEl.appendChild(imgElement);
+      }
+    }
+  }
+  
+  if (dmgCostEl) {
+    dmgCostEl.textContent = player.dmgCost;
+    const parentEl = dmgCostEl.parentElement;
+    if (parentEl && parentEl.classList.contains('shop-price')) {
+      const oldImg = parentEl.querySelector('img');
+      if (oldImg) oldImg.remove();
+      
+      if (hasGoldCoin && goldImg) {
+        const imgElement = document.createElement('img');
+        imgElement.src = goldImg.src;
+        imgElement.alt = '';
+        imgElement.style.width = '16px';
+        imgElement.style.height = '16px';
+        imgElement.style.objectFit = 'contain';
+        imgElement.style.verticalAlign = 'middle';
+        imgElement.style.marginLeft = '4px';
+        imgElement.style.imageRendering = 'pixelated';
+        parentEl.appendChild(imgElement);
+      }
+    }
+  }
+  
+  // Цены на оружие
+  const vampPriceEl = document.getElementById('vamp-price');
+  if (vampPriceEl && !player.ownedMeleeWeapons.includes('vampire')) {
+    vampPriceEl.textContent = getWeaponPrice('vampire');
+    replaceEmojiWithImage(vampPriceEl);
+  }
+  
+  const stunPriceEl = document.getElementById('stun-price');
+  if (stunPriceEl && !player.ownedMeleeWeapons.includes('stun')) {
+    stunPriceEl.textContent = getWeaponPrice('stun');
+    replaceEmojiWithImage(stunPriceEl);
+  }
+  
+  const fireballPriceEl = document.getElementById('fireball-price');
+  if (fireballPriceEl && !player.ownedRangedWeapons.includes('fireball')) {
+    fireballPriceEl.textContent = getWeaponPrice('fireball');
+    replaceEmojiWithImage(fireballPriceEl);
+  }
+  
+  // Цена на карту
+  const mapPriceEl = document.getElementById('map-price');
+  if (mapPriceEl && !player.hasMap) {
+    mapPriceEl.textContent = getItemPrice('map');
+    replaceEmojiWithImage(mapPriceEl);
+  }
+
+  // Цена на огненный талисман
+  const talismanPriceEl = document.getElementById('talisman-fire-price');
+  if (talismanPriceEl) {
+    const itemData = getItemData('talismanFire');
+    if (itemData) {
+      const isOwned = player.inventory?.items?.equipment?.includes('talismanFire') || false;
+      if (!isOwned) {
+        talismanPriceEl.textContent = itemData.price;
+        replaceEmojiWithImage(talismanPriceEl);
+      }
     }
   }
 }
 
 /**
  * Обновление всех иконок в магазине
- * 
- * @returns {void}
  */
 export function updateAllShopIcons() {
-  // Проверяем, что магазин открыт
   const shopUI = document.getElementById('shop-ui');
   if (!shopUI || shopUI.style.display === 'none') return;
   
-  // Обновляем иконки товаров
-  for (const [elementId, config] of Object.entries(SHOP_ICON_MAP)) {
+  // === ОБЫЧНЫЕ ТОВАРЫ (улучшения) ===
+  const upgradeElements = ['buy-hp', 'buy-dmg'];
+  for (const elementId of upgradeElements) {
     const element = document.getElementById(elementId);
     if (element) {
-      updateShopItemImage(element, config.key, config.defaultEmoji);
+      const config = SHOP_ICON_MAP[elementId];
+      if (config) {
+        updateShopItemImage(element, config.key, config.defaultEmoji);
+      }
     }
   }
   
-  // Обновляем золото
-  updateShopGoldDisplay();
+  // === ПРЕДМЕТЫ ===
+  // Карта (с учётом биома)
+  const mapBtn = document.getElementById('buy-map');
+  if (mapBtn) {
+    updateShopMapImage(mapBtn, '🗺️');
+  }
+
+  // Огненный талисман (только если доступен)
+  const talismanBtn = document.getElementById('buy-talisman-fire');
+  if (talismanBtn) {
+    // Проверяем, должен ли талисман быть скрыт
+    if (!isItemHiddenInShop('talismanFire', state.gameLevel)) {
+      talismanBtn.style.display = 'flex';
+      updateShopEquipmentImage(talismanBtn, 'talismanFire', '🔥');
+    } else {
+      talismanBtn.style.display = 'none';
+    }
+  }
   
-  // Обновляем цены
+  // === ОРУЖИЕ ===
+  const stunBtn = document.getElementById('buy-sword-stun');
+  if (stunBtn) {
+    updateShopWeaponImage(stunBtn, 'stun', '⚡');
+  }
+  
+  const vampBtn = document.getElementById('buy-sword-vamp');
+  if (vampBtn) {
+    updateShopWeaponImage(vampBtn, 'vampire', '🦇');
+  }
+  
+  const fireballBtn = document.getElementById('buy-fireball');
+  if (fireballBtn) {
+    updateShopWeaponImage(fireballBtn, 'fireball', '🔥');
+  }
+  
+  updateShopGoldDisplay();
   updateShopPrices();
+}
+
+/**
+ * Проверка, есть ли новые предметы в магазине
+ * @returns {boolean} - true, если есть хотя бы один новый предмет
+ */
+function hasNewItems() {
+  const ownedItems = player.inventory?.items?.equipment || [];
+  const ownedUtils = player.inventory?.items?.available || [];
+  const allOwned = [...ownedItems, ...ownedUtils];
+  
+  for (const [id, data] of Object.entries(ITEMS_DATA)) {
+    // Проверяем: предмет помечен как новый, доступен по уровню, не скрыт, ещё не куплен
+    if (data.isNew && 
+        data.minLevel <= state.gameLevel && 
+        !isItemHiddenInShop(id, state.gameLevel) &&
+        !allOwned.includes(id)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
@@ -204,19 +475,25 @@ export function updateAllShopIcons() {
 function doInitShopHandlers() {
   if (shopHandlersInitialized) return;
   
-  // ===== ОТКРЫТИЕ МАГАЗИНА =====
   const shopUI = document.getElementById('shop-ui');
   if (shopUI) {
     const observer = new MutationObserver(() => {
       if (shopUI.style.display === 'flex' || shopUI.style.display === 'block') {
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.welcome));
+        // Обновляем видимость талисмана
+        updateTalismanVisibilityInShop();
+        
+        // Проверяем, есть ли новые товары
+        if (hasNewItems()) {
+          updateShopkeeperSpeech(getRandomSpeech(SPEECH.newItems));
+        } else {
+          updateShopkeeperSpeech(getRandomSpeech(SPEECH.welcome));
+        }
         setTimeout(updateAllShopIcons, 50);
       }
     });
     observer.observe(shopUI, { attributes: true, attributeFilter: ['style'] });
   }
 
-  // ===== ЗАКРЫТИЕ МАГАЗИНА =====
   const closeBtn = document.getElementById('shop-close-btn');
   if (closeBtn) {
     const newCloseBtn = closeBtn.cloneNode(true);
@@ -224,7 +501,6 @@ function doInitShopHandlers() {
     newCloseBtn.addEventListener('click', closeShop);
   }
 
-  // ===== ВКЛАДКИ =====
   document.querySelectorAll('.shop-tab').forEach(tab => {
     const newTab = tab.cloneNode(true);
     tab.parentNode.replaceChild(newTab, tab);
@@ -234,16 +510,14 @@ function doInitShopHandlers() {
     });
   });
 
-  // ===== ИНИЦИАЛИЗАЦИЯ ОБРАБОТЧИКОВ ПОКУПОК =====
   initBuyHpHandler(updateShopUI);
   initBuyDamageHandler(updateShopUI);
-  initBuyMapHandler(updateShopUI);
   initBuyVampireStaffHandler(updateShopUI);
   initBuyStunStaffHandler(updateShopUI);
-  initBuyDefaultStaffHandler(updateShopUI);
   initBuyFireballHandler(updateShopUI);
+  initBuyMapHandler(updateShopUI);
+  initBuyTalismanFireHandler(updateShopUI);
 
-  // ===== ПЕРВОНАЧАЛЬНОЕ ОБНОВЛЕНИЕ UI =====
   updateShopUI();
   
   shopHandlersInitialized = true;
@@ -289,10 +563,10 @@ function closeShop() {
   state.isShopOpen = false;
   const shopUI = document.getElementById('shop-ui');
   if (shopUI) shopUI.style.display = 'none';
+  registerModalClose('shop');
   
   updateShopkeeperSpeech(getRandomSpeech(SPEECH.close));
 
-  // Сохранение при закрытии окна магазина
   import('../../../save/saveSystem.js').then(module => {
     module.saveGame();
   });
@@ -303,36 +577,59 @@ function closeShop() {
 }
 
 /**
+ * Обновление видимости талисмана в магазине
+ * @returns {void}
+ */
+function updateTalismanVisibilityInShop() {
+  const talismanBtn = document.getElementById('buy-talisman-fire');
+  if (!talismanBtn) return;
+  
+  if (isItemHiddenInShop('talismanFire', state.gameLevel)) {
+    talismanBtn.style.display = 'none';
+  } else {
+    talismanBtn.style.display = 'flex';
+  }
+}
+
+/**
  * Обновление UI магазина
  * 
  * @returns {void}
  * @private
  */
 function updateShopUI() {
-  const shopUI = document.getElementById('shop-ui');
-  if (!shopUI || shopUI.style.display !== 'block') return;
+  if (!state.isShopOpen) {
+    return;
+  }
 
-  // ===== ОБНОВЛЕНИЕ ЗОЛОТА =====
+  const hpCostEl = document.getElementById('hp-cost');
+  const dmgCostEl = document.getElementById('dmg-cost');
   const goldEl = document.getElementById('shop-gold');
-  if (goldEl) goldEl.textContent = player.gold;
+  
+  if (!hpCostEl || !dmgCostEl || !goldEl) {
+    setTimeout(() => {
+      if (state.isShopOpen) {
+        updateShopUI();
+      }
+    }, 50);
+    return;
+  }
 
-  // ===== ОБНОВЛЕНИЕ СТОИМОСТИ =====
-  const hpCost = document.getElementById('hp-cost');
-  if (hpCost) hpCost.textContent = player.hpCost;
+  goldEl.textContent = player.gold;
+  hpCostEl.textContent = player.hpCost;
+  dmgCostEl.textContent = player.dmgCost;
 
-  const dmgCost = document.getElementById('dmg-cost');
-  if (dmgCost) dmgCost.textContent = player.dmgCost;
+  // Обновляем видимость талисмана
+  updateTalismanVisibilityInShop();
 
-  // ===== ОБНОВЛЕНИЕ СТАТУСОВ =====
   updateBuyHpStatus();
   updateBuyDamageStatus();
   updateMapStatus();
   updateVampireStaffStatus();
   updateStunStaffStatus();
-  updateDefaultStaffStatus();
   updateFireballStatus();
+  updateTalismanFireStatus();
   
-  // ===== ОБНОВЛЕНИЕ ИКОНОК =====
   updateAllShopIcons();
 }
 
@@ -342,5 +639,8 @@ function updateShopUI() {
  * @returns {void}
  */
 export function updateShopUIForExternal() {
+  if (!state.isShopOpen) {
+    return;
+  }
   updateShopUI();
 }

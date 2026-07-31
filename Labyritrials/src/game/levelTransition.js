@@ -11,6 +11,8 @@ import { COLORS } from '../core/config/colors.js';
 import { logger } from '../utils/logger.js';
 import { generateMaze, clearPortalFlags } from '../world/maze.js';
 import { EMOJIS } from '../emojis.js';
+import { removeMapFromInventory } from '../systems/ui/inventory/inventoryUtils.js';
+import { resetLevelTimer, forceStopSnowfall } from '../systems/weather/snowManager.js';
 import { clearEventEffects, generateRandomEvent, showEventMessage } from '../systems/events/index.js';
 import { resetAdaptations } from '../entities/monsters/adaptations/index.js';
 import { clearBloodPuddles } from '../entities/objects/utils/bloodSystem.js';
@@ -185,6 +187,9 @@ async function executeLevelTransition() {
     }, 500);
     return;
   }
+
+  // ===== ПРИНУДИТЕЛЬНАЯ ОСТАНОВКА СНЕГОПАДА ПРИ ПЕРЕХОДЕ =====
+  forceStopSnowfall();
   
   showLoader(`Генерация уровня ${state.gameLevel + 1}...`, '🗺️', 'Создание подземелий...', 0);
   
@@ -206,6 +211,9 @@ async function executeLevelTransition() {
   // ===== ПОВЫШЕНИЕ УРОВНЯ =====
   state.gameLevel++;
 
+  // Сбрасываем таймер уровня для системы погоды
+  resetLevelTimer();
+
   // ===== ОПРЕДЕЛЕНИЕ БИОМА =====
   const biomeId = getBiomeByLevel(state.gameLevel);
   const biomeConfig = getBiomeConfig(biomeId);
@@ -213,6 +221,7 @@ async function executeLevelTransition() {
   logger.game(`🌍 БИОМ: ${biomeConfig.name} (${biomeId}) | Уровень ${state.gameLevel}`);
 
   player.hasMap = false;
+  removeMapFromInventory();
   
   // ===== ПРОВЕРКА ДОСТИЖЕНИЙ =====
   if (state.gameLevel === 5) {

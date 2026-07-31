@@ -14,6 +14,7 @@ import { audio } from '../audio/audioManager.js';
 import { exitToMainMenu } from '../utils/exitToMainMenu.js';
 import { resetAllKeys } from '../systems/input/index.js';
 import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../utils/htmlLoader.js';
+import { registerModalOpen, registerModalClose } from '../systems/ui/modalManager.js';
 
 /** @type {boolean} - Открыто ли меню паузы */
 let isPaused = false;
@@ -57,6 +58,7 @@ function showPauseMenu() {
   Game.stopLoop();
   updatePauseStats();
   pauseMenu.style.display = 'flex';
+  registerModalOpen('pause');
   
   const controlButtons = document.getElementById('control-buttons-container');
   if (controlButtons) controlButtons.style.display = 'none';
@@ -78,10 +80,8 @@ export function openPauseMenu() {
   const gameUI = document.getElementById('ui');
   if (!gameUI || gameUI.style.display === 'none') return;
   
-  // ==== ЗАГРУЗКА ШАБЛОНА ПАУЗЫ (ЕСЛИ НУЖНО) =====
   if (!isTemplateLoaded('pause')) {
     loadTemplateIfNeeded('pause').then(() => {
-      // Инициализируем обработчики ПОСЛЕ вставки в DOM
       initTemplateHandlers('pause').then(() => {
         showPauseMenu();
       });
@@ -89,7 +89,6 @@ export function openPauseMenu() {
     return;
   }
   
-  // Если шаблон загружен, но не инициализирован
   if (!isTemplateInitialized('pause')) {
     initTemplateHandlers('pause').then(() => {
       showPauseMenu();
@@ -112,6 +111,7 @@ export function closePauseMenu() {
   
   isPaused = false;
   pauseMenu.style.display = 'none';
+  registerModalClose('pause');
   
   const controlButtons = document.getElementById('control-buttons-container');
   if (controlButtons) controlButtons.style.display = 'flex';

@@ -72,6 +72,27 @@ export function collectGameStatsData() {
 }
 
 /**
+ * Сбор данных о погоде
+ * 
+ * @returns {Object} - Данные о погоде
+ */
+export function collectWeatherData() {
+  import('../../systems/weather/snowManager.js').then(({ snowState }) => {
+    import('../../systems/weather/frostSystem.js').then(({ frostState }) => {
+      return {
+        snowActive: snowState.active,
+        snowStartTime: snowState.startTime,
+        lastSnowfallEnd: snowState.lastSnowfallEnd,
+        levelStartTime: snowState.levelStartTime,
+        frostProgress: frostState.progress,
+        frostFrozen: frostState.frozen,
+        frostDamageTimer: frostState.damageTimer,
+      };
+    });
+  });
+}
+
+/**
  * Сбор данных о достижениях
  * 
  * @returns {Object} - Данные о достижениях

@@ -11,41 +11,41 @@ export const WALL_IMAGES = {
   // === CAVE BIOME ===
   cave: {
     wall: [
-      'assets/images/walls/cave/wall-1.png',
-      'assets/images/walls/cave/wall-2.png',
-      'assets/images/walls/cave/wall-3.png',
+      'assets/images/walls/biomes/cave/wall-1.png',
+      'assets/images/walls/biomes/cave/wall-2.png',
+      'assets/images/walls/biomes/cave/wall-3.png',
     ],
     cracked: [
-      'assets/images/walls/cave/wallCracked-1.png',
-      'assets/images/walls/cave/wallCracked-2.png',
-      'assets/images/walls/cave/wallCracked-3.png',
-      'assets/images/walls/cave/wallCracked-4.png',
-      'assets/images/walls/cave/wallCracked-5.png',
+      'assets/images/walls/biomes/cave/wallCracked-1.png',
+      'assets/images/walls/biomes/cave/wallCracked-2.png',
+      'assets/images/walls/biomes/cave/wallCracked-3.png',
+      'assets/images/walls/biomes/cave/wallCracked-4.png',
+      'assets/images/walls/biomes/cave/wallCracked-5.png',
     ],
   },
   
   // === ICE BIOME ===
   ice: {
     wall: [
-      'assets/images/walls/ice/wall-1.png',
-      'assets/images/walls/ice/wall-2.png',
-      'assets/images/walls/ice/wall-3.png',
+      'assets/images/walls/biomes/ice/wall-1.png',
+      'assets/images/walls/biomes/ice/wall-2.png',
+      'assets/images/walls/biomes/ice/wall-3.png',
     ],
     cracked: [
-      'assets/images/walls/ice/wallCracked-1.png',
-      'assets/images/walls/ice/wallCracked-2.png',
+      'assets/images/walls/biomes/ice/wallCracked-1.png',
+      'assets/images/walls/biomes/ice/wallCracked-2.png',
     ],
   },
   
   // === SAND BIOME ===
   sand: {
     wall: [
-      'assets/images/walls/sand/wall-1.png',
-      'assets/images/walls/sand/wall-2.png',
+      'assets/images/walls/biomes/sand/wall-1.png',
+      'assets/images/walls/biomes/sand/wall-2.png',
     ],
     cracked: [
-      'assets/images/walls/sand/wallCracked-1.png',
-      'assets/images/walls/sand/wallCracked-2.png',
+      'assets/images/walls/biomes/sand/wallCracked-1.png',
+      'assets/images/walls/biomes/sand/wallCracked-2.png',
     ],
   },
   
@@ -53,6 +53,66 @@ export const WALL_IMAGES = {
   boss: {
     wall: 'assets/images/walls/bossArena/wallBossArena.png',
     cracked: null, // На босс-аренах нет разрушаемых стен
+  },
+  
+  // === КОМНАТЫ ===
+  safeRoom: {
+    wall: [
+      'assets/images/walls/rooms/safeRoom/wall-1.png',
+      'assets/images/walls/rooms/safeRoom/wall-2.png',
+      'assets/images/walls/rooms/safeRoom/wall-3.png',
+      'assets/images/walls/rooms/safeRoom/wall-4.png',
+      'assets/images/walls/rooms/safeRoom/wall-5.png',
+      'assets/images/walls/rooms/safeRoom/wall-6.png',
+      'assets/images/walls/rooms/safeRoom/wall-7.png',
+    ],
+    cracked: null, // В безопасной комнате нет разрушаемых стен
+  },
+
+  trapRoom: {
+    wall: [
+      'assets/images/walls/rooms/trapRoom/wall-1.png',
+      'assets/images/walls/rooms/trapRoom/wall-2.png',
+      'assets/images/walls/rooms/trapRoom/wall-3.png',
+      'assets/images/walls/rooms/trapRoom/wall-4.png',
+      'assets/images/walls/rooms/trapRoom/wall-5.png',
+      'assets/images/walls/rooms/trapRoom/wall-6.png',
+      'assets/images/walls/rooms/trapRoom/wall-7.png',
+    ],
+    cracked: null, // В комнате-ловушке нет разрушаемых стен
+  },
+
+  shrineRoom: {
+    wall: [
+      'assets/images/walls/rooms/shrineRoom/wall-1.png',
+      'assets/images/walls/rooms/shrineRoom/wall-2.png',
+      'assets/images/walls/rooms/shrineRoom/wall-3.png',
+      'assets/images/walls/rooms/shrineRoom/wall-4.png',
+      'assets/images/walls/rooms/shrineRoom/wall-5.png',
+      'assets/images/walls/rooms/shrineRoom/wall-6.png',
+      'assets/images/walls/rooms/shrineRoom/wall-7.png',
+      'assets/images/walls/rooms/shrineRoom/wall-8.png',
+      'assets/images/walls/rooms/shrineRoom/wall-9.png',
+    ],
+    cracked: null, // В комнате с алтарём нет разрушаемых стен
+  },
+  
+  treasureRoom: {
+    wall: [
+      'assets/images/walls/rooms/treasureRoom/wall-1.png',
+      'assets/images/walls/rooms/treasureRoom/wall-2.png',
+      'assets/images/walls/rooms/treasureRoom/wall-3.png',
+      'assets/images/walls/rooms/treasureRoom/wall-4.png',
+      'assets/images/walls/rooms/treasureRoom/wall-5.png',
+      'assets/images/walls/rooms/treasureRoom/wall-6.png',
+      'assets/images/walls/rooms/treasureRoom/wall-7.png',
+    ],
+    cracked: [
+      'assets/images/walls/rooms/treasureRoom/wallCracked-1.png',
+      'assets/images/walls/rooms/treasureRoom/wallCracked-2.png',
+      'assets/images/walls/rooms/treasureRoom/wallCracked-3.png',
+      'assets/images/walls/rooms/treasureRoom/wallCracked-4.png',
+    ],
   },
 };
 
@@ -63,9 +123,10 @@ export const WALL_IMAGES = {
 /**
  * Получение случайного изображения стены для биома
  * 
- * @param {string} biomeId - ID биома ('cave', 'ice', 'sand', 'boss')
+ * @param {string} biomeId - ID биома
  * @param {boolean} isCracked - Разрушаемая ли стена
- * @param {string} [bossType] - Тип босса (для босс-арен, пока не используется)
+ * @param {string|null} [bossType] - Тип босса (для босс-арен)
+ * @param {number} [seed=0] - Seed для детерминированного выбора
  * @returns {string|null} - Путь к изображению или null, если изображений нет
  */
 export function getWallImage(biomeId, isCracked = false, bossType = null, seed = 0) {
@@ -74,19 +135,44 @@ export function getWallImage(biomeId, isCracked = false, bossType = null, seed =
     return WALL_IMAGES.boss.wall;
   }
   
-  // Для тайных комнат и безопасной комнаты — возвращаем null
-  const secretRooms = ['treasure', 'shrine', 'trap', 'safe'];
-  if (secretRooms.includes(biomeId)) {
-    return null;
+  // Сокровищница — поддерживаем разрушаемые стены
+  if (biomeId === 'treasureRoom') {
+    const biome = WALL_IMAGES.treasureRoom;
+    if (!biome) return null;
+    
+    const images = isCracked ? biome.cracked : biome.wall;
+    if (!images || images.length === 0) return null;
+    
+    const index = Math.floor(seed * images.length) % images.length;
+    return images[index];
   }
   
+  // Безопасная комната, комната-ловушка, комната с алтарём — разрушаемых стен нет
+  if (biomeId === 'safeRoom' || biomeId === 'trapRoom' || biomeId === 'shrineRoom') {
+    const biome = WALL_IMAGES[biomeId];
+    if (!biome) return null;
+    
+    const images = biome.wall;
+    if (!images || images.length === 0) return null;
+    
+    const index = Math.floor(seed * images.length) % images.length;
+    return images[index];
+  }
+  
+  // Обычные биомы
   const biome = WALL_IMAGES[biomeId];
   if (!biome) return null;
   
   const images = isCracked ? biome.cracked : biome.wall;
-  if (!images || images.length === 0) return null;
+  if (!images || images.length === 0) {
+    // Если нет изображений для cracked — возвращаем обычную стену
+    if (isCracked && biome.wall && biome.wall.length > 0) {
+      const index = Math.floor(seed * biome.wall.length) % biome.wall.length;
+      return biome.wall[index];
+    }
+    return null;
+  }
   
-  // Используем seed для детерминированного выбора
   const index = Math.floor(seed * images.length) % images.length;
   return images[index];
 }
@@ -101,7 +187,14 @@ export function getAllWallImagesForBiome(biomeId) {
   const biome = WALL_IMAGES[biomeId];
   if (!biome) return [];
   
-  return [...(biome.wall || []), ...(biome.cracked || [])];
+  const result = [];
+  if (biome.wall) {
+    result.push(...(Array.isArray(biome.wall) ? biome.wall : [biome.wall]));
+  }
+  if (biome.cracked) {
+    result.push(...(Array.isArray(biome.cracked) ? biome.cracked : [biome.cracked]));
+  }
+  return result;
 }
 
 /**
@@ -114,6 +207,7 @@ export function getAllWallImagesForRegistration() {
   
   for (const [biomeId, biome] of Object.entries(WALL_IMAGES)) {
     for (const [type, images] of Object.entries(biome)) {
+      if (!images) continue;
       const imageArray = Array.isArray(images) ? images : [images];
       for (let i = 0; i < imageArray.length; i++) {
         const path = imageArray[i];

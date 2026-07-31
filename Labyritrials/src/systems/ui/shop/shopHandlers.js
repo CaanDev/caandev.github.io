@@ -9,6 +9,8 @@
 import { CONFIG, state, player } from '../../../core/config/index.js';
 import { audio } from '../../../audio/audioManager.js';
 import { Game } from '../../../core/game.js';
+import { addMapToInventory } from '../inventory/inventoryUtils.js';
+import { getWeaponPrice, getWeaponMinLevel, getItemPrice, getItemMinLevel, getItemData } from '../../../data/index.js';
 import { updateProgress, setProgress } from '../../../systems/achievements/index.js';
 import { isUnlocked } from '../../../systems/achievements/manager.js';
 import { getRandomSpeech, updateShopkeeperSpeech } from './shopSpeech.js';
@@ -39,7 +41,31 @@ export function initBuyHpHandler(updateShopUICallback) {
         
         // Эффекты и обновление
         audio.playSound('shopBuyItem', 0.6);
+        
+        // ===== ОБНОВЛЕНИЕ UI =====
+        // Сначала вызываем колбэк
         updateShopUICallback();
+        
+        // Затем обновляем элементы напрямую (с задержкой, чтобы DOM успел обновиться)
+        setTimeout(() => {
+          const hpCostEl = document.getElementById('hp-cost');
+          if (hpCostEl) hpCostEl.textContent = player.hpCost;
+          
+          const statusEl = document.getElementById('hp-status');
+          if (statusEl) {
+            if (player.gold >= player.hpCost) {
+              statusEl.textContent = 'Купить';
+              statusEl.className = 'shop-status buy';
+            } else {
+              statusEl.textContent = 'Не хватает золота';
+              statusEl.className = 'shop-status no-gold';
+            }
+          }
+          
+          const goldEl = document.getElementById('shop-gold');
+          if (goldEl) goldEl.textContent = player.gold;
+        }, 50);
+        
         Game.updateUI();
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.hp));
       } else {
@@ -70,45 +96,32 @@ export function initBuyDamageHandler(updateShopUICallback) {
         // Обновляем стоимость
         const newCost = Math.floor(player.dmgCost * CONFIG.shop.dmgCostMultiplier);
         player.dmgCost = Math.min(newCost, CONFIG.shop.dmgMaxCost);
-
-        // Эффекты и обновление
+        
         audio.playSound('shopBuyItem', 0.6);
+        
         updateShopUICallback();
+        
+        setTimeout(() => {
+          const dmgCostEl = document.getElementById('dmg-cost');
+          if (dmgCostEl) dmgCostEl.textContent = player.dmgCost;
+          
+          const statusEl = document.getElementById('dmg-status');
+          if (statusEl) {
+            if (player.gold >= player.dmgCost) {
+              statusEl.textContent = 'Купить';
+              statusEl.className = 'shop-status buy';
+            } else {
+              statusEl.textContent = 'Не хватает золота';
+              statusEl.className = 'shop-status no-gold';
+            }
+          }
+          
+          const goldEl = document.getElementById('shop-gold');
+          if (goldEl) goldEl.textContent = player.gold;
+        }, 50);
+        
         Game.updateUI();
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.damage));
-      } else {
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));
-      }
-    });
-  }
-}
-
-/**
- * Инициализация обработчика покупки карты
- * 
- * @param {Function} updateShopUICallback - Колбэк обновления UI магазина
- * @returns {void}
- */
-export function initBuyMapHandler(updateShopUICallback) {
-  const btn = document.getElementById('buy-map');
-  if (btn) {
-    btn.addEventListener('click', () => {
-      if (!player.hasMap && player.gold >= CONFIG.shop.mapCost) {
-        // Списываем золото
-        player.gold -= CONFIG.shop.mapCost;
-        state.gameStats.goldSpent += CONFIG.shop.mapCost;
-        player.hasMap = true;
-
-        // Обновляем достижение
-        updateProgress('map_bought', 1);
-
-        // Эффекты и обновление
-        audio.playSound('shopBuyItem', 0.6);
-        updateShopUICallback();
-        Game.updateUI();
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.map));
-      } else if (player.hasMap) {
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyOwned));
       } else {
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));
       }
@@ -127,20 +140,13 @@ export function initBuyVampireStaffHandler(updateShopUICallback) {
   if (btn) {
     btn.addEventListener('click', () => {
       const isOwned = player.ownedMeleeWeapons.includes('vampire');
-      const isLevelAvailable = state.gameLevel >= CONFIG.shop.vampireStaffMinLevel;
+      const minLevel = getWeaponMinLevel('vampire');
+      const cost = getWeaponPrice('vampire');
+      const isLevelAvailable = state.gameLevel >= minLevel;
 
-      // Если уже активно
-      if (isOwned && player.meleeWeapon === 'vampire') {
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyActive));
-        return;
-      }
-
-      // Если уже куплено — просто переключаем
+      // Если уже куплено — просто показываем сообщение
       if (isOwned) {
-        player.meleeWeapon = 'vampire';
-        updateShopUICallback();
-        Game.updateUI();
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.vampireStaff));
+        updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyOwned));
         return;
       }
 
@@ -151,11 +157,10 @@ export function initBuyVampireStaffHandler(updateShopUICallback) {
       }
 
       // Покупка
-      if (player.gold >= CONFIG.shop.vampireStaffCost) {
-        player.gold -= CONFIG.shop.vampireStaffCost;
-        state.gameStats.goldSpent += CONFIG.shop.vampireStaffCost;
+      if (player.gold >= cost) {
+        player.gold -= cost;
+        state.gameStats.goldSpent += cost;
         player.ownedMeleeWeapons.push('vampire');
-        player.meleeWeapon = 'vampire';
         
         updateWeaponsBoughtProgress();
         
@@ -181,18 +186,12 @@ export function initBuyStunStaffHandler(updateShopUICallback) {
   if (btn) {
     btn.addEventListener('click', () => {
       const isOwned = player.ownedMeleeWeapons.includes('stun');
-      const isLevelAvailable = state.gameLevel >= CONFIG.shop.stunMinLevel;
-
-      if (isOwned && player.meleeWeapon === 'stun') {
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyActive));
-        return;
-      }
+      const minLevel = getWeaponMinLevel('stun');
+      const cost = getWeaponPrice('stun');
+      const isLevelAvailable = state.gameLevel >= minLevel;
 
       if (isOwned) {
-        player.meleeWeapon = 'stun';
-        updateShopUICallback();
-        Game.updateUI();
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.stunStaff));
+        updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyOwned));
         return;
       }
 
@@ -201,11 +200,10 @@ export function initBuyStunStaffHandler(updateShopUICallback) {
         return;
       }
 
-      if (player.gold >= CONFIG.shop.stunStaffCost) {
-        player.gold -= CONFIG.shop.stunStaffCost;
-        state.gameStats.goldSpent += CONFIG.shop.stunStaffCost;
+      if (player.gold >= cost) {
+        player.gold -= cost;
+        state.gameStats.goldSpent += cost;
         player.ownedMeleeWeapons.push('stun');
-        player.meleeWeapon = 'stun';
         
         updateWeaponsBoughtProgress();
         
@@ -221,29 +219,6 @@ export function initBuyStunStaffHandler(updateShopUICallback) {
 }
 
 /**
- * Инициализация обработчика выбора обычного посоха
- * 
- * @param {Function} updateShopUICallback - Колбэк обновления UI магазина
- * @returns {void}
- */
-export function initBuyDefaultStaffHandler(updateShopUICallback) {
-  const btn = document.getElementById('buy-default-staff');
-  if (btn) {
-    btn.addEventListener('click', () => {
-      if (player.meleeWeapon === 'default') {
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyActive));
-        return;
-      }
-      
-      player.meleeWeapon = 'default';
-      updateShopUICallback();
-      Game.updateUI();
-      updateShopkeeperSpeech(getRandomSpeech(SPEECH.defaultStaff));
-    });
-  }
-}
-
-/**
  * Инициализация обработчика покупки огненного шара
  * 
  * @param {Function} updateShopUICallback - Колбэк обновления UI магазина
@@ -254,18 +229,12 @@ export function initBuyFireballHandler(updateShopUICallback) {
   if (btn) {
     btn.addEventListener('click', () => {
       const isOwned = player.ownedRangedWeapons.includes('fireball');
-      const isLevelAvailable = state.gameLevel >= CONFIG.shop.fireballMinLevel;
-
-      if (isOwned && player.rangedWeapon === 'fireball') {
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyActive));
-        return;
-      }
+      const minLevel = getWeaponMinLevel('fireball');
+      const cost = getWeaponPrice('fireball');
+      const isLevelAvailable = state.gameLevel >= minLevel;
 
       if (isOwned) {
-        player.rangedWeapon = 'fireball';
-        updateShopUICallback();
-        Game.updateUI();
-        updateShopkeeperSpeech(getRandomSpeech(SPEECH.fireball));
+        updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyOwned));
         return;
       }
 
@@ -274,11 +243,10 @@ export function initBuyFireballHandler(updateShopUICallback) {
         return;
       }
 
-      if (player.gold >= CONFIG.shop.fireballCost) {
-        player.gold -= CONFIG.shop.fireballCost;
-        state.gameStats.goldSpent += CONFIG.shop.fireballCost;
+      if (player.gold >= cost) {
+        player.gold -= cost;
+        state.gameStats.goldSpent += cost;
         player.ownedRangedWeapons.push('fireball');
-        player.rangedWeapon = 'fireball';
         
         updateWeaponsBoughtProgress();
         
@@ -286,6 +254,91 @@ export function initBuyFireballHandler(updateShopUICallback) {
         updateShopUICallback();
         Game.updateUI();
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.fireball));
+      } else {
+        updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));
+      }
+    });
+  }
+}
+
+/**
+ * Инициализация обработчика покупки карты
+ * 
+ * @param {Function} updateShopUICallback - Колбэк обновления UI магазина
+ * @returns {void}
+ */
+export function initBuyMapHandler(updateShopUICallback) {
+  const btn = document.getElementById('buy-map');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const mapPrice = getItemPrice('map');
+      
+      if (!player.hasMap && player.gold >= mapPrice) {
+        // Списываем золото
+        player.gold -= mapPrice;
+        state.gameStats.goldSpent += mapPrice;
+        player.hasMap = true;
+        addMapToInventory();
+
+        // Обновляем достижение
+        updateProgress('map_bought', 1);
+
+        // Эффекты и обновление
+        audio.playSound('shopBuyItem', 0.6);
+        updateShopUICallback();
+        Game.updateUI();
+        updateShopkeeperSpeech(getRandomSpeech(SPEECH.map));
+      } else if (player.hasMap) {
+        updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyOwned));
+      } else {
+        updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));
+      }
+    });
+  }
+}
+
+/**
+ * Инициализация обработчика покупки огненного талисмана
+ * 
+ * @param {Function} updateShopUICallback - Колбэк обновления UI магазина
+ * @returns {void}
+ */
+export function initBuyTalismanFireHandler(updateShopUICallback) {
+  const btn = document.getElementById('buy-talisman-fire');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const itemData = getItemData('talismanFire');
+      if (!itemData) return;
+
+      const cost = itemData.price;
+      const isOwned = player.inventory?.items?.equipment?.includes('talismanFire') || false;
+
+      if (!isOwned && player.gold >= cost) {
+        // Списываем золото
+        player.gold -= cost;
+        state.gameStats.goldSpent += cost;
+
+        // Инициализируем инвентарь, если его нет
+        if (!player.inventory) {
+          player.inventory = { equipped: {}, items: { equipment: [] } };
+        }
+        if (!player.inventory.items) {
+          player.inventory.items = { equipment: [] };
+        }
+        if (!player.inventory.items.equipment) {
+          player.inventory.items.equipment = [];
+        }
+
+        // Добавляем талисман в снаряжение
+        player.inventory.items.equipment.push('talismanFire');
+
+        // Эффекты
+        audio.playSound('shopBuyItem', 0.6);
+        updateShopUICallback();
+        Game.updateUI();
+        updateShopkeeperSpeech(getRandomSpeech(SPEECH.talismanFire));
+      } else if (isOwned) {
+        updateShopkeeperSpeech(getRandomSpeech(SPEECH.alreadyOwned));
       } else {
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));
       }
