@@ -32,7 +32,8 @@ assets/
     │   │
     │   ├── items/
     │   │   ├── mapLevel.png
-    │   │   └── mapLevelIce.png
+    │   │   ├── mapLevelIce.png
+    │   │   └── mapLevelSand.png
     │   │
     │   └── weapon/
     │       ├── fireball.png
@@ -118,6 +119,14 @@ assets/
     │   ├── bookshelf.png
     │   ├── shopStand.png
     │   │
+    │   ├── altars/
+    │   │   ├── altarCaveActive.png
+    │   │   ├── altarCaveActivated.png
+    │   │   ├── altarIceActive.png
+    │   │   ├── altarIceActivated.png
+    │   │   ├── altarSandActive.png
+    │   │   └── altarSandActivated.png
+    │   │
     │   ├── torches/
     │   │   ├── biomes/
     │   │   │   ├── cave/
@@ -161,11 +170,14 @@ assets/
     │   ├── stackOfGoldCoins.png
     │   │
     │   └── improvements/
-    │       ├── damageIncrease.png
-    │       └── heartOfHealth.png
+    │       ├── boostDMG.png
+    │       ├── boostHP.png
+    │       └── boostStamina.png
     │
     ├── ui/
     │   ├── miniMap.png
+    │   ├── miniMapIce.png
+    │   ├── miniMapSand.png
     │   │
     │   └── achievements/
     │       ├── collection/
@@ -180,7 +192,10 @@ assets/
     │       ├── combat/
     │       │   ├── bossConqueror.png
     │       │   ├── bossHunter10.png
+    │       │   ├── bossHunter15.png
+    │       │   ├── bossHunter5.png
     │       │   ├── fireMage.png
+    │       │   ├── monsterSlayer.png
     │       │   ├── thunderer.png
     │       │   └── vampireLord.png
     │       │
@@ -234,7 +249,10 @@ assets/
         │       └── wallCracked-2.png
         │
         ├── bossArena/
-        │   └── wallBossArena.png
+        │   ├── wallBossArena.png
+        │   ├── wallBossArenaLvl10.png
+        │   ├── wallBossArenaLvl15.png
+        │   └── wallBossArenaLvl5.png
         │
         └── rooms/
             ├── safeRoom/
