@@ -7,7 +7,7 @@
 
 import { state, player } from '../../core/config/index.js';
 import { getEventTypesByLevel } from '../../core/config/biomes.js';
-import { EVENTS } from './config.js';
+import { EVENTS_DATA } from '../../data/events.js';
 
 /**
  * Генерация случайного события на уровне
@@ -38,7 +38,7 @@ export function generateRandomEvent() {
   
   // Выбор случайного события из доступных
   const randomEventKey = availableEventTypes[Math.floor(Math.random() * availableEventTypes.length)];
-  const event = EVENTS[randomEventKey];
+  const event = EVENTS_DATA[randomEventKey];
 
   // Если событие не найдено — выходим
   if (!event) return;
@@ -48,7 +48,7 @@ export function generateRandomEvent() {
   state.eventMessageShown = false;
   
   // Применяем эффект события
-  event.applyEffect();
+  event.effects.apply(player, state);
 }
 
 /**
@@ -63,9 +63,9 @@ export function clearEventEffects() {
   if (!state.currentEvent) return;
   
   // Снимаем эффект события
-  const event = EVENTS[state.currentEvent];
+  const event = EVENTS_DATA[state.currentEvent];
   if (event) {
-    event.removeEffect();
+    event.effects.remove(player, state);
   }
   
   // Сбрасываем состояние события

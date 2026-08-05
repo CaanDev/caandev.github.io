@@ -24,6 +24,8 @@ import { clearAllCaches } from './utils/cache.js';
 import { logger } from './utils/logger.js';
 import { openSettings, initSettings, getSettings } from './systems/ui/settings/index.js';
 import { initInventory, handleInventoryKey } from './systems/ui/inventory/index.js';
+import { clearSoundEvents } from './entities/monsters/ai/hearing.js';
+
 // Импорты для изображений
 import { registerImages, loadAllImages } from './utils/imageLoader.js';
 import { SHOP_IMAGES } from './images/shopImages.js';
@@ -118,6 +120,9 @@ async function startNewGame() {
     // Сбрасываем биом
     const { state } = await import('./core/config/state.js');
     state.currentBiome = 'cave';
+    
+    // Очищаем звуковые события
+    clearSoundEvents();
     
     updateLoader('Генерация лабиринта...', '🗺️', 'Создание подземелий...', 50);
     
@@ -566,9 +571,13 @@ async function init() {
   // Добавляем обработчик клавиатуры для инвентаря
   document.addEventListener('keydown', handleInventoryKey);
 
+  // Инициализация звуковых событий
+  state.soundEvents = [];
+
   // При выходе из игры очищаем ресурсы
   window.addEventListener('beforeunload', () => {
     cleanupSnowManager();
+    clearSoundEvents();
   });
 
   updateLoader('Завершение...', '✨', 'Подготовка к запуску...', 85);

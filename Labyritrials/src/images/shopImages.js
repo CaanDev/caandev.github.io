@@ -16,6 +16,7 @@ export const SHOP_IMAGES = {
   // === УЛУЧШЕНИЯ (improvements/) ===
   hpUpgrade: 'assets/images/shop/improvements/boostHP.png',
   damageUpgrade: 'assets/images/shop/improvements/boostDMG.png',
+  staminaUpgrade: 'assets/images/shop/improvements/boostStamina.png',
   
   // === ПРЕДМЕТЫ ===
   map: INVENTORY_IMAGES.mapLevel,
@@ -28,6 +29,7 @@ export const SHOP_ITEM_IMAGES = {
   // Улучшения
   'hp': SHOP_IMAGES.hpUpgrade,
   'dmg': SHOP_IMAGES.damageUpgrade,
+  'stamina': SHOP_IMAGES.staminaUpgrade,
   
   // Карта
   'map': SHOP_IMAGES.map,
@@ -39,5 +41,6 @@ export const SHOP_ITEM_IMAGES = {
 export const SHOP_ICON_MAP = {
   'buy-hp': { key: 'hp', defaultEmoji: '❤️' },
   'buy-dmg': { key: 'dmg', defaultEmoji: '⚔️' },
+  'buy-stamina': { key: 'stamina', defaultEmoji: '⚡' },
   'buy-map': { key: 'map', defaultEmoji: '🗺️' },
 };

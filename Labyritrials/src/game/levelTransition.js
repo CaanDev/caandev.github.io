@@ -350,6 +350,10 @@ async function executeLevelTransition() {
     player.py = CONFIG.cellSize + CONFIG.cellSize / 2;
   }
 
+  // ===== ВОССТАНОВЛЕНИЕ ВЫНОСЛИВОСТИ =====
+  player.stamina = player.maxStamina;
+  player.lastAttackTime = 0;
+
   if (pendingUICallback) {
     pendingUICallback();
     pendingUICallback = null;

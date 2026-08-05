@@ -4,7 +4,7 @@
  * @module save/collectors/baseCollector
  */
 
-import { state } from '../../core/config/index.js';
+import { state, player } from '../../core/config/index.js';
 
 /**
  * Сбор базовых данных игры
@@ -19,6 +19,8 @@ export function collectBasicData() {
     currentBiome: state.currentBiome || 'cave',
     saveDate: Date.now(),
     seed: state.seed,
+    staminaUpgradeCount: player.staminaUpgradeCount || 0,
+    staminaUpgradeCost: player.staminaUpgradeCost || 150,
     randomCounter: state.randomCounter,
     bonusGiven: state.bonusGiven,
     hadMonsters: state.hadMonsters,

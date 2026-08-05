@@ -5,7 +5,7 @@
  */
 
 import { state, CONFIG } from '../../core/config/index.js';
-import { BIOMES } from '../../core/config/biomes.js';
+import { BIOMES_DATA as BIOMES } from '../../data/biomes.js';
 import { setSeed } from '../../world/mazeGenerator.js';
 
 /**

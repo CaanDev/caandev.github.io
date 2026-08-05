@@ -13,10 +13,24 @@ import { getEventDamageMultiplier } from '../../systems/events/index.js';
 import { addMonsterKilled } from '../../game/levelTransition.js';
 import { spawnLightningSparks, spawnBloodDrops } from '../../systems/rendering/player/particleSpawner.js';
 import { updateAttackCounter, hasStunImmunity, getHealingMultiplier } from '../monsters/adaptations/index.js';
+import { addSoundEvent } from '../monsters/ai/hearing.js';
 import { createBloodPuddle } from '../objects/utils/bloodSystem.js';
 import { handleMonsterDeath } from '../monsters/death.js';
 import { updateProgress } from '../../systems/achievements/index.js';
 import { triggerGameOver } from './gameOver.js';
+
+/**
+ * @namespace STAMINA_COST
+ * @description Стоимость действий в единицах выносливости
+ */
+const STAMINA_COST = {
+  /** @type {number} - Стоимость обычной атаки */
+  attack: 20,
+  /** @type {number} - Стоимость заряженной атаки */
+  strongAttack: 35,
+  /** @type {number} - Стоимость огненного шара */
+  fireball: 25,
+};
 
 /** @type {number} - Время последней атаки для кулдауна */
 let lastAttackTime = 0;
@@ -43,10 +57,30 @@ export function executeAttack(isStrong) {
     return;
   }
 
+  // ===== ПРОВЕРКА КУЛДАУНА =====
   const now = Date.now();
   if (now - lastAttackTime < ATTACK_COOLDOWN) {
     return;
   }
+
+  // ===== ПРОВЕРКА ВЫНОСЛИВОСТИ =====
+  const staminaCost = isStrong ? STAMINA_COST.strongAttack : STAMINA_COST.attack;
+
+  if (player.stamina < staminaCost) {
+    state.damageTexts.push({
+      x: player.px,
+      y: player.py - 60,
+      text: '⚡ Недостаточно выносливости!',
+      color: '#ffcc00',
+      size: 20,
+      life: 40,
+      speedy: 0.5
+    });
+    return;
+  }
+
+  // Списываем выносливость
+  player.stamina -= staminaCost;
   lastAttackTime = now;
 
   player.attackExecuted = true;
@@ -105,6 +139,8 @@ function breakWall(targetX, targetY, isStrong) {
     state.screenShake = 15;
 
     audio.playSound('wallDestroy', 0.6);
+    // Звуковое событие для монстров
+    addSoundEvent(targetX * CONFIG.cellSize + CONFIG.cellSize / 2, targetY * CONFIG.cellSize + CONFIG.cellSize / 2, 'wallDestroy');
     
     if (cell.hasTreasurePortal && state.treasurePortal && !state.treasurePortal.active) activateTreasurePortal(targetX, targetY);
     if (cell.hasShrinePortal && state.shrinePortal && !state.shrinePortal.active) activateShrinePortal(targetX, targetY);
@@ -213,7 +249,7 @@ function activateTrapPortal(wallX, wallY) {
     x: player.px,
     y: player.py - 50,
     text: `💰 ВЫ НАШЛИ ПОРТАЛ В СОКРОВИЩНИЦУ! 💰`,
-    color: '#ff6600',
+    color: COLORS.portals.treasure,
     size: 24,
     life: 80,
     speedy: 0.8
@@ -274,6 +310,9 @@ function dealDamageToMonsters(attackX, attackY, damage, isStrong, dirX, dirY) {
     
     if (Math.hypot(m.x - attackX, m.y - attackY) < CONFIG.cellSize * 0.85) {
       if (hasLineOfSight(player.px, player.py, m.x, m.y) && !hasPillarBetween(player.px, player.py, m.x, m.y)) {
+        // ===== ЗАПОМИНАЕМ ВРЕМЯ АТАКИ (для определения статуса "в бою") =====
+        player.lastAttackTime = Date.now();
+
         const finalDamage = getEventDamageMultiplier(damage);
         m.hp -= finalDamage;
         m.state = 'chase';

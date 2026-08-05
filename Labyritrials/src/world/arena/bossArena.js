@@ -12,7 +12,7 @@ import { EMOJIS } from '../../emojis.js';
 import { Cell } from '../cells/cell.js';
 import { spawnBossTorches } from '../../entities/objects/spawners/torchSpawner.js';
 import { triggerBossSummonFade, updateBossSummonCircle } from '../../systems/rendering/maze/bossSummonCircle.js';
-import { getBossByLevel } from '../../entities/monsters/bosses/config.js';
+import { getBossByLevel, BOSS_TYPES } from '../../entities/monsters/bosses/config.js';
 import { resetBossLightFade } from '../../systems/rendering/maze/index.js';
 import { 
   PhaseSummonAbility, 
@@ -27,6 +27,7 @@ import {
   TremorAbility,
   CircleFireballAbility
 } from '../../entities/monsters/bosses/abilities/index.js';
+import { getBossData } from '../../data/index.js';
 
 /**
  * @namespace PILLAR_CONFIG
@@ -124,6 +125,12 @@ export function generateBossArena() {
   state.lootItems = [];
 
   const bossLevel = Math.floor(state.gameLevel / 5) * 5;
+  const bossData = getBossData(
+    bossLevel === 5 ? 'demon' :
+    bossLevel === 10 ? 'mind' :
+    bossLevel === 15 ? 'duo' : 'demon'
+  );
+
   let bossType = 'demon';
   if (bossLevel === 10) bossType = 'mind';
   if (bossLevel === 15) bossType = 'duo';
@@ -377,6 +384,25 @@ function spawnDemonBoss(x, y, scaling) {
     isDuoBoss: false,
     pathUpdateCounter: 0,
     currentPathTarget: null,
+    // ===== ПАМЯТЬ =====
+    lastKnownX: null,
+    lastKnownY: null,
+    lastKnownDirection: { x: 0, y: 0 },
+    predictedPath: [],
+    predictionTimer: 0,
+    predictionLength: 5,
+    memoryTimer: 0,
+    memoryDuration: 300,
+    isSearching: false,
+    searchRadius: 80,
+    searchTimer: 0,
+    // ===== ВИДИМОСТЬ =====
+    vision: bossConfig.vision || 1000,
+    baseVision: bossConfig.vision || 1000,
+    visionBoosted: false,
+    visionBoostTimer: 0,
+    visionBoostDuration: 180,
+    visionBoostMultiplier: 1.5,
     abilities: {
       phaseSummon: new PhaseSummonAbility(),
       periodicSummon: new SummonMinionsAbility(),
@@ -441,6 +467,25 @@ function spawnMindBoss(x, y, scaling) {
     isDuoBoss: false,
     pathUpdateCounter: 0,
     currentPathTarget: null,
+    // ===== ПАМЯТЬ =====
+    lastKnownX: null,
+    lastKnownY: null,
+    lastKnownDirection: { x: 0, y: 0 },
+    predictedPath: [],
+    predictionTimer: 0,
+    predictionLength: 5,
+    memoryTimer: 0,
+    memoryDuration: 300,
+    isSearching: false,
+    searchRadius: 80,
+    searchTimer: 0,
+    // ===== ВИДИМОСТЬ =====
+    vision: bossConfig.vision || 1000,
+    baseVision: bossConfig.vision || 1000,
+    visionBoosted: false,
+    visionBoostTimer: 0,
+    visionBoostDuration: 180,
+    visionBoostMultiplier: 1.5,
     abilities: {
       mindBall: new MindBallAbility(),
       psionicWave: new PsionicWaveAbility(),
@@ -513,6 +558,25 @@ function spawnDuoBosses(x1, x2, y, scaling) {
     duoRole: 'chaser',
     pathUpdateCounter: 0,
     currentPathTarget: null,
+    // ===== ПАМЯТЬ =====
+    lastKnownX: null,
+    lastKnownY: null,
+    lastKnownDirection: { x: 0, y: 0 },
+    predictedPath: [],
+    predictionTimer: 0,
+    predictionLength: 5,
+    memoryTimer: 0,
+    memoryDuration: 300,
+    isSearching: false,
+    searchRadius: 80,
+    searchTimer: 0,
+    // ===== ВИДИМОСТЬ =====
+    vision: bossConfig.vision || 1000,
+    baseVision: bossConfig.vision || 1000,
+    visionBoosted: false,
+    visionBoostTimer: 0,
+    visionBoostDuration: 180,
+    visionBoostMultiplier: 1.5,
     abilities: {
       speedBoost: new SpeedBoostAbility()
     },
@@ -553,6 +617,25 @@ function spawnDuoBosses(x1, x2, y, scaling) {
     duoRole: 'shooter',
     pathUpdateCounter: 0,
     currentPathTarget: null,
+    // ===== ПАМЯТЬ =====
+    lastKnownX: null,
+    lastKnownY: null,
+    lastKnownDirection: { x: 0, y: 0 },
+    predictedPath: [],
+    predictionTimer: 0,
+    predictionLength: 5,
+    memoryTimer: 0,
+    memoryDuration: 300,
+    isSearching: false,
+    searchRadius: 80,
+    searchTimer: 0,
+    // ===== ВИДИМОСТЬ =====
+    vision: bossConfig.vision || 1000,
+    baseVision: bossConfig.vision || 1000,
+    visionBoosted: false,
+    visionBoostTimer: 0,
+    visionBoostDuration: 180,
+    visionBoostMultiplier: 1.5,
     abilities: {
       shootFireball: new ShootFireballAbility(),
       circleFireball: new CircleFireballAbility()

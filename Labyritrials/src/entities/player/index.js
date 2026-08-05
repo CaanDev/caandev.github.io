@@ -38,6 +38,61 @@ export { triggerGameOver, initRestartHandler } from './gameOver.js';
 export { executeAttack } from './combat.js';
 
 // ============================================================
+// ВЫНОСЛИВОСТЬ
+// ============================================================
+
+/**
+ * Обновление выносливости игрока (восстановление)
+ * Вызывается каждый кадр из gameLoop
+ * 
+ * @returns {void}
+ */
+function updateStamina() {
+  // Если выносливость уже полная — ничего не делаем
+  if (player.stamina >= player.maxStamina) return;
+
+  // Защита от деления на ноль
+  if (player.maxStamina <= 0) {
+    player.maxStamina = 80;
+    player.stamina = 80;
+    return;
+  }
+  
+  const now = Date.now();
+  const timeSinceLastAttack = now - player.lastAttackTime;
+  
+  // Определяем статус "в бою" (атака была менее 3 секунд назад)
+  const isInCombat = timeSinceLastAttack < 3000;
+  
+  // Определяем скорость восстановления с учётом эффектов
+  let regenRate = isInCombat ? player.staminaRegenInCombat : player.staminaRegenOutOfCombat;
+  
+  // ===== ЭФФЕКТЫ, ВЛИЯЮЩИЕ НА ВОССТАНОВЛЕНИЕ =====
+  // Заморозка — полная блокировка
+  if (player.isFrozen && player.freezeTimer > 0) {
+    regenRate = 0;
+  }
+  // Отравление — сильно замедляет
+  else if (player.poisonTimer > 0) {
+    regenRate = Math.min(regenRate, 2);
+  }
+  // Шок — умеренно замедляет
+  else if (player.shockTimer > 0) {
+    regenRate = Math.min(regenRate, 4);
+  }
+  
+  // Если регенерация отключена — выходим
+  if (regenRate <= 0) return;
+  
+  // Рассчитываем восстановление за кадр (при 60 FPS — 1/60 секунды)
+  const deltaTime = 1 / 60;
+  const regenAmount = regenRate * deltaTime;
+  
+  // Применяем восстановление
+  player.stamina = Math.min(player.maxStamina, player.stamina + regenAmount);
+}
+
+// ============================================================
 // ОСНОВНОЙ ЦИКЛ ОБНОВЛЕНИЯ
 // ============================================================
 
@@ -46,14 +101,15 @@ export { executeAttack } from './combat.js';
  * 
  * Выполняется каждый кадр в следующем порядке:
  * 1. Обновление эффектов (заморозка, шок, отравление)
- * 2. Перезарядка огненного шара
- * 3. Движение и туман войны
- * 4. Сбор предметов
- * 5. Взаимодействие с объектами
- * 6. Проверка порталов
- * 7. Проверка ловушек
- * 8. Анимация атаки
- * 9. Проверка завершения волны в комнате-ловушке
+ * 2. Восстановление выносливости
+ * 3. Перезарядка огненного шара
+ * 4. Движение и туман войны
+ * 5. Сбор предметов
+ * 6. Взаимодействие с объектами
+ * 7. Проверка порталов
+ * 8. Проверка ловушек
+ * 9. Анимация атаки
+ * 10. Проверка завершения волны в комнате-ловушке
  * 
  * @returns {void}
  */
@@ -74,27 +130,30 @@ export function updatePlayer() {
   if (updatePoisonEffect()) return;
   updatePlayerEffects();
   
-  // ===== 2. ПЕРЕЗАРЯДКА ОГНЕННОГО ШАРА =====
+  // ===== 2. ВОССТАНОВЛЕНИЕ ВЫНОСЛИВОСТИ =====
+  updateStamina();
+  
+  // ===== 3. ПЕРЕЗАРЯДКА ОГНЕННОГО ШАРА =====
   if (player.fireballCooldown > 0) {
     player.fireballCooldown--;
   }
   
-  // ===== 3. ДВИЖЕНИЕ И ТУМАН ВОЙНЫ =====
+  // ===== 4. ДВИЖЕНИЕ И ТУМАН ВОЙНЫ =====
   updateMovement();
   updateTorchActivation();
   updateFogOfWar();
   updateShopPrompt();
   
-  // ===== 4. СБОР ПРЕДМЕТОВ =====
+  // ===== 5. СБОР ПРЕДМЕТОВ =====
   collectLoot();
   collectArtifacts();
   
-  // ===== 5. ВЗАИМОДЕЙСТВИЕ С ОБЪЕКТАМИ =====
+  // ===== 6. ВЗАИМОДЕЙСТВИЕ С ОБЪЕКТАМИ =====
   interactWithChests();
   interactWithShrines();
   checkNoteInteraction();
   
-  // ===== 6. ПОРТАЛЫ =====
+  // ===== 7. ПОРТАЛЫ =====
   if (checkSecretPortal()) return;
   if (checkExitPortal()) return;
   if (checkShrinePortal()) return;
@@ -105,13 +164,13 @@ export function updatePlayer() {
   if (checkSafePortal()) return;
   if (checkSafeRoomExit()) return;
   
-  // ===== 7. ЛОВУШКИ =====
+  // ===== 8. ЛОВУШКИ =====
   checkTraps();
   
-  // ===== 8. АНИМАЦИЯ АТАКИ =====
+  // ===== 9. АНИМАЦИЯ АТАКИ =====
   updateAttackAnimation();
 
-  // ===== 9. КОМНАТА-ЛОВУШКА: ПРОВЕРКА ВОЛНЫ =====
+  // ===== 10. КОМНАТА-ЛОВУШКА: ПРОВЕРКА ВОЛНЫ =====
   if (state.inTrapRoom && state.trapActivated) {
     checkTrapWaveComplete();
   }

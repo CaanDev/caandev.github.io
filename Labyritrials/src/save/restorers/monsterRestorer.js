@@ -28,6 +28,23 @@ import { restoreBossAbilities } from './helpers.js';
  * @returns {void}
  */
 export function restoreMonstersData(save) {
+  // Если мы в комнате-ловушке и волна активна — НЕ перезаписываем монстров
+  if (save.trapRoomData?.inTrapRoom && save.trapRoomData?.trapWaveActive) {
+    // Только добавляем недостающих монстров из сохранения
+    if (save.monsters && Array.isArray(save.monsters)) {
+      for (const m of save.monsters) {
+        const exists = state.monsters.some(existing => 
+          existing.x === m.x && existing.y === m.y
+        );
+        if (!exists) {
+          state.monsters.push(m);
+        }
+      }
+    }
+    return;
+  }
+  
+  // Обычное восстановление
   if (save.monsters && Array.isArray(save.monsters)) {
     state.monsters = save.monsters.map(m => {
       const restored = { ...m };

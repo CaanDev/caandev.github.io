@@ -166,6 +166,10 @@ function resetPlayerState() {
   player.baseDamage = 20;
   player.incomingDamageMultiplier = 1.0;
   
+  // ===== ВЫНОСЛИВОСТЬ =====
+  player.stamina = player.maxStamina;
+  player.lastAttackTime = 0;
+  
   // ===== ЭФФЕКТЫ =====
   player.isFrozen = false;
   player.freezeTimer = 0;

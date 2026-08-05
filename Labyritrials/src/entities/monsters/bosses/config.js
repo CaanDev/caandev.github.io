@@ -7,6 +7,19 @@
 
 import { EMOJIS } from '../../../emojis.js';
 import { getAbilitiesByBossType } from './abilities/index.js';
+import {
+  BOSSES_DATA,
+  getBossData,
+  getBossByLevel as getBossByLevelData,
+  isBossLevel as isBossLevelData,
+  getBossNameByLevel as getBossNameByLevelData,
+  getBossEmojiByLevel as getBossEmojiByLevelData,
+  getBossTypeByLevel as getBossTypeByLevelData
+} from '../../../data/index.js';
+
+// ============================================================
+// РЕЭКСПОРТ ДЛЯ ОБРАТНОЙ СОВМЕСТИМОСТИ
+// ============================================================
 
 /**
  * @namespace BOSS_TYPES
@@ -18,6 +31,10 @@ export const BOSS_TYPES = {
   DUO_CHASER: 'duo_chaser',
   DUO_SHOOTER: 'duo_shooter'
 };
+
+// ============================================================
+// КЛАСС БОССА
+// ============================================================
 
 /**
  * Базовый класс босса
@@ -124,117 +141,80 @@ export class Boss {
   }
 }
 
-/**
- * Класс босса "Верховный демон" (уровень 5)
- * 
- * @class DemonBoss
- * @extends Boss
- */
-class DemonBoss extends Boss {
-  constructor() {
-    super({
-      id: 'demon_boss',
-      name: 'Верховный демон',
-      level: 5,
-      emoji: EMOJIS.bosses.demon,
-      bossType: BOSS_TYPES.DEMON,
-      baseHp: 1000,
-      baseDamage: 35,
-      baseSpeed: 2.0,
-      state: 'chase',
-      isBoss: true,
-      isDuoBoss: false,
-      phaseThresholds: [0.75, 0.5]
-    });
-  }
-}
+// ============================================================
+// ЭКЗЕМПЛЯРЫ БОССОВ (ДЛЯ ОБРАТНОЙ СОВМЕСТИМОСТИ)
+// ============================================================
 
-/**
- * Класс босса "Разум" (уровень 10)
- * 
- * @class MindBoss
- * @extends Boss
- */
-class MindBoss extends Boss {
-  constructor() {
-    super({
-      id: 'mind_boss',
-      name: 'Разум',
-      level: 10,
-      emoji: EMOJIS.bosses.mind,
-      bossType: BOSS_TYPES.MIND,
-      baseHp: 800,
-      baseDamage: 45,
-      baseSpeed: 1.2,
-      canShootProjectiles: true,
-      state: 'chase',
-      isBoss: true,
-      isDuoBoss: false,
-      radius: 98,
-      vision: 1200,
-      phaseThresholds: [0.75, 0.4]
-    });
-  }
-}
+// Создаём экземпляры из данных
+const demonData = getBossData('demon');
+const mindData = getBossData('mind');
+const duoData = getBossData('duo');
 
-/**
- * Класс босса "Страж-Преследователь" (уровень 15, часть дуэта)
- * 
- * @class DuoChaserBoss
- * @extends Boss
- */
-class DuoChaserBoss extends Boss {
-  constructor() {
-    super({
-      id: 'duo_chaser',
-      name: 'Страж-Преследователь',
-      level: 15,
-      emoji: EMOJIS.bosses.guardian,
-      bossType: BOSS_TYPES.DUO_CHASER,
-      baseHp: 600,
-      baseDamage: 35,
-      baseSpeed: 4.0,
-      isBoss: true,
-      isDuoBoss: true,
-      duoRole: 'chaser',
-      state: 'chase',
-      phaseThreshold: 0.5
-    });
-  }
-}
+export const DEMON_BOSS = new Boss({
+  id: demonData.id,
+  name: demonData.name,
+  level: demonData.level,
+  emoji: demonData.emoji,
+  bossType: demonData.bossType,
+  baseHp: demonData.baseHp,
+  baseDamage: demonData.baseDamage,
+  baseSpeed: demonData.baseSpeed,
+  vision: demonData.vision,
+  radius: demonData.radius,
+  phaseThresholds: demonData.phaseThresholds,
+});
 
-/**
- * Класс босса "Страж-Стрелок" (уровень 15, часть дуэта)
- * 
- * @class DuoShooterBoss
- * @extends Boss
- */
-class DuoShooterBoss extends Boss {
-  constructor() {
-    super({
-      id: 'duo_shooter',
-      name: 'Страж-Стрелок',
-      level: 15,
-      emoji: EMOJIS.bosses.guardian,
-      bossType: BOSS_TYPES.DUO_SHOOTER,
-      baseHp: 500,
-      baseDamage: 25,
-      baseSpeed: 3.0,
-      isBoss: true,
-      isDuoBoss: true,
-      duoRole: 'shooter',
-      state: 'flee',
-      canShootProjectiles: true,
-      phaseThreshold: 0.5
-    });
-  }
-}
+export const MIND_BOSS = new Boss({
+  id: mindData.id,
+  name: mindData.name,
+  level: mindData.level,
+  emoji: mindData.emoji,
+  bossType: mindData.bossType,
+  baseHp: mindData.baseHp,
+  baseDamage: mindData.baseDamage,
+  baseSpeed: mindData.baseSpeed,
+  vision: mindData.vision,
+  radius: mindData.radius,
+  phaseThresholds: mindData.phaseThresholds,
+});
 
-// Экспорт экземпляров боссов
-export const DEMON_BOSS = new DemonBoss();
-export const MIND_BOSS = new MindBoss();
-export const DUO_CHASER_BOSS = new DuoChaserBoss();
-export const DUO_SHOOTER_BOSS = new DuoShooterBoss();
+// Для дуэта используем отдельную логику (как было)
+export const DUO_CHASER_BOSS = new Boss({
+  id: duoData.chaser.id,
+  name: duoData.chaser.name,
+  level: duoData.level,
+  emoji: duoData.chaser.emoji,
+  bossType: duoData.chaser.bossType,
+  baseHp: duoData.chaser.baseHp,
+  baseDamage: duoData.chaser.baseDamage,
+  baseSpeed: duoData.chaser.baseSpeed,
+  vision: duoData.chaser.vision,
+  radius: duoData.chaser.radius,
+  isDuoBoss: true,
+  duoRole: duoData.chaser.duoRole,
+  phaseThresholds: duoData.chaser.phaseThresholds,
+});
+
+export const DUO_SHOOTER_BOSS = new Boss({
+  id: duoData.shooter.id,
+  name: duoData.shooter.name,
+  level: duoData.level,
+  emoji: duoData.shooter.emoji,
+  bossType: duoData.shooter.bossType,
+  baseHp: duoData.shooter.baseHp,
+  baseDamage: duoData.shooter.baseDamage,
+  baseSpeed: duoData.shooter.baseSpeed,
+  vision: duoData.shooter.vision,
+  radius: duoData.shooter.radius,
+  isDuoBoss: true,
+  duoRole: duoData.shooter.duoRole,
+  phaseThresholds: duoData.shooter.phaseThresholds,
+  canShootProjectiles: true,
+});
+
+// ============================================================
+// ФУНКЦИИ (РЕЭКСПОРТ ДЛЯ ОБРАТНОЙ СОВМЕСТИМОСТИ)
+// ============================================================
 
 /**
  * Получение конфигурации босса по уровню игры
@@ -243,18 +223,7 @@ export const DUO_SHOOTER_BOSS = new DuoShooterBoss();
  * @returns {Object|null} - Конфигурация босса или null, если босса нет на уровне
  */
 export function getBossByLevel(gameLevel) {
-  const bossLevel = Math.floor(gameLevel / 5) * 5;
-
-  switch (bossLevel) {
-    case 5:
-      return DEMON_BOSS;
-    case 10:
-      return MIND_BOSS;
-    case 15:
-      return { chaser: DUO_CHASER_BOSS, shooter: DUO_SHOOTER_BOSS };
-    default:
-      return null;
-  }
+  return getBossByLevelData(gameLevel);
 }
 
 /**
@@ -264,7 +233,7 @@ export function getBossByLevel(gameLevel) {
  * @returns {boolean} - true, если уровень является босс-уровнем
  */
 export function isBossLevel(gameLevel) {
-  return gameLevel > 0 && gameLevel % 5 === 0;
+  return isBossLevelData(gameLevel);
 }
 
 /**
@@ -274,18 +243,7 @@ export function isBossLevel(gameLevel) {
  * @returns {string} - Название босса
  */
 export function getBossNameByLevel(gameLevel) {
-  const bossLevel = Math.floor(gameLevel / 5) * 5;
-
-  switch (bossLevel) {
-    case 5:
-      return 'Верховный демон';
-    case 10:
-      return 'Разум';
-    case 15:
-      return 'Страж лабиринта';
-    default:
-      return 'БОСС АРЕНЫ';
-  }
+  return getBossNameByLevelData(gameLevel);
 }
 
 /**
@@ -295,18 +253,7 @@ export function getBossNameByLevel(gameLevel) {
  * @returns {string} - Эмодзи босса
  */
 export function getBossEmojiByLevel(gameLevel) {
-  const bossLevel = Math.floor(gameLevel / 5) * 5;
-
-  switch (bossLevel) {
-    case 5:
-      return EMOJIS.bosses.demon;
-    case 10:
-      return EMOJIS.bosses.mind;
-    case 15:
-      return EMOJIS.bosses.guardian;
-    default:
-      return EMOJIS.bosses.demon;
-  }
+  return getBossEmojiByLevelData(gameLevel);
 }
 
 /**
@@ -316,16 +263,5 @@ export function getBossEmojiByLevel(gameLevel) {
  * @returns {string} - Тип босса
  */
 export function getBossTypeByLevel(gameLevel) {
-  const bossLevel = Math.floor(gameLevel / 5) * 5;
-
-  switch (bossLevel) {
-    case 5:
-      return BOSS_TYPES.DEMON;
-    case 10:
-      return BOSS_TYPES.MIND;
-    case 15:
-      return 'duo';
-    default:
-      return 'default';
-  }
+  return getBossTypeByLevelData(gameLevel);
 }

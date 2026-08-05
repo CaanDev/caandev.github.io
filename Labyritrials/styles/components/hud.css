@@ -27,9 +27,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: -5px;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 #hp-icon {
@@ -62,16 +62,87 @@
 }
 
 #hp-text {
-  font-size: 14px;
-  color: var(--color-text-dark);
-  flex-shrink: 0;
-  min-width: 60px;
-  text-align: right;
-  font-weight: bold;
+  display: none;
 }
 
-#hp-text #hp-val {
-  color: var(--color-text-light);
+/* ===== ВЫНОСЛИВОСТЬ ===== */
+
+#ui-stamina {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: opacity 0.3s ease;
+}
+
+/* Прозрачность, когда выносливость полная */
+#ui-stamina.full {
+  opacity: 0.6;
+}
+
+#stamina-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+#stamina-bar-bg {
+  flex: 0 0 auto;
+  width: 33.333%;
+  height: 6px;
+  background: rgba(44, 62, 80, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 60px;
+  max-width: 200px;
+}
+
+#stamina-bar-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: 4px;
+  transition: width 0.15s ease;
+  background: linear-gradient(90deg, #3498db, #5dade2);
+  position: relative;
+}
+
+/* Блик на полоске выносливости */
+#stamina-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* Мерцание при низкой выносливости (< 20) */
+#ui-stamina.low #stamina-bar-fill {
+  animation: staminaPulse 0.8s ease-in-out infinite;
+  background: linear-gradient(90deg, #e67e22, #f1c40f);
+}
+
+#ui-stamina.critical #stamina-bar-fill {
+  animation: staminaPulse 0.4s ease-in-out infinite;
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
+}
+
+#stamina-text {
+  display: none;
+}
+
+/* ===== АНИМАЦИЯ МЕРЦАНИЯ ===== */
+@keyframes staminaPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* ===== СТРОКИ СТАТИСТИКИ ===== */
@@ -335,6 +406,21 @@
     height: 8px;
     min-width: 60px;
   }
+
+  #stamina-bar-bg {
+    height: 6px;
+    min-width: 50px;
+    max-width: 150px;
+  }
+
+  #stamina-text {
+    font-size: 12px;
+    min-width: 40px;
+  }
+
+  #stamina-icon {
+    font-size: 15px;
+  }
   
   .ui-inventory-button {
     font-size: 13px;
@@ -370,6 +456,21 @@
   #hp-text {
     font-size: 11px;
     min-width: 40px;
+  }
+
+  #stamina-bar-bg {
+    height: 5px;
+    min-width: 40px;
+    max-width: 120px;
+  }
+
+  #stamina-text {
+    font-size: 11px;
+    min-width: 35px;
+  }
+
+  #stamina-icon {
+    font-size: 13px;
   }
   
   .ui-inventory-button {

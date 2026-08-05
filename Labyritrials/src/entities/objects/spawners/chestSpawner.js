@@ -123,7 +123,12 @@ export function spawnChests(isTreasureRoom = false, isProtectedCell = () => fals
 
     // Мухи для мимиков
     if (chestType === 'mimic') {
-      createFlies(pos.x * CONFIG.cellSize + CONFIG.cellSize / 2, pos.y * CONFIG.cellSize + CONFIG.cellSize / 2);
+      const biome = state.currentBiome || 'cave';
+      createFlies(
+        pos.x * CONFIG.cellSize + CONFIG.cellSize / 2,
+        pos.y * CONFIG.cellSize + CONFIG.cellSize / 2,
+        biome
+      );
     }
 
     markCellUsed(pos.x, pos.y);

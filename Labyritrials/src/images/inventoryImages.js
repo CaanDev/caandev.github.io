@@ -21,6 +21,7 @@ export const INVENTORY_IMAGES = {
   // === ПРЕДМЕТЫ (items/) ===
   mapLevel: 'assets/images/inventory/items/mapLevel.png',
   mapLevelIce: 'assets/images/inventory/items/mapLevelIce.png',
+  mapLevelSand: 'assets/images/inventory/items/mapLevelSand.png',
 };
 
 /**
@@ -58,9 +59,8 @@ export function getWeaponImagePath(weaponId) {
  * @returns {string} - Ключ изображения карты
  */
 export function getMapImageKey(biome) {
-  if (biome === 'ice') {
-    return 'mapLevelIce';
-  }
+  if (biome === 'ice') return 'mapLevelIce';
+  if (biome === 'sand') return 'mapLevelSand';
   return 'mapLevel';
 }
 

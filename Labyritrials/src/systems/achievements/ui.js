@@ -16,7 +16,7 @@ import {
   isUnlocked,
   getUnlocked
 } from './manager.js';
-import { CATEGORIES, getTotalCount } from './config.js';
+import { CATEGORIES_DATA as CATEGORIES, getTotalAchievementsCount } from '../../data/achievements.js';
 import { logger } from '../../utils/logger.js';
 import { loadTemplateIfNeeded, isTemplateLoaded, isTemplateInitialized, initTemplateHandlers } from '../../utils/htmlLoader.js';
 import { getImage, isImageLoaded } from '../../utils/imageLoader.js';
@@ -42,7 +42,10 @@ let achievementsOpen = false;
 function getAchievementImageKey(id) {
   const imageMap = {
     // Combat
+    'monster_slayer': 'monsterSlayer',
+    'boss_hunter_5': 'bossHunter5',
     'boss_hunter_10': 'bossHunter10',
+    'boss_hunter_15': 'bossHunter15',
     'boss_conqueror': 'bossConqueror',
     'fire_mage': 'fire_mage',
     'vampire_lord': 'vampire_lord',
@@ -62,7 +65,7 @@ function getAchievementImageKey(id) {
     'gold_millionaire': 'gold_millionaire',
     'collector': 'collector',
     'artifactor': 'artifactor',
-    'fully_equipped': 'fullyEquipped',
+    'fully_equipped': 'fully_equipped',
     'story_collector': 'story_collector',
     
     // Survival
@@ -225,6 +228,10 @@ function showAchievementsWindow() {
     logger.warn('⚠️ Окно достижений не найдено');
     return;
   }
+
+  import('./manager.js').then(module => {
+    module.forceLoadAchievements();
+  });
   
   achievementsOpen = true;
   window.style.display = 'flex';

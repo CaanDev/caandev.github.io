@@ -6,7 +6,7 @@
  */
 
 import { state } from '../../core/config/state.js';
-import { ACHIEVEMENTS_LIST, getTotalCount } from './config.js';
+import { ACHIEVEMENTS_DATA, getTotalAchievementsCount } from '../../data/achievements.js';
 import { logger } from '../../utils/logger.js';
 import { showAchievementNotification } from './ui.js';
 import { saveGame } from '../../save/saveSystem.js';
@@ -147,9 +147,6 @@ export function setProgress(key, value) {
 /**
  * Проверка всех достижений
  * 
- * Проходит по списку всех достижений, проверяет условия разблокировки
- * и разблокирует достижения, условия которых выполнены.
- * 
  * @returns {void}
  */
 export function checkAchievements() {
@@ -158,7 +155,7 @@ export function checkAchievements() {
   
   let hasNewUnlock = false;
   
-  for (const [id, achievement] of Object.entries(ACHIEVEMENTS_LIST)) {
+  for (const [id, achievement] of Object.entries(ACHIEVEMENTS_DATA)) {
     // Пропускаем уже разблокированные
     if (unlocked.includes(id)) continue;
     
@@ -182,7 +179,7 @@ export function checkAchievements() {
  * @returns {void}
  */
 export function unlockAchievement(id) {
-  const achievement = ACHIEVEMENTS_LIST[id];
+  const achievement = ACHIEVEMENTS_DATA[id];
   if (!achievement) {
     logger.warn(`⚠️ Достижение "${id}" не найдено`);
     return;
@@ -196,7 +193,7 @@ export function unlockAchievement(id) {
   
   logger.achievement(`🏆 Достижение разблокировано: ${achievement.name}`);
   
-  // Показываем уведомление (теперь всегда работает)
+  // Показываем уведомление
   showAchievementNotification(id);
 
   // Воспроизводим звук
@@ -234,7 +231,7 @@ export function isUnlocked(id) {
  * @returns {Object|null} - Объект с данными достижения или null
  */
 export function getAchievementState(id) {
-  const achievement = ACHIEVEMENTS_LIST[id];
+  const achievement = ACHIEVEMENTS_DATA[id];
   if (!achievement) return null;
   
   const unlocked = isUnlocked(id);
@@ -260,7 +257,7 @@ export function getAchievementState(id) {
  */
 export function getAllAchievementsState() {
   const result = [];
-  for (const [id] of Object.entries(ACHIEVEMENTS_LIST)) {
+  for (const [id] of Object.entries(ACHIEVEMENTS_DATA)) {
     result.push(getAchievementState(id));
   }
   return result;
@@ -274,7 +271,7 @@ export function getAllAchievementsState() {
  */
 export function getAchievementsByCategoryState(categoryId) {
   const result = [];
-  for (const [id, achievement] of Object.entries(ACHIEVEMENTS_LIST)) {
+  for (const [id, achievement] of Object.entries(ACHIEVEMENTS_DATA)) {
     if (achievement.category === categoryId) {
       result.push(getAchievementState(id));
     }
@@ -288,7 +285,7 @@ export function getAchievementsByCategoryState(categoryId) {
  * @returns {Object} - Объект со статистикой { total, unlocked }
  */
 export function getAchievementsStats() {
-  const total = getTotalCount();
+  const total = getTotalAchievementsCount();
   const unlocked = (state.achievements.unlocked || []).length;
   return { total, unlocked };
 }
@@ -331,7 +328,7 @@ export function resetAchievements() {
  */
 export function getHiddenAchievements() {
   const result = [];
-  for (const [id, achievement] of Object.entries(ACHIEVEMENTS_LIST)) {
+  for (const [id, achievement] of Object.entries(ACHIEVEMENTS_DATA)) {
     if (achievement.hidden === true) {
       result.push(id);
     }
@@ -346,7 +343,7 @@ export function getHiddenAchievements() {
  * @returns {boolean} - true, если достижение скрытое
  */
 export function isHidden(id) {
-  const achievement = ACHIEVEMENTS_LIST[id];
+  const achievement = ACHIEVEMENTS_DATA[id];
   return achievement ? achievement.hidden === true : false;
 }
 
@@ -368,4 +365,31 @@ export function getCategoryStats(categoryId) {
   const unlocked = achievements.filter(a => a.unlocked).length;
   
   return { total, unlocked };
+}
+
+/**
+ * Принудительная загрузка достижений из localStorage в состояние
+ * Используется при открытии окна достижений в главном меню
+ * 
+ * @returns {void}
+ */
+export function forceLoadAchievements() {
+  try {
+    const raw = localStorage.getItem(ACHIEVEMENTS_STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (!state.achievements) {
+        state.achievements = {
+          unlocked: data.unlocked || [],
+          progress: data.progress || {}
+        };
+      } else {
+        state.achievements.unlocked = data.unlocked || [];
+        state.achievements.progress = data.progress || {};
+      }
+      logger.save('📀 Достижения загружены из localStorage');
+    }
+  } catch (e) {
+    logger.warn('⚠️ Не удалось загрузить достижения:', e);
+  }
 }

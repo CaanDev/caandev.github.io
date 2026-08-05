@@ -129,6 +129,8 @@ export function handleKeyDown(e) {
 
   // Клавиша E: взаимодействие
   if (mappedKey === 'e') {
+    if (state.isBossLevel) return;
+
     if (isNearBookshelf()) {
       e.preventDefault();
       openBookshelf();
@@ -185,29 +187,7 @@ export function handleKeyUp(e) {
  * @private
  */
 async function handleShopToggle() {
-  if (state.isBossLevel && !state.bossReady) {
-    state.damageTexts.push({
-      x: player.px, y: player.py - 30,
-      text: '⏳ Сначала победите босса!',
-      color: COLORS.ui.textRed,
-      size: 16,
-      life: 30,
-      speedy: 0.5
-    });
-    return;
-  }
-
   if (CONFIG.shopPos.x < 0 || CONFIG.shopPos.y < 0) return;
-
-  if (state.isBossLevel) {
-    state.damageTexts.push({
-      x: player.px, y: player.py - 30,
-      text: '🏪 Торговец не пришёл на арену, но оставил вам карту!',
-      color: COLORS.ui.textRed,
-      size: 18, life: 60, speedy: 1.0
-    });
-    return;
-  }
 
   let distToShop = Math.hypot(
     player.px - (CONFIG.shopPos.x * CONFIG.cellSize + CONFIG.cellSize / 2),

@@ -1,6 +1,6 @@
 /**
  * @fileoverview Обновление игрового UI.
- * Обновляет все элементы пользовательского интерфейса: здоровье, золото, урон,
+ * Обновляет все элементы пользовательского интерфейса: здоровье, выносливость, золото, урон,
  * количество монстров, уровень, оружие и состояние магазина с оптимизацией через кэширование.
  * 
  * @module systems/ui/statsUpdater
@@ -186,6 +186,9 @@ function updateBasicStats() {
       hp: -1,
       maxHp: -1,
       hpPercent: -1,
+      stamina: -1,
+      maxStamina: -1,
+      staminaPercent: -1,
       frostProtected: false,
     };
   }
@@ -256,6 +259,62 @@ function updateBasicStats() {
 
       hpBarFill.style.display = 'block';
       hpBarFill.style.opacity = '1';
+    }
+  }
+
+  // ===== ВЫНОСЛИВОСТЬ =====
+  const staminaVal = document.getElementById('stamina-text');
+  const staminaBarFill = document.getElementById('stamina-bar-fill');
+  const staminaContainer = document.getElementById('ui-stamina');
+
+  if (staminaVal && staminaBarFill && staminaContainer) {
+    const current = (typeof player.stamina === 'number' && !isNaN(player.stamina)) 
+      ? Math.floor(player.stamina) 
+      : 0;
+    const max = (typeof player.maxStamina === 'number' && !isNaN(player.maxStamina) && player.maxStamina > 0) 
+      ? player.maxStamina 
+      : 80;
+    
+    const staminaPercent = Math.max(0, Math.min(100, (current / max) * 100));
+
+    // Обновляем текст
+    const newText = `<span class="stamina-current">${current}</span><span class="stamina-separator">/</span><span class="stamina-max">${max}</span>`;
+    if (staminaVal.innerHTML !== newText) {
+      staminaVal.innerHTML = newText;
+    }
+
+    // Обновляем полоску
+    if (staminaBarFill.style.width !== staminaPercent + '%') {
+      staminaBarFill.style.width = staminaPercent + '%';
+    }
+
+    // ===== КЛАССЫ СОСТОЯНИЯ =====
+    const isFull = current >= max;
+    const isLow = staminaPercent < 20 && staminaPercent > 0;
+    const isCritical = current <= 0;
+
+    // Проверяем, нужно ли обновлять классы
+    const hasFull = staminaContainer.classList.contains('full');
+    const hasLow = staminaContainer.classList.contains('low');
+    const hasCritical = staminaContainer.classList.contains('critical');
+
+    // Обновляем только если состояние изменилось
+    if (isFull && !hasFull) {
+      staminaContainer.classList.add('full');
+    } else if (!isFull && hasFull) {
+      staminaContainer.classList.remove('full');
+    }
+
+    if (isLow && !hasLow) {
+      staminaContainer.classList.add('low');
+    } else if (!isLow && hasLow) {
+      staminaContainer.classList.remove('low');
+    }
+
+    if (isCritical && !hasCritical) {
+      staminaContainer.classList.add('critical');
+    } else if (!isCritical && hasCritical) {
+      staminaContainer.classList.remove('critical');
     }
   }
 

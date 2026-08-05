@@ -52,6 +52,27 @@ function getCachedWallImageKey(biomeId, isCracked, seed) {
   // Получаем конфигурацию биома
   const biome = WALL_IMAGES[biomeId];
   if (!biome) return null;
+
+  if (biomeId === 'boss' || biomeId === 'bossArena') {
+    const bossLevel = Math.floor(state.gameLevel / 5) * 5;
+    if (bossLevel === 0) bossLevel = 5;
+    
+    // Используем прямой ключ для изображения босс-арены
+    const bossKey = `boss${bossLevel}`;
+    const imageKey = `boss_wall_${bossLevel}`;
+    
+    // Проверяем, загружено ли изображение для конкретного уровня
+    if (isImageLoaded(imageKey)) {
+      return imageKey;
+    }
+    
+    // Fallback: используем общее изображение босс-арены
+    if (isImageLoaded('boss_wall_0')) {
+      return 'boss_wall_0';
+    }
+    
+    return null;
+  }
   
   const images = actualIsCracked ? biome.cracked : biome.wall;
   if (!images || images.length === 0) {
@@ -146,6 +167,16 @@ export function drawWalls(ctx, visibleRange) {
         if (state.inTreasureRoom && cell.isBreakable) {
           // Используем изображения разрушаемых стен сокровищницы
           imageKey = getCachedWallImageKey('treasureRoom', true, seed);
+        } else if (state.isBossLevel) {
+          // Для босс-арен используем специальную логику
+          const bossLevel = Math.floor(state.gameLevel / 5) * 5;
+          imageKey = `boss_wall_${bossLevel}`;
+          
+          // Проверяем, загружено ли изображение
+          if (!isImageLoaded(imageKey)) {
+            // Fallback: используем общее изображение
+            imageKey = 'boss_wall_0';
+          }
         } else {
           imageKey = getCachedWallImageKey(wallBiome, isCracked, seed);
         }

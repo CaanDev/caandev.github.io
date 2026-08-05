@@ -15,7 +15,8 @@ import {
   getAchievementState,
   getAllAchievementsState,
   getAchievementsStats,
-  getCategoryStats
+  getCategoryStats,
+  forceLoadAchievements
 } from './manager.js';
 
 import { 
@@ -27,14 +28,20 @@ import {
   isAchievementsOpen
 } from './ui.js';
 
+import {
+  ACHIEVEMENTS_DATA,
+  CATEGORIES_DATA,
+  getAchievementData,
+  getAllAchievements,
+  getAchievementsByCategory,
+  getCategories,
+  getTotalAchievementsCount
+} from '../../data/achievements.js';
+
 // ============================================================
 // ЭКСПОРТ ФУНКЦИЙ УПРАВЛЕНИЯ
 // ============================================================
 
-/**
- * Экспорт основных функций управления достижениями
- * @see module:systems/achievements/manager
- */
 export { 
   initAchievements,
   initAchievementsUI,
@@ -50,24 +57,54 @@ export {
   getAchievementState,
   getAllAchievementsState,
   getAchievementsStats,
-  getCategoryStats
+  getCategoryStats,
+  forceLoadAchievements
 };
 
 // ============================================================
 // ЭКСПОРТ КОНФИГУРАЦИИ
 // ============================================================
 
-/**
- * Экспорт конфигурации достижений
- * @see module:systems/achievements/config
- */
 export {
-  CATEGORIES,
-  ACHIEVEMENTS_LIST,
-  getCategories,
-  getAchievementsList,
-  getAchievement,
-  getAchievementsByCategory,
+  ACHIEVEMENTS_DATA,
+  CATEGORIES_DATA as CATEGORIES,
+  getAchievementData,
   getAllAchievements,
-  getTotalCount
-} from './config.js';
+  getAchievementsByCategory,
+  getCategories,
+  getTotalAchievementsCount
+};
+
+// ============================================================
+// УСТАРЕВШИЕ АЛИАСЫ (для обратной совместимости)
+// ============================================================
+
+/**
+ * @deprecated Используйте getAllAchievements()
+ */
+export const getAchievementsList = getAllAchievements;
+
+/**
+ * @deprecated Используйте getAllAchievements()
+ */
+export const getAchievementsListOld = getAllAchievements;
+
+/**
+ * @deprecated Используйте getAchievementsByCategory()
+ */
+export const getAchievementsByCategoryLegacy = getAchievementsByCategory;
+
+/**
+ * @deprecated Используйте getCategories()
+ */
+export const getCategoriesLegacy = getCategories;
+
+/**
+ * @deprecated Используйте getTotalAchievementsCount()
+ */
+export const getTotalCount = getTotalAchievementsCount;
+
+/**
+ * @deprecated Используйте ACHIEVEMENTS_DATA
+ */
+export const ACHIEVEMENTS_LIST = ACHIEVEMENTS_DATA;

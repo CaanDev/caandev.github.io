@@ -159,6 +159,7 @@ export function restoreTrapRoomData(save) {
 
   const tr = save.trapRoomData;
 
+  // ===== ВОССТАНАВЛИВАЕМ ФЛАГИ =====
   state.inTrapRoom = tr.inTrapRoom || false;
   state.trapActivated = tr.trapActivated || false;
   state.trapWave = tr.trapWave || 0;
@@ -173,6 +174,7 @@ export function restoreTrapRoomData(save) {
   state.trapWaveLoaded = tr.trapWaveLoaded || false;
   state.trapMonsterIds = new Set(Array.isArray(tr.trapMonsterIds) ? tr.trapMonsterIds : []);
 
+  // ===== ВОССТАНАВЛИВАЕМ PORTAL =====
   if (tr.trapPortal) {
     state.trapPortal = {
       x: tr.trapPortal.x,
@@ -190,15 +192,19 @@ export function restoreTrapRoomData(save) {
     state.trapPortal = null;
   }
 
-  state.trapMonsters = (tr.trapMonsters || []).filter(m => m.hp > 0);
-
+  // ===== ЕСЛИ МЫ В КОМНАТЕ-ЛОВУШКЕ И ОНА АКТИВНА =====
   if (state.inTrapRoom && state.trapActivated) {
+    // Восстанавливаем монстров
+    state.trapMonsters = (tr.trapMonsters || []).filter(m => m.hp > 0);
+    
+    // Очищаем старых trap-монстров из state.monsters
     state.monsters = state.monsters.filter(m => {
       if (m.isTrapMonster) return false;
       if (state.trapMonsterIds.has(m.id || `${m.x},${m.y}`)) return false;
       return true;
     });
 
+    // Добавляем восстановленных монстров
     for (const m of state.trapMonsters) {
       if (m.hp === undefined || m.hp <= 0) {
         m.hp = m.maxHp || 50;
@@ -215,9 +221,16 @@ export function restoreTrapRoomData(save) {
       }
       state.trapMonsterIds.add(m.id);
 
-      state.monsters.push(m);
+      // Проверяем, нет ли уже такого монстра
+      const exists = state.monsters.some(existing => 
+        existing.x === m.x && existing.y === m.y && existing.id === m.id
+      );
+      if (!exists) {
+        state.monsters.push(m);
+      }
     }
 
+    // ===== ВОССТАНАВЛИВАЕМ СОСТОЯНИЕ ВОЛНЫ =====
     const aliveMonsters = state.trapMonsters.filter(m => m.hp > 0);
 
     if (aliveMonsters.length > 0) {
@@ -244,6 +257,11 @@ export function restoreTrapRoomData(save) {
         });
       }
     }
+  } else {
+    // ===== ЕСЛИ МЫ НЕ В КОМНАТЕ-ЛОВУШКЕ =====
+    state.trapMonsters = [];
+    state.trapWaveActive = false;
+    state.trapActivated = false;
   }
 }
 

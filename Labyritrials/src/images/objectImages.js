@@ -56,6 +56,52 @@ export const TORCH_IMAGES = {
   ],
 };
 
+// ============================================================
+// ЛОВУШКИ
+// ============================================================
+
+export const TRAP_IMAGES = {
+  explosion: 'assets/images/objects/traps/trapExplosion.png',
+  ice: 'assets/images/objects/traps/trapIce.png',
+  acid: 'assets/images/objects/traps/trapAcid.png',
+  lightning: 'assets/images/objects/traps/trapLightning.png',
+  psionic: 'assets/images/objects/traps/trapPsionic.png',
+};
+
+// ============================================================
+// АЛТАРИ (СВЯТИЛИЩА)
+// ============================================================
+
+export const ALTAR_IMAGES = {
+  // Биом Cave
+  cave: {
+    active: 'assets/images/objects/altars/altarCaveActive.png',
+    activated: 'assets/images/objects/altars/altarCaveActivated.png',
+  },
+  // Биом Ice
+  ice: {
+    active: 'assets/images/objects/altars/altarIceActive.png',
+    activated: 'assets/images/objects/altars/altarIceActivated.png',
+  },
+  // Биом Sand
+  sand: {
+    active: 'assets/images/objects/altars/altarSandActive.png',
+    activated: 'assets/images/objects/altars/altarSandActivated.png',
+  },
+};
+
+// ============================================================
+// ЛАВКА ТОРГОВЦА
+// ============================================================
+
+export const SHOP_STAND_IMAGE = 'assets/images/objects/shopStand.png';
+
+// ============================================================
+// КНИЖНЫЕ ПОЛКИ
+// ============================================================
+
+export const BOOKSHELF_IMAGE = 'assets/images/objects/bookshelf.png';
+
 /**
  * Получение изображения факела для биома и уровня
  * 
@@ -102,18 +148,6 @@ export function getRandomTorchImage(type = 'normal') {
   return images[Math.floor(Math.random() * images.length)];
 }
 
-// ============================================================
-// ЛОВУШКИ
-// ============================================================
-
-export const TRAP_IMAGES = {
-  explosion: 'assets/images/objects/traps/trapExplosion.png',
-  ice: 'assets/images/objects/traps/trapIce.png',
-  acid: 'assets/images/objects/traps/trapAcid.png',
-  lightning: 'assets/images/objects/traps/trapLightning.png',
-  psionic: 'assets/images/objects/traps/trapPsionic.png',
-};
-
 /**
  * Получение изображения ловушки по типу
  * 
@@ -124,17 +158,34 @@ export function getTrapImage(type) {
   return TRAP_IMAGES[type] || TRAP_IMAGES.explosion;
 }
 
-// ============================================================
-// ЛАВКА ТОРГОВЦА
-// ============================================================
+/**
+ * Получение изображения алтаря
+ * 
+ * @param {string} biome - ID биома ('cave', 'ice', 'sand')
+ * @param {boolean} activated - Активирован ли алтарь
+ * @returns {string|null} - Путь к изображению или null
+ */
+export function getAltarImage(biome, activated = false) {
+  const biomeData = ALTAR_IMAGES[biome];
+  if (!biomeData) return null;
+  
+  const key = activated ? 'activated' : 'active';
+  return biomeData[key] || null;
+}
 
-export const SHOP_STAND_IMAGE = 'assets/images/objects/shopStand.png';
-
-// ============================================================
-// КНИЖНЫЕ ПОЛКИ
-// ============================================================
-
-export const BOOKSHELF_IMAGE = 'assets/images/objects/bookshelf.png';
+/**
+ * Получение биома для алтаря на основе состояния игры
+ * 
+ * @param {Object} state - Объект состояния игры
+ * @returns {string} - ID биома ('cave', 'ice', 'sand')
+ */
+export function getAltarBiome(state) {
+  // В комнате с алтарём используем биом текущего уровня
+  if (state.inShrineRoom) {
+    return state.currentBiome || 'cave';
+  }
+  return state.currentBiome || 'cave';
+}
 
 // ============================================================
 // РЕГИСТРАЦИЯ ВСЕХ ИЗОБРАЖЕНИЙ ДЛЯ ЗАГРУЗКИ
@@ -171,12 +222,20 @@ export const OBJECT_IMAGES = {
   torchBoss10: 'assets/images/objects/torches/bossArena/torchBossArenaLvl10.png',
   torchBoss15: 'assets/images/objects/torches/bossArena/torchBossArenaLvl15.png',
 
-  // Ловушки
+  // ===== ЛОВУШКИ =====
   trapExplosion: 'assets/images/objects/traps/trapExplosion.png',
   trapIce: 'assets/images/objects/traps/trapIce.png',
   trapAcid: 'assets/images/objects/traps/trapAcid.png',
   trapLightning: 'assets/images/objects/traps/trapLightning.png',
   trapPsionic: 'assets/images/objects/traps/trapPsionic.png',
+
+  // ===== АЛТАРИ =====
+  altarCaveActive: 'assets/images/objects/altars/altarCaveActive.png',
+  altarCaveActivated: 'assets/images/objects/altars/altarCaveActivated.png',
+  altarIceActive: 'assets/images/objects/altars/altarIceActive.png',
+  altarIceActivated: 'assets/images/objects/altars/altarIceActivated.png',
+  altarSandActive: 'assets/images/objects/altars/altarSandActive.png',
+  altarSandActivated: 'assets/images/objects/altars/altarSandActivated.png',
 
   // Лавка торговца
   shopStand: 'assets/images/objects/shopStand.png',

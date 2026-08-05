@@ -130,6 +130,68 @@ export function initBuyDamageHandler(updateShopUICallback) {
 }
 
 /**
+ * Инициализация обработчика покупки улучшения выносливости
+ * 
+ * @param {Function} updateShopUICallback - Колбэк обновления UI магазина
+ * @returns {void}
+ */
+export function initBuyStaminaHandler(updateShopUICallback) {
+  const btn = document.getElementById('buy-stamina');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    const maxUpgrades = 7;
+    const currentUpgrades = player.staminaUpgradeCount || 0;
+    const cost = player.staminaUpgradeCost || 150;
+
+    if (currentUpgrades >= maxUpgrades) {
+      updateShopkeeperSpeech(getRandomSpeech(SPEECH.maxStamina));
+      return;
+    }
+
+    if (player.gold >= cost) {
+      player.gold -= cost;
+      state.gameStats.goldSpent += cost;
+
+      player.maxStamina += 10;
+      player.stamina = player.maxStamina;
+      player.staminaUpgradeCount++;
+      player.staminaUpgradeCost = Math.floor(cost * 1.25);
+
+      audio.playSound('shopBuyItem', 0.6);
+      
+      // Обновляем UI через колбэк
+      updateShopUICallback();
+      Game.updateUI();
+      updateShopkeeperSpeech(getRandomSpeech(SPEECH.stamina));
+
+      // Обновляем статус кнопки
+      setTimeout(() => {
+        const statusEl = document.getElementById('stamina-status');
+        const goldEl = document.getElementById('shop-gold');
+        
+        if (goldEl) goldEl.textContent = player.gold;
+        
+        if (statusEl) {
+          if (currentUpgrades + 1 >= maxUpgrades) {
+            statusEl.textContent = 'Максимум';
+            statusEl.className = 'shop-status owned';
+          } else if (player.gold >= player.staminaUpgradeCost) {
+            statusEl.textContent = 'Купить';
+            statusEl.className = 'shop-status buy';
+          } else {
+            statusEl.textContent = 'Не хватает золота';
+            statusEl.className = 'shop-status no-gold';
+          }
+        }
+      }, 50);
+    } else {
+      updateShopkeeperSpeech(getRandomSpeech(SPEECH.noGold));
+    }
+  });
+}
+
+/**
  * Инициализация обработчика покупки посоха вампира
  * 
  * @param {Function} updateShopUICallback - Колбэк обновления UI магазина

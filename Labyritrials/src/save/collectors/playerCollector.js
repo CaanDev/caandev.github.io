@@ -27,6 +27,10 @@ export function collectPlayerData() {
     goldMultiplier: player.goldMultiplier || 1.0,
     vampMultiplier: player.vampMultiplier || 1.0,
     inventory: player.inventory || null,
+    stamina: player.stamina,
+    maxStamina: player.maxStamina,
+    staminaUpgradeCount: player.staminaUpgradeCount || 0,
+    staminaUpgradeCost: player.staminaUpgradeCost || 150,
   };
 }
 

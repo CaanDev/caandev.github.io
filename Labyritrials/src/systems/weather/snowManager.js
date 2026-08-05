@@ -48,6 +48,14 @@ function isIceBiome() {
 }
 
 /**
+ * Проверка, находится ли игрок в тайной комнате
+ * @returns {boolean} - true, если игрок в тайной комнате
+ */
+function isInSecretRoom() {
+  return state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom || state.inSafeRoom;
+}
+
+/**
  * Проверка, прошло ли достаточно времени от начала уровня
  * @returns {boolean} - true, если прошло больше 1 минуты
  */
@@ -61,10 +69,11 @@ function isLevelReadyForSnow() {
  * Запуск снегопада
  */
 export function startSnowfall() {
-  const isIceBiome = state.currentBiome === 'ice' && state.gameLevel >= 6 && state.gameLevel <= 9;
-  if (!isIceBiome) return;
+  // Проверяем биом Ice
+  if (!isIceBiome()) return;
+  // Проверяем, не в тайной комнате ли игрок
+  if (isInSecretRoom()) return;
   if (snowState.active) return;
-  if (state.inSafeRoom || state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom) return;
   if (state.isBossLevel) return;
 
   snowState.active = true;
@@ -220,9 +229,9 @@ export function updateSnowOpacity() {
  */
 export function updateSnowfall() {
   // Проверяем, активен ли ледяной биом
-  const isIceBiome = state.currentBiome === 'ice' && state.gameLevel >= 6 && state.gameLevel <= 9;
+  const iceBiome = isIceBiome();
   
-  if (!isIceBiome) {
+  if (!iceBiome || isInSecretRoom()) {
     if (snowState.active) {
       stopSnowfall();
     }

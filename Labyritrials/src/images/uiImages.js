@@ -10,7 +10,10 @@
 export const ACHIEVEMENT_IMAGES = {
   // Боевые
   combat: {
+    monsterSlayer: 'assets/images/ui/achievements/combat/monsterSlayer.png',
+    bossHunter5: 'assets/images/ui/achievements/combat/bossHunter5.png',
     bossHunter10: 'assets/images/ui/achievements/combat/bossHunter10.png',
+    bossHunter15: 'assets/images/ui/achievements/combat/bossHunter15.png',
     bossConqueror: 'assets/images/ui/achievements/combat/bossConqueror.png',
     fire_mage: 'assets/images/ui/achievements/combat/fireMage.png',
     vampire_lord: 'assets/images/ui/achievements/combat/vampireLord.png',
@@ -69,7 +72,10 @@ export const UI_IMAGES = {
   // ============================================================
 
   // Combat
+  monsterSlayer: 'assets/images/ui/achievements/combat/monsterSlayer.png',
+  bossHunter5: 'assets/images/ui/achievements/combat/bossHunter5.png',
   bossHunter10: 'assets/images/ui/achievements/combat/bossHunter10.png',
+  bossHunter15: 'assets/images/ui/achievements/combat/bossHunter15.png',
   bossConqueror: 'assets/images/ui/achievements/combat/bossConqueror.png',
   fire_mage: 'assets/images/ui/achievements/combat/fireMage.png',
   vampire_lord: 'assets/images/ui/achievements/combat/vampireLord.png',
@@ -112,4 +118,6 @@ export const UI_IMAGES = {
   // МИНИ-КАРТА
   // ============================================================
   minimapBg: 'assets/images/ui/miniMap.png',
+  minimapBgIce: 'assets/images/ui/miniMapIce.png',
+  minimapBgSand: 'assets/images/ui/miniMapSand.png',
 };

@@ -307,18 +307,29 @@ export function drawFlies(ctx) {
     fly.flickerPhase = (fly.flickerPhase || 0) + 0.1;
     const flicker = 0.7 + Math.sin(fly.flickerPhase) * 0.3;
     
-    ctx.save();
-    ctx.globalAlpha = 0.7 * flicker;
-    ctx.shadowBlur = 2;
-    ctx.shadowColor = COLORS.shadows.strong;
+    // Используем цвета из объекта мухи
+    const bodyColor = fly.bodyColor || 'rgba(200, 200, 200, 0.8)';
+    const glowColor = fly.glowColor || 'rgba(180, 180, 180, 0.6)';
+    const wingColor = fly.wingColor || 'rgba(220, 220, 220, 0.4)';
     
+    ctx.save();
+    
+    // ===== СВЕЧЕНИЕ =====
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = glowColor;
+    
+    // ===== ТЕЛО МУХИ (основная точка) =====
+    ctx.globalAlpha = 0.7 * flicker;
+    ctx.fillStyle = bodyColor;
     ctx.font = `${12 + fly.size * 4}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#222222';
     ctx.fillText('•', fly.x, fly.y);
     
-    ctx.fillStyle = `rgba(200, 200, 200, ${0.3 * flicker})`;
+    // ===== КРЫЛЬЯ (две маленькие точки) =====
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 0.4 * flicker;
+    ctx.fillStyle = wingColor;
     ctx.font = `${8 + fly.size * 3}px Arial`;
     ctx.fillText('⚬', fly.x - 5, fly.y - 3);
     ctx.fillText('⚬', fly.x + 5, fly.y - 3);

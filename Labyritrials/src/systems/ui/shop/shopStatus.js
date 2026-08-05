@@ -62,6 +62,46 @@ export function updateBuyDamageStatus() {
 }
 
 /**
+ * Обновление статуса покупки улучшения выносливости
+ * 
+ * @returns {void}
+ */
+export function updateBuyStaminaStatus() {
+  const btn = document.getElementById('buy-stamina');
+  const status = document.getElementById('stamina-status');
+  const priceEl = document.getElementById('stamina-cost');
+  
+  if (!btn || !status || !priceEl) return;
+
+  const maxUpgrades = 7;
+  const currentUpgrades = player.staminaUpgradeCount || 0;
+  const cost = player.staminaUpgradeCost || 150;
+  const isMaxed = currentUpgrades >= maxUpgrades;
+
+  // Сбрасываем классы
+  btn.classList.remove('no-gold', 'owned', 'locked');
+
+  if (isMaxed) {
+    btn.classList.add('owned');
+    status.textContent = 'Максимум';
+    status.className = 'shop-status owned';
+    btn.style.cursor = 'default';
+    return;
+  }
+
+  if (player.gold >= cost) {
+    status.textContent = 'Купить';
+    status.className = 'shop-status buy';
+    btn.style.cursor = 'pointer';
+  } else {
+    btn.classList.add('no-gold');
+    status.textContent = 'Не хватает золота';
+    status.className = 'shop-status no-gold';
+    btn.style.cursor = 'pointer';
+  }
+}
+
+/**
  * Обновление статуса посоха вампира
  * 
  * @returns {void}
@@ -264,43 +304,54 @@ export function updateTalismanFireStatus() {
   
   btn.classList.remove('active', 'locked', 'no-gold', 'owned', 'new-item');
 
-  if (isOwned || isEquipped) {
-    btn.classList.add('owned');
-    status.textContent = 'Куплено';
-    status.className = 'shop-status owned';
-    price.style.display = 'none';
-    btn.style.cursor = 'default';
-    if (nameEl) {
-      const badge = nameEl.querySelector('.new-badge');
-      if (badge) badge.remove();
-    }
-  } else if (!isLevelAvailable) {
-    btn.classList.add('locked');
-    status.textContent = `🔒 Ур. ${minLevel}`;
-    status.className = 'shop-status locked';
-    price.style.display = 'block';
-    price.textContent = `${cost} 💰`;
-    btn.style.cursor = 'not-allowed';
-    if (nameEl) {
-      const badge = nameEl.querySelector('.new-badge');
-      if (badge) badge.remove();
-    }
-  } else if (player.gold >= cost) {
-    // Если предмет — новинка и доступен для покупки
-    if (itemData.isNew) {
-      // Добавляем бейдж "Новинка" к названию
-      if (nameEl && !nameEl.querySelector('.new-badge')) {
+  // Показываем бейдж, если:
+  // 1. Товар помечен как новый
+  // 2. Товар доступен по уровню
+  // 3. Товар ещё не куплен
+  // 4. Товар появился не более 1 уровня назад (текущий уровень - minLevel <= 1)
+  const isNewItem = itemData.isNew && 
+                    isLevelAvailable && 
+                    !isOwned && 
+                    !isEquipped &&
+                    (state.gameLevel - minLevel <= 1);
+
+  // Обновляем бейдж
+  if (nameEl) {
+    const existingBadge = nameEl.querySelector('.new-badge');
+    if (isNewItem) {
+      if (!existingBadge) {
         const badge = document.createElement('span');
         badge.className = 'new-badge';
         badge.textContent = 'Новинка';
         nameEl.appendChild(badge);
       }
     } else {
-      if (nameEl) {
-        const badge = nameEl.querySelector('.new-badge');
-        if (badge) badge.remove();
+      if (existingBadge) {
+        existingBadge.remove();
       }
     }
+  }
+
+  if (isOwned || isEquipped) {
+    btn.classList.add('owned');
+    status.textContent = 'Куплено';
+    status.className = 'shop-status owned';
+    price.style.display = 'none';
+    btn.style.cursor = 'default';
+    return;
+  }
+
+  if (!isLevelAvailable) {
+    btn.classList.add('locked');
+    status.textContent = `🔒 Ур. ${minLevel}`;
+    status.className = 'shop-status locked';
+    price.style.display = 'block';
+    price.textContent = `${cost} 💰`;
+    btn.style.cursor = 'not-allowed';
+    return;
+  }
+
+  if (player.gold >= cost) {
     status.textContent = 'Купить';
     status.className = 'shop-status buy';
     price.style.display = 'block';
@@ -313,9 +364,5 @@ export function updateTalismanFireStatus() {
     price.style.display = 'block';
     price.textContent = `${cost} 💰`;
     btn.style.cursor = 'pointer';
-    if (nameEl) {
-      const badge = nameEl.querySelector('.new-badge');
-      if (badge) badge.remove();
-    }
   }
 }

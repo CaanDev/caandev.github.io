@@ -1,6 +1,7 @@
 /**
  * @fileoverview Функция запуска огненного шара игроком.
- * Обрабатывает условие использования, кулдаун и создание снаряда.
+ * Обрабатывает условие использования, кулдаун, проверку выносливости
+ * и создание снаряда.
  * 
  * @module systems/input/fireball
  */
@@ -9,11 +10,20 @@ import { state, player } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
 
 /**
+ * @namespace STAMINA_COST
+ * @description Стоимость действий в единицах выносливости
+ */
+const STAMINA_COST = {
+  /** @type {number} - Стоимость огненного шара */
+  fireball: 25,
+};
+
+/**
  * Запуск огненного шара игроком
  * 
  * Проверяет, что игрок владеет огненным шаром, кулдаун прошёл,
- * и босс не находится в стадии появления. Создаёт снаряд,
- * направленный в сторону цели игрока.
+ * есть достаточно выносливости, и босс не находится в стадии появления.
+ * Создаёт снаряд, направленный в сторону цели игрока.
  * 
  * @returns {void}
  */
@@ -44,6 +54,23 @@ export function shootFireball() {
     });
     return;
   }
+
+  // ===== ПРОВЕРКА ВЫНОСЛИВОСТИ =====
+  if (player.stamina < STAMINA_COST.fireball) {
+    state.damageTexts.push({
+      x: player.px,
+      y: player.py - 60,
+      text: '⚡ Недостаточно выносливости!',
+      color: '#ffcc00',
+      size: 20,
+      life: 40,
+      speedy: 0.5
+    });
+    return;
+  }
+
+  // Списываем выносливость
+  player.stamina -= STAMINA_COST.fireball;
 
   // Обновляем статистику использования оружия
   state.gameStats.weaponHits.fireball++;

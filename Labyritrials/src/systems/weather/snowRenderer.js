@@ -128,7 +128,9 @@ export function createSnowflakes() {
 export function drawSnow(ctx, canvas, camX, camY) {
   // Если снег не активен или полностью прозрачен — не рисуем
   if (!snowState.active || snowState.opacity < 0.005) return;
-  if (state.isBossLevel || state.inTrapRoom || state.inSafeRoom) return;
+  const isInSecretRoom = state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom || state.inSafeRoom;
+  if (isInSecretRoom) return;
+  if (state.isBossLevel) return;
   
   // Если снежинок нет — создаём их
   if (snowflakes.length === 0) {

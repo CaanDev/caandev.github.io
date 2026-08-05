@@ -6,24 +6,11 @@
  */
 
 import { CONFIG, state } from '../../../core/config/index.js';
-import { getMonsterTypesByLevel } from '../../../core/config/biomes.js';
 import { EMOJIS } from '../../../emojis.js';
 import { getRandomArtifactImage } from '../../../images/itemImages.js';
 import { ITEM_IMAGES } from '../../../images/itemImages.js';
 import { getRandomFreeCells, markCellUsed, isPortalCell } from '../utils/spawnUtils.js';
-
-// ============================================================
-// ВСЕ ТИПЫ МОНСТРОВ
-// ============================================================
-
-const typeMap = {
-  bat: { emoji: EMOJIS.monsters.bat, hp: 25, damage: 6, radius: 18, name: 'Летучая мышь', speed: 2.5, vision: 280, minLevel: 1 },
-  pumpkin: { emoji: EMOJIS.monsters.pumpkin, hp: 60, damage: 12, radius: 24, name: 'Тыква', speed: 2.0, vision: 320, minLevel: 1 },
-  ghost: { emoji: EMOJIS.monsters.ghost, hp: 30, damage: 6, radius: 22, name: 'Призрак', speed: 1.5, vision: 260, minLevel: 8, isGhost: true },
-  skull: { emoji: EMOJIS.monsters.skull, hp: 90, damage: 18, radius: 22, name: 'Череп', speed: 2.4, vision: 350, minLevel: 3 },
-  demon: { emoji: EMOJIS.monsters.demon, hp: 150, damage: 28, radius: 28, name: 'Демон', speed: 1.8, vision: 400, minLevel: 6 },
-  scorpion: { emoji: EMOJIS.monsters.scorpion, hp: 130, damage: 24, radius: 26, name: 'Гигантский скорпион', speed: 1.6, vision: 350, minLevel: 11, poisonOnHit: true },
-};
+import { getMonstersByLevel, getMonsterData } from '../../../data/index.js';
 
 /**
  * Создание монстров на уровне
@@ -40,17 +27,30 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
 
   // ===== МАСШТАБИРОВАНИЕ СЛОЖНОСТИ =====
   let scaling = 1 + (state.gameLevel - 1) * 0.15;
-  // ===== ПОЛУЧЕНИЕ ТИПОВ МОНСТРОВ ПО БИОМУ =====
-  const monsterTypeKeys = getMonsterTypesByLevel(state.gameLevel);
+  
+  // ===== ПОЛУЧЕНИЕ ТИПОВ МОНСТРОВ ПО БИОМУ И УРОВНЮ =====
+  let availableMonsters = getMonstersByLevel(state.gameLevel, state.currentBiome);
 
-  // Фильтруем только те типы, которые доступны по уровню
-  let availableTypes = monsterTypeKeys
-    .map(key => typeMap[key])
-    .filter(t => t !== undefined && state.gameLevel >= t.minLevel);
-
-  // Если по какой-то причине нет доступных типов — fallback
-  if (availableTypes.length === 0) {
-    availableTypes = [typeMap['pumpkin']];
+  if (availableMonsters.length === 0) {
+    const fallback = getMonsterData('pumpkin');
+    if (fallback) {
+      availableMonsters = [fallback];
+    } else {
+      availableMonsters = [{
+        id: 'pumpkin',
+        name: 'Тыква',
+        emoji: EMOJIS.monsters.pumpkin,
+        hp: 60,
+        damage: 12,
+        radius: 24,
+        speed: 2.0,
+        vision: 320,
+        minLevel: 1,
+        biomes: ['cave', 'ice'],
+        special: {},
+        dropChance: 0.35,
+      }];
+    }
   }
 
   // ===== КОЛИЧЕСТВО МОНСТРОВ =====
@@ -67,10 +67,7 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
     if (isProtectedCell(x, y)) return false;
     if (isPortalCell(x, y)) return false;
 
-    // Не спавним рядом со стартовой позицией
     if (Math.abs(x - 1) < 4 && Math.abs(y - 1) < 4) return false;
-
-    // Не спавним рядом с выходом
     if (Math.abs(x - CONFIG.goal.x) < 2 && Math.abs(y - CONFIG.goal.y) < 2) return false;
 
     if (isTreasureRoom && monstersSpawned >= maxMonstersInTreasure) return false;
@@ -83,7 +80,7 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
     if (monstersSpawned >= monsterCount) break;
     if (isTreasureRoom && monstersSpawned >= maxMonstersInTreasure) break;
 
-    const base = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+    const base = availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
     const isHor = Math.random() < 0.5;
 
     const x = cell.x * CONFIG.cellSize + CONFIG.cellSize / 2;
@@ -100,24 +97,50 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
       radius: base.radius,
       name: base.name,
       speed: base.speed,
-      vision: base.vision,
       dir: 1,
       isHorizontal: isHor,
       patrolRange: CONFIG.cellSize * (Math.floor(Math.random() * 2) + 1),
       state: 'patrol',
       lastHit: 0,
       stunTimer: 0,
-      poisonOnHit: base.poisonOnHit || false,
+      poisonOnHit: base.special?.poisonOnHit || false,
       shockTimer: 0,
       shockTick: 0,
       shockSlowAmount: 0,
-      isGhost: base.isGhost || false,
+      isGhost: base.special?.isGhost || false,
       willNeverStop: false,
       ghostPhaseTimer: 0,
       originalOpacity: 1,
       isPhasing: false,
       justSpawned: true,
-      justSpawnedTimer: 20
+      justSpawnedTimer: 20,
+      canDropItems: true,
+      
+      // ===== ВИДИМОСТЬ =====
+      vision: base.vision,
+      baseVision: base.vision,
+      visionBoosted: false,
+      visionBoostTimer: 0,
+      visionBoostDuration: 180,
+      visionBoostMultiplier: 1.5,
+      
+      // ===== ПАМЯТЬ =====
+      lastKnownX: null,
+      lastKnownY: null,
+      lastKnownDirection: { x: 0, y: 0 },
+      predictedPath: [],
+      predictionTimer: 0,
+      predictionLength: 5,
+      predictionStep: 0,
+      memoryTimer: 0,
+      memoryDuration: 360,
+      isSearching: false,
+      searchRadius: 80,
+      searchTimer: 0,
+      
+      // ===== ⭐ ИНИЦИАЛИЗАЦИЯ _lastX/_lastY ДЛЯ ОТСЛЕЖИВАНИЯ ЗАСТРЕВАНИЯ =====
+      _lastX: x,  // 👈 ТЕПЕРЬ ИНИЦИАЛИЗИРУЕМ!
+      _lastY: y,  // 👈 ТЕПЕРЬ ИНИЦИАЛИЗИРУЕМ!
     };
 
     // ===== ПРИМЕНЕНИЕ ЭФФЕКТОВ СОБЫТИЙ =====
@@ -156,7 +179,6 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
 export function spawnArtifacts(isTreasureRoom = false, isProtectedCell = () => false) {
   state.artifacts = [];
 
-  // Определяем биом для артефактов
   let artifactBiome;
   if (isTreasureRoom || state.inTreasureRoom) {
     artifactBiome = 'treasure';

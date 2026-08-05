@@ -52,6 +52,9 @@ export const WALL_IMAGES = {
   // === BOSS ARENA ===
   boss: {
     wall: 'assets/images/walls/bossArena/wallBossArena.png',
+    wallLvl5: 'assets/images/walls/bossArena/wallBossArenaLvl5.png',
+    wallLvl10: 'assets/images/walls/bossArena/wallBossArenaLvl10.png',
+    wallLvl15: 'assets/images/walls/bossArena/wallBossArenaLvl15.png',
     cracked: null, // На босс-аренах нет разрушаемых стен
   },
   
@@ -132,7 +135,26 @@ export const WALL_IMAGES = {
 export function getWallImage(biomeId, isCracked = false, bossType = null, seed = 0) {
   // Босс-арена
   if (biomeId === 'boss' || biomeId === 'bossArena') {
-    return WALL_IMAGES.boss.wall;
+    // Определяем уровень босса из состояния игры
+    let bossLevel = 5; // по умолчанию
+    
+    // Пытаемся получить уровень из глобального состояния
+    if (typeof state !== 'undefined' && state.gameLevel) {
+      bossLevel = Math.floor(state.gameLevel / 5) * 5;
+      if (bossLevel === 0) bossLevel = 5;
+    }
+    
+    // Выбираем изображение в зависимости от уровня
+    switch (bossLevel) {
+      case 5:
+        return WALL_IMAGES.boss.wallLvl5 || WALL_IMAGES.boss.wall;
+      case 10:
+        return WALL_IMAGES.boss.wallLvl10 || WALL_IMAGES.boss.wall;
+      case 15:
+        return WALL_IMAGES.boss.wallLvl15 || WALL_IMAGES.boss.wall;
+      default:
+        return WALL_IMAGES.boss.wall;
+    }
   }
   
   // Сокровищница — поддерживаем разрушаемые стены
@@ -206,6 +228,24 @@ export function getAllWallImagesForRegistration() {
   const result = {};
   
   for (const [biomeId, biome] of Object.entries(WALL_IMAGES)) {
+    // ===== ОСОБАЯ ОБРАБОТКА ДЛЯ БОСС-АРЕН =====
+    if (biomeId === 'boss' || biomeId === 'bossArena') {
+      if (biome.wallLvl5) {
+        result['boss_wall_5'] = biome.wallLvl5;
+      }
+      if (biome.wallLvl10) {
+        result['boss_wall_10'] = biome.wallLvl10;
+      }
+      if (biome.wallLvl15) {
+        result['boss_wall_15'] = biome.wallLvl15;
+      }
+      if (biome.wall) {
+        result['boss_wall_0'] = biome.wall;
+      }
+      continue;
+    }
+    
+    // ===== ОСТАЛЬНЫЕ БИОМЫ =====
     for (const [type, images] of Object.entries(biome)) {
       if (!images) continue;
       const imageArray = Array.isArray(images) ? images : [images];

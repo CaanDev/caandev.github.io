@@ -34,6 +34,10 @@ export const GameInit = {
     player.baseSpeed = 7;
     player.speed = 7;
     player.originalSpeed = undefined;
+
+    // Восстановление выносливости
+    player.stamina = player.maxStamina;
+    player.lastAttackTime = 0;
     
     generateMaze();
 

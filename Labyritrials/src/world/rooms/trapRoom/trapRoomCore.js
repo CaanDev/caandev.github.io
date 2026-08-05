@@ -201,6 +201,14 @@ export function generateTrapRoom() {
   player.y = 1;
   player.px = CONFIG.cellSize + CONFIG.cellSize / 2;
   player.py = CONFIG.cellSize + CONFIG.cellSize / 2;
+
+  // Автосохранение после входа
+  // Делаем его с небольшой задержкой, чтобы игрок успел осмотреться
+  setTimeout(() => {
+    import('../../../save/saveSystem.js').then(module => {
+      module.saveGame();
+    });
+  }, 300);
 }
 
 /**

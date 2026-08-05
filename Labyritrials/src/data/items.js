@@ -198,8 +198,7 @@ export function getItemMinLevel(id) {
  * @returns {string} - Ключ изображения
  */
 export function getMapImageKeyByBiome(biome) {
-  if (biome === 'ice') {
-    return 'mapLevelIce';
-  }
+  if (biome === 'ice') return 'mapLevelIce';
+  if (biome === 'sand') return 'mapLevelSand';
   return 'mapLevel';
 }

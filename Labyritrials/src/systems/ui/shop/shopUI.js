@@ -26,6 +26,7 @@ import {
 import {
   updateBuyHpStatus,
   updateBuyDamageStatus,
+  updateBuyStaminaStatus,
   updateMapStatus,
   updateVampireStaffStatus,
   updateStunStaffStatus,
@@ -40,6 +41,7 @@ import {
   initBuyStunStaffHandler,
   initBuyFireballHandler,
   initBuyTalismanFireHandler,
+  initBuyStaminaHandler,
 } from './shopHandlers.js';
 import { registerModalOpen, registerModalClose } from '../modalManager.js';
 
@@ -49,6 +51,53 @@ let currentShopTab = 'upgrades';
 /** @type {boolean} - Инициализированы ли обработчики магазина */
 let shopHandlersInitialized = false;
 
+/**
+ * Вспомогательная функция: добавляет или обновляет иконку золота у элемента цены
+ * 
+ * @param {HTMLElement} element - Элемент с ценой
+ * @param {boolean} hasGoldCoin - Доступно ли изображение монеты
+ * @param {HTMLImageElement|null} goldImg - Изображение монеты
+ * @returns {void}
+ */
+function addGoldIconToPrice(element, hasGoldCoin, goldImg) {
+  if (!element) return;
+  
+  // Проверяем, есть ли уже изображение
+  let existingImg = element.querySelector('img');
+  
+  // Если изображение уже есть и оно правильное — ничего не делаем
+  if (existingImg) {
+    // Проверяем, правильный ли src у изображения
+    if (goldImg && existingImg.src !== goldImg.src) {
+      existingImg.src = goldImg.src;
+    }
+    return;
+  }
+  
+  // Если нет изображения — добавляем
+  let text = element.textContent || '';
+  const cleanText = text.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim();
+  
+  // Очищаем и добавляем текст + иконку
+  element.innerHTML = '';
+  
+  const textSpan = document.createElement('span');
+  textSpan.textContent = cleanText;
+  element.appendChild(textSpan);
+  
+  if (hasGoldCoin && goldImg) {
+    const imgElement = document.createElement('img');
+    imgElement.src = goldImg.src;
+    imgElement.alt = '';
+    imgElement.style.width = '16px';
+    imgElement.style.height = '16px';
+    imgElement.style.objectFit = 'contain';
+    imgElement.style.verticalAlign = 'middle';
+    imgElement.style.marginLeft = '4px';
+    imgElement.style.imageRendering = 'pixelated';
+    element.appendChild(imgElement);
+  }
+}
 /**
  * Обновление иконки товара (замена эмодзи на изображение)
  * 
@@ -274,35 +323,6 @@ export function updateShopPrices() {
   const hasGoldCoin = cacheKey && isImageLoaded(cacheKey);
   const goldImg = hasGoldCoin ? getImage(cacheKey) : null;
   
-  function replaceEmojiWithImage(element) {
-    if (!element) return;
-    
-    const existingImg = element.querySelector('img');
-    if (existingImg) return;
-    
-    let text = element.textContent || '';
-    const cleanText = text.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim();
-    
-    element.innerHTML = '';
-    
-    const textSpan = document.createElement('span');
-    textSpan.textContent = cleanText;
-    element.appendChild(textSpan);
-    
-    if (hasGoldCoin && goldImg) {
-      const imgElement = document.createElement('img');
-      imgElement.src = goldImg.src;
-      imgElement.alt = '';
-      imgElement.style.width = '16px';
-      imgElement.style.height = '16px';
-      imgElement.style.objectFit = 'contain';
-      imgElement.style.verticalAlign = 'middle';
-      imgElement.style.marginLeft = '4px';
-      imgElement.style.imageRendering = 'pixelated';
-      element.appendChild(imgElement);
-    }
-  }
-  
   if (hpCostEl) {
     hpCostEl.textContent = player.hpCost;
     const parentEl = hpCostEl.parentElement;
@@ -318,7 +338,6 @@ export function updateShopPrices() {
         imgElement.style.height = '16px';
         imgElement.style.objectFit = 'contain';
         imgElement.style.verticalAlign = 'middle';
-        imgElement.style.marginLeft = '4px';
         imgElement.style.imageRendering = 'pixelated';
         parentEl.appendChild(imgElement);
       }
@@ -340,10 +359,20 @@ export function updateShopPrices() {
         imgElement.style.height = '16px';
         imgElement.style.objectFit = 'contain';
         imgElement.style.verticalAlign = 'middle';
-        imgElement.style.marginLeft = '4px';
         imgElement.style.imageRendering = 'pixelated';
         parentEl.appendChild(imgElement);
       }
+    }
+  }
+
+  // Цена на выносливость
+  const staminaPriceEl = document.getElementById('stamina-cost');
+  if (staminaPriceEl) {
+    const maxUpgrades = 7;
+    const currentUpgrades = player.staminaUpgradeCount || 0;
+    if (currentUpgrades < maxUpgrades) {
+      staminaPriceEl.textContent = player.staminaUpgradeCost || 150;
+      addGoldIconToPrice(staminaPriceEl, hasGoldCoin, goldImg);
     }
   }
   
@@ -351,26 +380,26 @@ export function updateShopPrices() {
   const vampPriceEl = document.getElementById('vamp-price');
   if (vampPriceEl && !player.ownedMeleeWeapons.includes('vampire')) {
     vampPriceEl.textContent = getWeaponPrice('vampire');
-    replaceEmojiWithImage(vampPriceEl);
+    addGoldIconToPrice(vampPriceEl, hasGoldCoin, goldImg);
   }
   
   const stunPriceEl = document.getElementById('stun-price');
   if (stunPriceEl && !player.ownedMeleeWeapons.includes('stun')) {
     stunPriceEl.textContent = getWeaponPrice('stun');
-    replaceEmojiWithImage(stunPriceEl);
+    addGoldIconToPrice(stunPriceEl, hasGoldCoin, goldImg);
   }
   
   const fireballPriceEl = document.getElementById('fireball-price');
   if (fireballPriceEl && !player.ownedRangedWeapons.includes('fireball')) {
     fireballPriceEl.textContent = getWeaponPrice('fireball');
-    replaceEmojiWithImage(fireballPriceEl);
+    addGoldIconToPrice(fireballPriceEl, hasGoldCoin, goldImg);
   }
   
   // Цена на карту
   const mapPriceEl = document.getElementById('map-price');
   if (mapPriceEl && !player.hasMap) {
     mapPriceEl.textContent = getItemPrice('map');
-    replaceEmojiWithImage(mapPriceEl);
+    addGoldIconToPrice(mapPriceEl, hasGoldCoin, goldImg);
   }
 
   // Цена на огненный талисман
@@ -381,7 +410,7 @@ export function updateShopPrices() {
       const isOwned = player.inventory?.items?.equipment?.includes('talismanFire') || false;
       if (!isOwned) {
         talismanPriceEl.textContent = itemData.price;
-        replaceEmojiWithImage(talismanPriceEl);
+        addGoldIconToPrice(talismanPriceEl, hasGoldCoin, goldImg);
       }
     }
   }
@@ -395,7 +424,7 @@ export function updateAllShopIcons() {
   if (!shopUI || shopUI.style.display === 'none') return;
   
   // === ОБЫЧНЫЕ ТОВАРЫ (улучшения) ===
-  const upgradeElements = ['buy-hp', 'buy-dmg'];
+  const upgradeElements = ['buy-hp', 'buy-dmg', 'buy-stamina'];
   for (const elementId of upgradeElements) {
     const element = document.getElementById(elementId);
     if (element) {
@@ -517,6 +546,7 @@ function doInitShopHandlers() {
   initBuyFireballHandler(updateShopUI);
   initBuyMapHandler(updateShopUI);
   initBuyTalismanFireHandler(updateShopUI);
+  initBuyStaminaHandler(updateShopUI);
 
   updateShopUI();
   
@@ -624,6 +654,7 @@ function updateShopUI() {
 
   updateBuyHpStatus();
   updateBuyDamageStatus();
+  updateBuyStaminaStatus();
   updateMapStatus();
   updateVampireStaffStatus();
   updateStunStaffStatus();

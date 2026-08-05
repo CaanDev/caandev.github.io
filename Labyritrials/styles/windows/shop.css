@@ -355,6 +355,10 @@
   background: rgba(255, 255, 255, 0.03) !important;
 }
 
+.shop-item.owned .shop-price {
+  display: none !important;
+}
+
 .shop-item.owned:hover {
   transform: none !important;
   background: rgba(255, 255, 255, 0.03) !important;

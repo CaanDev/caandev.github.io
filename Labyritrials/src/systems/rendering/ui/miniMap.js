@@ -12,6 +12,17 @@ import { getImage, isImageLoaded } from '../../../utils/imageLoader.js';
 import { UI_IMAGES } from '../../../images/uiImages.js';
 
 /**
+ * Получение ключа фона мини-карты в зависимости от биома
+ * @param {string} biome - ID биома ('cave', 'ice', 'sand')
+ * @returns {string} - Ключ изображения фона
+ */
+function getMiniMapBgKey(biome) {
+  if (biome === 'ice') return 'minimapBgIce';
+  if (biome === 'sand') return 'minimapBgSand';
+  return 'minimapBg';
+}
+
+/**
  * Отрисовка мини-карты
  * 
  * @param {CanvasRenderingContext2D} ctx - Контекст рисования
@@ -32,7 +43,9 @@ export function drawMiniMap(ctx, canvas) {
   const radius = 6;
   
   // ===== ФОН =====
-  const bgKey = 'minimapBg';
+  const biome = state.currentBiome || 'cave';
+  const bgKey = getMiniMapBgKey(biome);
+  
   if (isImageLoaded(bgKey)) {
     const img = getImage(bgKey);
     if (img) {
@@ -41,8 +54,19 @@ export function drawMiniMap(ctx, canvas) {
       ctx.restore();
     }
   } else {
-    ctx.fillStyle = COLORS.ui.minimap.bg;
-    ctx.fillRect(rx, ry, mSize, mSize);
+    // Fallback: стандартный фон
+    const fallbackKey = 'minimapBg';
+    if (isImageLoaded(fallbackKey)) {
+      const img = getImage(fallbackKey);
+      if (img) {
+        ctx.save();
+        ctx.drawImage(img, rx - 40, ry - 40, mSize + 80, mSize + 80);
+        ctx.restore();
+      }
+    } else {
+      ctx.fillStyle = COLORS.ui.minimap.bg;
+      ctx.fillRect(rx, ry, mSize, mSize);
+    }
   }
   
   // ===== МИНИ-КАРТА =====

@@ -214,6 +214,11 @@ export function resetGameFull() {
   player.ownedRangedWeapons = [];
   player.emoji = EMOJIS.player.default;
 
+  player.stamina = 80;
+  player.maxStamina = 80;
+  player.lastAttackTime = 0;
+  player.staminaUpgradeCount = 0;
+
   player.baseSpeed = 7;
   player.speed = 7;
   player.originalSpeed = undefined;

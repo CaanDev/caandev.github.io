@@ -83,6 +83,21 @@ import { frostState } from '../systems/weather/frostSystem.js';
  * @returns {void}
  */
 export function saveGame() {
+  // Запрещаем сохранение во время активной волны в комнате-ловушке
+  if (state.inTrapRoom && state.trapWaveActive && state.trapMonsters.length > 0) {
+    // Показываем уведомление игроку
+    state.damageTexts.push({
+      x: player.px,
+      y: player.py - 60,
+      text: '⚠️ Сохранение недоступно!',
+      color: '#ff4444',
+      size: 20,
+      life: 60,
+      speedy: 0.5
+    });
+    return;
+  }
+
   // Если игра завершена или игрок мёртв — не сохраняем
   if (player.hp <= 0) return;
 
@@ -336,10 +351,12 @@ async function restoreMimicFlies() {
     state.flies = [];
   }
 
+  const biome = state.currentBiome || 'cave';
+
   for (let chest of state.chests) {
     if (chest.type === 'mimic' && !chest.opened) {
       const { createFlies } = await import('../entities/objects/fly.js');
-      createFlies(chest.x, chest.y);
+      createFlies(chest.x, chest.y, biome);
     }
   }
 }

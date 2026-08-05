@@ -8,6 +8,7 @@
 import { CONFIG, state } from '../../../../core/config/index.js';
 import { EMOJIS } from '../../../../emojis.js';
 import { COLORS } from '../../../../core/config/colors.js';
+import { getMonsterData } from '../../../../data/index.js';
 
 /**
  * Призыв миньонов вокруг босса
@@ -26,10 +27,26 @@ export function summonMinionsAroundBoss(boss, count) {
 
   // Доступные типы миньонов
   const minionTypes = [
-    { emoji: EMOJIS.minions.ghost, hp: 20, damage: 8, radius: 22, name: "Призрак-миньон", speed: 1.8, vision: 300 },
-    { emoji: EMOJIS.minions.pumpkin, hp: 40, damage: 14, radius: 24, name: "Тыква-миньон", speed: 2.2, vision: 350 },
-    { emoji: EMOJIS.minions.skull, hp: 60, damage: 20, radius: 22, name: "Череп-миньон", speed: 2.5, vision: 380 }
-  ];
+    getMonsterData('ghost'),
+    getMonsterData('pumpkin'),
+    getMonsterData('skull'),
+  ].filter(m => m !== undefined);
+
+  // Если данных нет — fallback
+  if (minionTypes.length === 0) {
+    minionTypes.push({
+      id: 'ghost',
+      name: 'Призрак-миньон',
+      emoji: EMOJIS.minions.ghost,
+      hp: 20,
+      damage: 8,
+      radius: 22,
+      speed: 1.8,
+      vision: 300,
+      special: { isGhost: true },
+      dropChance: 0,
+    });
+  }
 
   // Инициализация счётчика дропа, если его нет
   if (state.bossMinionDropCounter === undefined) {

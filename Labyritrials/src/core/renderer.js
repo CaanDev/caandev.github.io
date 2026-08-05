@@ -6,7 +6,7 @@
 import { CONFIG, state, player } from './config/index.js';
 import { COLORS } from './config/colors.js';
 import { getSettings } from '../systems/ui/settings/index.js';
-import { drawFloor, drawWalls } from '../systems/rendering/mazeRenderer.js';
+import { drawFloor, drawWalls, drawPillars, drawRunes } from '../systems/rendering/mazeRenderer.js';
 import { drawBackground, drawBossSummonCircle, drawBossLightFade } from '../systems/rendering/maze/index.js';
 import { drawSnow } from '../systems/weather/snowRenderer.js';
 import { drawBloodPuddles } from '../systems/rendering/bloodRenderer.js';
@@ -28,7 +28,6 @@ import { drawRealityShift } from '../systems/rendering/realityShiftRenderer.js';
 import { getVisibleCellRange } from '../systems/rendering/visibilityUtils.js';
 import { drawPlayerTrails } from '../entities/objects/playerTrails.js';
 import { drawExplosion } from '../entities/objects/explosion.js';
-import { drawPillars } from '../systems/rendering/maze/pillars.js';
 
 /** @type {number} - Кэшированная ширина холста для оптимизации */
 let cachedWidth = 0;
@@ -180,6 +179,7 @@ export const Renderer = {
     
     // Стены и объекты лабиринта
     drawWalls(ctx, this._visibleRange);
+    drawRunes(ctx, this._visibleRange);
     
     // Лавка торговца, факелы, порталы, ловушки, алтари
     drawTorches(ctx, camX, camY, canvas);

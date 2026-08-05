@@ -175,9 +175,9 @@ function createRunesOnCell(gridX, gridY, palette, count, isShrineRoom, existingP
     const symbol = ALL_SYMBOLS[Math.floor(Math.random() * ALL_SYMBOLS.length)];
     let size;
     if (isShrineRoom) {
-      size = 0.12 + Math.random() * 0.15;
+      size = 0.08 + Math.random() * 0.10;
     } else {
-      size = 0.15 + Math.random() * 0.2;
+      size = 0.10 + Math.random() * 0.12;
     }
 
     const hue = palette.hue + (Math.random() - 0.5) * 12;
@@ -305,6 +305,12 @@ function generateShrineFloorRunes() {
  * @returns {void}
  */
 export function spawnRunes(density = 0.05) {
+  // Руны только в биоме Cave
+  if (state.currentBiome !== 'cave') {
+    state.runes = [];
+    return;
+  }
+
   if (state.isBossLevel) return;
   if (state.inTreasureRoom) return;
 
