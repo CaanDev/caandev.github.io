@@ -33,14 +33,18 @@
 │   │       └── state.js
 │   │
 │   ├── data/
+│   │   ├── achievements.js
+│   │   ├── biomes.js
+│   │   ├── bosses.js
+│   │   ├── events.js
 │   │   ├── index.js
 │   │   ├── items.js
+│   │   ├── monsters.js
 │   │   ├── notes.js
 │   │   └── weapons.js
 │   │
 │   ├── entities/
 │   │   ├── monsters/
-│   │   │   ├── ai.js
 │   │   │   ├── combat.js
 │   │   │   ├── death.js
 │   │   │   ├── drop.js
@@ -55,6 +59,19 @@
 │   │   │   │   ├── counter.js
 │   │   │   │   ├── helpers.js
 │   │   │   │   └── index.js
+│   │   │   │
+│   │   │   ├── ai/
+│   │   │   │   ├── ghost.js
+│   │   │   │   ├── hearing.js
+│   │   │   │   ├── index.js
+│   │   │   │   ├── memory.js
+│   │   │   │   ├── movement.js
+│   │   │   │   ├── pathPredictor.js
+│   │   │   │   ├── potion.js
+│   │   │   │   ├── searchStates.js
+│   │   │   │   ├── smoothMovement.js
+│   │   │   │   ├── states.js
+│   │   │   │   └── stuckHandler.js
 │   │   │   │
 │   │   │   └── bosses/
 │   │   │       ├── ai.js
