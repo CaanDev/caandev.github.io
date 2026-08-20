@@ -146,19 +146,12 @@ function handleEvasion(evasionChance, t) {
   if (!checkWallCollision(newX, player.py, 24)) player.px = newX;
   if (!checkWallCollision(player.px, newY, 24)) player.py = newY;
 
-  // Определяем направление для отображения
-  let directionText = '';
-  if (evadeX > 0) directionText = '→';
-  else if (evadeX < 0) directionText = '←';
-  else if (evadeY > 0) directionText = '↓';
-  else if (evadeY < 0) directionText = '↑';
-
   // Визуальные и звуковые эффекты
-  audio.playSound('dodge', 0.5);
+  audio.playSound('interactions.dodge');
   
   state.damageTexts.push({
     x: player.px, y: player.py - 30,
-    text: `✨ УВЕРНУЛСЯ! ${directionText} (${Math.round(evasionChance * 100)}%) ✨`,
+    text: `✨ УВЕРНУЛСЯ!`,
     color: COLORS.ui.textGold,
     size: 20, life: 50, speedy: 1.2
   });
@@ -202,7 +195,7 @@ function applyTrapEffectToPlayer(t, evasionChance) {
   switch (t.type) {
     case 'ice': {
       // Ледяная ловушка: заморозка + отталкивание
-      audio.playSound('trapIceActivate', 0.7);
+      audio.playSound('traps.trapIceActivate');
       const angle = Math.atan2(player.py - t.y, player.px - t.x);
       const pushDistance = 60;
       
@@ -234,7 +227,7 @@ function applyTrapEffectToPlayer(t, evasionChance) {
       state.screenShake = 8;
       state.damageTexts.push({
         x: player.px, y: player.py - 20,
-        text: `🧪 ОТРАВЛЕН! (${Math.round((1 - evasionChance) * 100)}%)`,
+        text: `🧪 ОТРАВЛЕН!`,
         color: COLORS.effects.poison,
         size: 18, life: 50, speedy: 1.0
       });
@@ -243,7 +236,7 @@ function applyTrapEffectToPlayer(t, evasionChance) {
 
     case 'lightning': {
       // Электрическая ловушка: шок + замедление
-      audio.playSound('trapLightningActivate', 0.6);
+      audio.playSound('traps.trapLightningActivate');
       
       // Останавливаем предыдущий звук эффекта
       if (player._shockSound) {
@@ -251,7 +244,7 @@ function applyTrapEffectToPlayer(t, evasionChance) {
         player._shockSound = null;
       }
       
-      player._shockSound = audio.playEffect('trapLightningEffect', 0.3);
+      player._shockSound = audio.playEffect('traps.trapLightningEffect', 0.3);
       
       player.shockTimer = 300;
       player.shockTick = 0;
@@ -295,7 +288,7 @@ function applyTrapEffectToPlayer(t, evasionChance) {
     case 'spike':
     default: {
       // Взрывная ловушка: урон + взрыв
-      audio.playSound('trapSpikeActivate', 0.7);
+      audio.playSound('traps.trapSpikeActivate');
       createExplosion(player.px, player.py, true);
 
       state.ironManActive = false;

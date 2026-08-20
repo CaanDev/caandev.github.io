@@ -224,6 +224,13 @@ export const CHEST_IMAGES = {
     empty: 'assets/images/items/chests/rooms/chestTreasureRoomEmpty-1.png',
     mimic: 'assets/images/items/chests/rooms/chestTreasureRoomMimicAttack-1.png',
   },
+  // Комната-ловушка
+  trap: {
+    closed: 'assets/images/items/chests/rooms/chestTrapRoomClosed-1.png',
+    open: 'assets/images/items/chests/rooms/chestTrapRoomOpen-1.png',
+    empty: null, // В комнате-ловушке нет пустых сундуков
+    mimic: null, // В комнате-ловушке нет мимиков
+  },
   // Безопасная комната
   safe: {
     closed: 'assets/images/items/chests/rooms/chestSafeRoomClosed-1.png',
@@ -360,6 +367,10 @@ export const ITEM_IMAGES = {
   chestTreasureOpen: 'assets/images/items/chests/rooms/chestTreasureRoomOpen-1.png',
   chestTreasureEmpty: 'assets/images/items/chests/rooms/chestTreasureRoomEmpty-1.png',
   chestTreasureMimic: 'assets/images/items/chests/rooms/chestTreasureRoomMimicAttack-1.png',
+
+  // Сундуки — Комната-ловушка
+  chestTrapRoomClosed: 'assets/images/items/chests/rooms/chestTrapRoomClosed-1.png',
+  chestTrapRoomOpen: 'assets/images/items/chests/rooms/chestTrapRoomOpen-1.png',
   
   // Сундуки — Безопасная комната
   chestSafeClosed: 'assets/images/items/chests/rooms/chestSafeRoomClosed-1.png',

@@ -221,7 +221,7 @@ export function handleMonsterTrapInteraction(m, i) {
           // Монстр увернулся — ловушка НЕ считается сработавшей
           t.hasDealtDamage = false;
           
-          audio.playSound('dodge', 0.4);
+          audio.playSound('interactions.dodge');
           
           state.damageTexts.push({ 
             x: m.x, y: m.y - 30, 
@@ -297,7 +297,7 @@ function applyTrapEffect(m, i, t) {
 
     case 'ice':
       // Ледяная ловушка: заморозка
-      audio.playSound('trapIceActivate', 0.7);
+      audio.playSound('traps.trapIceActivate');
       m.isFrozen = true;
       m.freezeTimer = 180;
       state.damageTexts.push({
@@ -310,10 +310,10 @@ function applyTrapEffect(m, i, t) {
 
     case 'lightning': {
       // Электрическая ловушка: шок + замедление
-      audio.playSound('trapLightningActivate', 0.6);
+      audio.playSound('traps.trapLightningActivate');
       
       // Создаём отдельный звук для каждого монстра
-      m._shockSound = audio.playEffect('trapLightningEffect', 0.3);
+      m._shockSound = audio.playEffect('traps.trapLightningEffect', 0.3);
       
       m.shockTimer = 300;
       m.shockTick = 0;
@@ -344,7 +344,7 @@ function applyTrapEffect(m, i, t) {
     case 'spike':
     default:
       // Взрывная ловушка: прямой урон
-      audio.playSound('trapSpikeActivate', 0.7);
+      audio.playSound('traps.trapSpikeActivate');
       
       m.hp -= t.damage;
       state.damageTexts.push({

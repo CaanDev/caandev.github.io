@@ -32,6 +32,9 @@ import { updateBossSummonCircle } from '../systems/rendering/maze/bossSummonCirc
 /** @type {number} - Счётчик кадров для периодических обновлений */
 let frameCounter = 0;
 
+/** @type {number} - Время последнего кадра */
+let lastTime = 0;
+
 /**
  * Создание функции игрового цикла
  * 
@@ -41,7 +44,14 @@ let frameCounter = 0;
  * @returns {Function} - Функция обновления игры
  */
 export function createGameLoop(updateUICallback, ctx, canvas) {
-  return function gameUpdate() {
+  return function gameUpdate(timestamp) {
+    // Вычисляем deltaTime в секундах
+    const deltaTime = lastTime === 0 ? 1/60 : (timestamp - lastTime) / 1000;
+    lastTime = timestamp;
+    
+    // Ограничиваем deltaTime, чтобы избежать скачков
+    const clampedDeltaTime = Math.min(deltaTime, 1/30);
+    
     // Если открыто окно перехода уровня — только рисуем
     const levelUpUI = document.getElementById('level-up-ui');
     if (levelUpUI && levelUpUI.style.display === 'block') {
@@ -63,9 +73,9 @@ export function createGameLoop(updateUICallback, ctx, canvas) {
     
     state.gameOverShown = false;
 
-    // Обновление игровых систем
-    updatePlayer();
-    updateMonsters();
+    // Обновление игровых систем с передачей deltaTime
+    updatePlayer(clampedDeltaTime);
+    updateMonsters(clampedDeltaTime);
     updateBossSummonCircle();
     updateBossLightFade();
 

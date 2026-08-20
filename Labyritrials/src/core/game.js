@@ -92,7 +92,7 @@ export const Game = {
   _runVsyncLoop() {
     const self = this;
     
-    function animate() {
+    function animate(timestamp) {
       if (!self.isRunning) return;
       
       // Проверяем, не переключился ли режим
@@ -106,7 +106,7 @@ export const Game = {
       
       // Проверяем FPS-лимит
       if (!shouldSkipFrame()) {
-        if (self.loopFunc) self.loopFunc();
+        if (self.loopFunc) self.loopFunc(timestamp);
         self.updateFps();
       }
       
@@ -139,7 +139,7 @@ export const Game = {
       
       // Проверяем FPS-лимит
       if (!shouldSkipFrame()) {
-        if (self.loopFunc) self.loopFunc();
+        if (self.loopFunc) self.loopFunc(performance.now());
         self.updateFps();
       }
       

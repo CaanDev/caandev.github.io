@@ -24,14 +24,12 @@ export function drawBookshelf(ctx, dx, dy, gridX, gridY) {
   if (isImageLoaded(imageKey)) {
     const img = getImage(imageKey);
     if (img) {
-      const cellSize = CONFIG.cellSize;
-      const padding = 8;
-      const size = cellSize - padding * 2;
+      const size = 160;
       
       ctx.save();
       ctx.shadowBlur = 8;
       ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-      ctx.drawImage(img, dx + padding, dy + padding, size, size);
+      ctx.drawImage(img, dx, dy, size, size);
       ctx.restore();
       return;
     }
@@ -56,6 +54,7 @@ function drawBookshelfFallback(ctx, dx, dy, gridX, gridY) {
   const cellSize = CONFIG.cellSize;
   const centerX = dx + cellSize / 2;
   const centerY = dy + cellSize / 2;
+  const size = 160;
   
   // Фон для контраста
   ctx.save();
@@ -63,7 +62,7 @@ function drawBookshelfFallback(ctx, dx, dy, gridX, gridY) {
   ctx.shadowBlur = 8;
   ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
   ctx.beginPath();
-  ctx.roundRect(dx + 8, dy + 8, cellSize - 16, cellSize - 16, 6);
+  ctx.roundRect(dx + 8, dy + 8, size, size, 6);
   ctx.fill();
   ctx.shadowBlur = 0;
   ctx.restore();

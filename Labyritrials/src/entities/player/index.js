@@ -6,10 +6,11 @@
  */
 
 import { state, player } from '../../core/config/index.js';
+import { updateMimicHealthBars, updateMimicsState } from './mimicCombat.js';
 import { updateFreezeEffect, updateShockEffect, updatePoisonEffect, updatePlayerEffects } from './effects.js';
 import { updateMovement, updateTorchActivation, updateFogOfWar, updateShopPrompt } from './movement.js';
 import { collectLoot, collectArtifacts } from './loot.js';
-import { interactWithChests, checkNoteInteraction } from './interaction.js';
+import { interactWithChests, checkNoteInteraction, checkInteractiveItems } from './interaction.js';
 import { interactWithShrines } from './shrines.js';
 import { 
   checkSecretPortal, checkExitPortal, 
@@ -20,6 +21,7 @@ import {
 import { checkTraps } from './traps.js';
 import { updateAttackAnimation } from './animation.js';
 import { checkTrapWaveComplete } from '../../world/rooms/trapRoom/index.js';
+import { playerAnimator } from '../../sprites/index.js';
 
 // ============================================================
 // ЭКСПОРТЫ
@@ -45,9 +47,10 @@ export { executeAttack } from './combat.js';
  * Обновление выносливости игрока (восстановление)
  * Вызывается каждый кадр из gameLoop
  * 
+ * @param {number} deltaTime - Время с последнего обновления (сек)
  * @returns {void}
  */
-function updateStamina() {
+function updateStamina(deltaTime) {
   // Если выносливость уже полная — ничего не делаем
   if (player.stamina >= player.maxStamina) return;
 
@@ -84,12 +87,86 @@ function updateStamina() {
   // Если регенерация отключена — выходим
   if (regenRate <= 0) return;
   
-  // Рассчитываем восстановление за кадр (при 60 FPS — 1/60 секунды)
-  const deltaTime = 1 / 60;
+  // Рассчитываем восстановление за кадр
   const regenAmount = regenRate * deltaTime;
   
   // Применяем восстановление
   player.stamina = Math.min(player.maxStamina, player.stamina + regenAmount);
+}
+
+// ============================================================
+// ОПРЕДЕЛЕНИЕ СОСТОЯНИЯ АНИМАЦИИ
+// ============================================================
+
+/**
+ * Определение текущего состояния анимации игрока
+ * 
+ * @returns {string} - 'idle', 'walk' или 'attack'
+ */
+function getPlayerAnimationState() {
+  // Атака
+  if (player.isAttacking && player.attackTimer > 5) return 'attack';
+
+  // Проверяем фактическое движение
+  return player.isMoving ? 'walk' : 'idle';
+}
+
+/**
+ * Получение направления для анимации
+ * 
+ * @returns {{dirX: number, dirY: number}} - Направление движения
+ */
+function getAnimationDirection() {
+  let dirX = 0, dirY = 0;
+  
+  // Используем фактическое движение (учитываем инверсию)
+  // Определяем направление из нажатых клавиш с учётом инверсии
+  if (!player.isFrozen) {
+    let rawX = 0, rawY = 0;
+    if (state.keys['w'] || state.keys['arrowup']) rawY = -1;
+    if (state.keys['s'] || state.keys['arrowdown']) rawY = 1;
+    if (state.keys['a'] || state.keys['arrowleft']) rawX = -1;
+    if (state.keys['d'] || state.keys['arrowright']) rawX = 1;
+
+    // Применяем инверсию управления
+    if (player.controlsInverted) {
+      dirX = -rawX;
+      dirY = -rawY;
+    } else {
+      dirX = rawX;
+      dirY = rawY;
+    }
+  }
+
+  // Если есть движение — используем его и обновляем последнее направление
+  if (dirX !== 0 || dirY !== 0) {
+    player.lastMoveDirX = dirX;
+    player.lastMoveDirY = dirY;
+    return { dirX, dirY };
+  }
+  
+  // Если игрок атакует или заряжает — используем направление атаки
+  // или последнее направление (если оно задано)
+  if (player.isAttacking || player.isCharging) {
+    // Сначала проверяем lastMoveDir (оно всегда есть, если игрок хоть раз двигался)
+    if (player.lastMoveDirX !== 0 || player.lastMoveDirY !== 0) {
+      return { dirX: player.lastMoveDirX, dirY: player.lastMoveDirY };
+    }
+    // Если lastMoveDir нет, используем направление атаки
+    if (player.dirX !== 0 || player.dirY !== 0) {
+      player.lastMoveDirX = player.dirX;
+      player.lastMoveDirY = player.dirY;
+      return { dirX: player.dirX, dirY: player.dirY };
+    }
+  }
+  
+  // Используем последнее направление движения
+  if (player.lastMoveDirX !== 0 || player.lastMoveDirY !== 0) {
+    return { dirX: player.lastMoveDirX, dirY: player.lastMoveDirY };
+  }
+  
+  // По умолчанию — юг
+  return { dirX: 0, dirY: 1 };
 }
 
 // ============================================================
@@ -109,11 +186,13 @@ function updateStamina() {
  * 7. Проверка порталов
  * 8. Проверка ловушек
  * 9. Анимация атаки
- * 10. Проверка завершения волны в комнате-ловушке
+ * 10. Обновление спрайтовой анимации
+ * 11. Проверка завершения волны в комнате-ловушке
  * 
+ * @param {number} deltaTime - Время с последнего обновления (сек)
  * @returns {void}
  */
-export function updatePlayer() {
+export function updatePlayer(deltaTime = 1/60) {
   // ===== СПЕЦИАЛЬНЫЙ РЕЖИМ: ПОЯВЛЕНИЕ БОССА =====
   // Если босс появляется - обновляем только эффекты
   if (state.isBossLevel && state.bossSpawnTriggered && !state.bossReady) {
@@ -131,7 +210,7 @@ export function updatePlayer() {
   updatePlayerEffects();
   
   // ===== 2. ВОССТАНОВЛЕНИЕ ВЫНОСЛИВОСТИ =====
-  updateStamina();
+  updateStamina(deltaTime);
   
   // ===== 3. ПЕРЕЗАРЯДКА ОГНЕННОГО ШАРА =====
   if (player.fireballCooldown > 0) {
@@ -139,7 +218,7 @@ export function updatePlayer() {
   }
   
   // ===== 4. ДВИЖЕНИЕ И ТУМАН ВОЙНЫ =====
-  updateMovement();
+  updateMovement(deltaTime * 1000); // Передаем в миллисекундах
   updateTorchActivation();
   updateFogOfWar();
   updateShopPrompt();
@@ -152,6 +231,7 @@ export function updatePlayer() {
   interactWithChests();
   interactWithShrines();
   checkNoteInteraction();
+  checkInteractiveItems();
   
   // ===== 7. ПОРТАЛЫ =====
   if (checkSecretPortal()) return;
@@ -170,8 +250,53 @@ export function updatePlayer() {
   // ===== 9. АНИМАЦИЯ АТАКИ =====
   updateAttackAnimation();
 
-  // ===== 10. КОМНАТА-ЛОВУШКА: ПРОВЕРКА ВОЛНЫ =====
+  // ===== 10. ОБНОВЛЕНИЕ СПРАЙТОВОЙ АНИМАЦИИ =====
+  const animState = getPlayerAnimationState();
+  const { dirX, dirY } = getAnimationDirection();
+  
+  // Время в миллисекундах для аниматора
+  const animDeltaTime = deltaTime * 1000;
+  
+  // Колбэк завершения атаки (сбрасываем флаги)
+  const onAttackComplete = () => {
+    player.isAttacking = false;
+    player.attackExecuted = false;
+    player.attackTimer = 0;
+    player.isFireballAttack = false;
+
+    // Очищаем следы атаки
+    import('../../systems/rendering/player/trailManager.js').then(({ clearAttackTrails }) => {
+      clearAttackTrails();
+    });
+  };
+
+  // Определяем, усиленная ли атака
+  const isStrong = player.chargeTime > 30;
+  
+  // Обновляем анимацию
+  if (animState === 'attack') {
+    // Запускаем или продолжаем анимацию атаки
+    // передаём направление атаки (dirX, dirY)
+    if (!playerAnimator.isAttackPlaying()) {
+      // Запускаем новую атаку с направлением
+      playerAnimator.update('attack', dirX, dirY, animDeltaTime, onAttackComplete, isStrong);
+    } else {
+      // Продолжаем текущую атаку
+      playerAnimator.update('attack', dirX, dirY, animDeltaTime, undefined, isStrong);
+    }
+  } else {
+    // Обычное обновление (не атака)
+    playerAnimator.update(animState, dirX, dirY, animDeltaTime);
+  }
+
+  // ===== 11. КОМНАТА-ЛОВУШКА: ПРОВЕРКА ВОЛНЫ =====
   if (state.inTrapRoom && state.trapActivated) {
     checkTrapWaveComplete();
   }
+
+  // ===== 12. МИМИКИ =====
+  // Обновление состояния мимиков
+  updateMimicsState();
+  // Обновление полосок HP мимиков
+  updateMimicHealthBars();
 }

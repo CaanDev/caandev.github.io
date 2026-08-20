@@ -1,7 +1,5 @@
 /**
  * @fileoverview Управление эффектами игрока.
- * Обрабатывает заморозку, отравление, шок и другие статусные эффекты.
- * 
  * @module entities/player/effects
  */
 
@@ -11,6 +9,21 @@ import { audio } from '../../audio/audioManager.js';
 import { triggerGameOver } from './gameOver.js';
 
 /**
+ * Обновление эффектов низкого здоровья (сердцебиение)
+ * @returns {void}
+ */
+function updateLowHPEffect() {
+  // Защита от NaN и деления на ноль
+  if (typeof player.hp !== 'number' || typeof player.maxHp !== 'number' || player.maxHp <= 0) {
+    return;
+  }
+  
+  const hpPercent = Math.max(0, Math.min(1, player.hp / player.maxHp));
+  
+  // Обновляем звук сердцебиения
+  audio.sound.updateLowHPSound(hpPercent);
+}
+/**
  * Обновление эффекта заморозки
  * Уменьшает таймер, создаёт эффекты при освобождении
  * 
@@ -19,9 +32,26 @@ import { triggerGameOver } from './gameOver.js';
 export function updateFreezeEffect() {
   if (player.freezeTimer > 0) {
     player.freezeTimer--;
+
+    // Если игрок только что замёрз — замораживаем анимацию
+    if (player.isFrozen && !player._animationFrozen) {
+      player._animationFrozen = true;
+      import('../../sprites/index.js').then(({ playerAnimator }) => {
+        const currentSprite = playerAnimator.getCurrentFrame();
+        playerAnimator.setFrozen(true, currentSprite);
+      });
+    }
+
     if (player.freezeTimer <= 0) {
       player.isFrozen = false;
-      audio.playSound('trapIceFinish', 0.6);
+      player._animationFrozen = false;
+
+      // Размораживаем анимацию
+      import('../../sprites/index.js').then(({ playerAnimator }) => {
+        playerAnimator.setFrozen(false);
+      });
+
+      audio.playSound('traps.trapIceFinish');
       
       // Эффект освобождения от льда
       if (state.damageTexts) {
@@ -95,10 +125,13 @@ export function updatePlayerEffects() {
   // Проверяем смерть (останавливаем звук шока)
   if (player.hp <= 0) {
     if (player._shockSoundActive) {
-      audio.sound.stopSound('trapLightningEffect');
+      audio.sound.stopSound('traps.trapLightningEffect');
       player._shockSoundActive = false;
     }
   }
+
+  // Обновляем эффект низкого здоровья
+  updateLowHPEffect();
 }
 
 /**

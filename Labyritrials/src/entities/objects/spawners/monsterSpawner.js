@@ -95,6 +95,7 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
       damage: Math.floor(base.damage * scaling),
       emoji: base.emoji,
       radius: base.radius,
+      baseRadius: base.radius,
       name: base.name,
       speed: base.speed,
       dir: 1,
@@ -121,8 +122,11 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
       baseVision: base.vision,
       visionBoosted: false,
       visionBoostTimer: 0,
-      visionBoostDuration: 180,
-      visionBoostMultiplier: 1.5,
+      visionBoostDuration: 300,
+      visionBoostMultiplier: 1.8,
+
+      // ===== СЛУХ =====
+      hearingRadius: 600, // базовый радиус слуха
       
       // ===== ПАМЯТЬ =====
       lastKnownX: null,
@@ -137,10 +141,34 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
       isSearching: false,
       searchRadius: 80,
       searchTimer: 0,
+
+      // ===== УЛУЧШЕННЫЙ ПАТРУЛЬ =====
+      // Маршрут патрулирования
+      patrolPath: [],              // Массив точек {x, y}
+      patrolIndex: 0,              // Текущая точка маршрута
+      patrolTimer: 0,              // Таймер до следующего действия
+      patrolPhase: 'moving',       // 'moving' | 'idle' | 'investigating'
+      idleTimer: 0,                // Время остановки (кадры)
+      idleDuration: 0,             // Общая длительность остановки
+      investigationTarget: null,   // Точка для осмотра {x, y}
+      investigationTimer: 0,       // Время осмотра
+      lookDirection: 0,            // Направление взгляда (угол)
+      lookTimer: 0,                // Таймер смены взгляда
+
+      // Интересы
+      interests: [],               // Точки, которые интересны монстру
+      checkedInterests: [],        // Уже проверенные точки
+      curiosity: 30 + Math.random() * 40, // Уровень любопытства (30-70)
+
+      // Восприятие
+      perception: {
+        interestRadius: 350,       // Радиус обнаружения интересных объектов
+        smellRadius: 150,          // Радиус "обоняния"
+      },
       
-      // ===== ⭐ ИНИЦИАЛИЗАЦИЯ _lastX/_lastY ДЛЯ ОТСЛЕЖИВАНИЯ ЗАСТРЕВАНИЯ =====
-      _lastX: x,  // 👈 ТЕПЕРЬ ИНИЦИАЛИЗИРУЕМ!
-      _lastY: y,  // 👈 ТЕПЕРЬ ИНИЦИАЛИЗИРУЕМ!
+      // Инициализация _lastX/_lastY для отслеживания застревания
+      _lastX: x,
+      _lastY: y,
     };
 
     // ===== ПРИМЕНЕНИЕ ЭФФЕКТОВ СОБЫТИЙ =====
@@ -153,8 +181,15 @@ export function spawnMonsters(isTreasureRoom = false, isProtectedCell = () => fa
     if (state.eventMonsterRageActive) {
       newMonster.originalDamage = newMonster.damage;
       newMonster.originalSpeed = newMonster.speed;
+      newMonster.originalVision = newMonster.vision;
+      newMonster.originalBaseVision = newMonster.baseVision;
+      newMonster.originalHearingRadius = newMonster.hearingRadius;
+      
       newMonster.damage = Math.floor(newMonster.damage * 1.3);
       newMonster.speed = newMonster.speed * 1.3;
+      newMonster.vision = Math.floor(newMonster.vision * 1.4);
+      newMonster.baseVision = Math.floor(newMonster.baseVision * 1.4);
+      newMonster.hearingRadius = Math.floor(newMonster.hearingRadius * 1.4);
       newMonster.isEventBoosted = true;
     }
 

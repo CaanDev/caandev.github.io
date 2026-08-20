@@ -7,7 +7,7 @@ import { state } from '../../../core/config/index.js';
 import { CONFIG } from '../../../core/config/index.js';
 import { smoothMoveToPosition } from './smoothMovement.js';
 
-/** @type {number} - Радиус слышимости разрушения стены (в пикселях) */
+/** @type {number} - Базовый радиус слышимости разрушения стены (в пикселях) */
 const WALL_DESTROY_HEARING_RADIUS = 600;
 
 /** @type {number} - Время жизни звука в секундах */
@@ -25,24 +25,31 @@ const MAX_MOVE_DURATION = 300; // 5 секунд при 60 FPS
 /** @type {number} - Пауза при реакции (кадры) */
 const REACTION_PAUSE = 30; // 0.5 секунды
 
+// ============================================================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// ============================================================
+
 /**
  * Добавление события звука
  * @param {number} x - Координата X источника звука
  * @param {number} y - Координата Y источника звука
  * @param {string} type - Тип звука ('wallDestroy')
- * @param {number} [radius=WALL_DESTROY_HEARING_RADIUS] - Радиус слышимости
+ * @param {number} [radius] - Радиус слышимости (если не указан, используется стандартный)
  * @returns {void}
  */
-export function addSoundEvent(x, y, type, radius = WALL_DESTROY_HEARING_RADIUS) {
+export function addSoundEvent(x, y, type, radius) {
   if (!state.soundEvents) {
     state.soundEvents = [];
   }
+
+  // Если радиус не указан — используем базовый
+  const actualRadius = radius || WALL_DESTROY_HEARING_RADIUS;
 
   state.soundEvents.push({
     x,
     y,
     type,
-    radius,
+    radius: actualRadius,
     timestamp: Date.now(),
     active: true,
     heardBy: []
@@ -217,11 +224,8 @@ function clearHeardSounds(m) {
  * @returns {void}
  */
 function clearSoundMemory(m) {
-  // Очищаем проверенные места
   m._checkedPlaces = [];
-  // Очищаем услышанные звуки
   clearHeardSounds(m);
-  // Сбрасываем текущую реакцию
   if (m._isReactingToSound) {
     resetSoundReaction(m);
   }
@@ -274,6 +278,10 @@ function isMonsterStuck(m) {
   return m._stuckMoveCounter > 30;
 }
 
+// ============================================================
+// ОСНОВНАЯ ФУНКЦИЯ — С ПРИОРИТЕТОМ ПРЕСЛЕДОВАНИЯ
+// ============================================================
+
 /**
  * Обновление реакции монстра на звуки
  * @param {Object} m - Объект монстра
@@ -282,24 +290,84 @@ function isMonsterStuck(m) {
  * @returns {Object|null} - Результат { isReacting: boolean, targetX, targetY } или null
  */
 export function updateMonsterHearing(m, distToPlayer, hasLineOfSight) {
-  // ===== ПРИОРИТЕТ: ВИДИМОСТЬ ИГРОКА =====
+  // Если монстр видит игрока — ВСЕГДА игнорирует звуки
   if (hasLineOfSight && distToPlayer < m.vision) {
     // Если монстр реагировал на звук — сбрасываем
     if (m._isReactingToSound) {
       clearSoundMemory(m);
     }
-    // Возвращаем null — монстр не реагирует на звуки, он видит игрока
+    // Если монстр в режиме поиска — переключаем в преследование
+    if (m.isSearching) {
+      m.isSearching = false;
+      m.memoryTimer = m.memoryDuration || 360;
+      m.state = 'chase';
+    }
+    return null; // Монстр не реагирует на звуки, он видит игрока
+  }
+
+  // Если монстр уже преследует игрока И имеет активную память о нём — звуки полностью игнорируются!
+  // Главная задача монстра — найти игрока, а не отвлекаться на шумы.
+  const hasActiveMemory = m.lastKnownX !== null && 
+                          m.memoryDuration !== undefined && 
+                          m.memoryTimer > m.memoryDuration * 0.3;
+  const isActivelyChasing = m.state === 'chase' && hasActiveMemory;
+  
+  if (isActivelyChasing) {
+    // Если монстр реагировал на звук — сбрасываем
+    if (m._isReactingToSound) {
+      clearSoundMemory(m);
+    }
+    // Продолжаем преследование — возвращаем null (не реагируем на звуки)
     return null;
   }
 
+  // Если монстр уже реагирует на звук — продолжаем реакцию
   if (m._isReactingToSound) {
     return updateSoundReaction(m);
   }
 
-  const nearestSound = getNearestSound(m);
+  // Монстр НЕ преследует игрока (патруль или потерял след) — может отреагировать на звук
+  const hearingRadius = m.hearingRadius || WALL_DESTROY_HEARING_RADIUS;
+  
+  const nearestSound = getNearestSoundWithRadius(m, hearingRadius);
   if (!nearestSound) return null;
 
   return startSoundReaction(m, nearestSound);
+}
+
+/**
+ * Получение ближайшего активного звука для монстра с учётом его радиуса слуха
+ * @param {Object} m - Объект монстра
+ * @param {number} hearingRadius - Радиус слуха монстра
+ * @returns {Object|null} - Ближайший звук или null
+ */
+function getNearestSoundWithRadius(m, hearingRadius) {
+  if (!state.soundEvents || state.soundEvents.length === 0) return null;
+
+  const monsterId = m.id || `monster_${m.x}_${m.y}`;
+  let nearest = null;
+  let nearestDist = Infinity;
+
+  for (const sound of state.soundEvents) {
+    if (!sound.active) continue;
+    
+    if (sound.heardBy && sound.heardBy.includes(monsterId)) continue;
+    if (isPlaceChecked(m, sound.x, sound.y)) continue;
+    
+    const dist = Math.hypot(m.x - sound.x, m.y - sound.y);
+    
+    // Используем радиус слуха монстра (или звука, если он больше)
+    const effectiveRadius = Math.max(sound.radius || hearingRadius, hearingRadius);
+    
+    if (dist <= effectiveRadius) {
+      if (dist < nearestDist) {
+        nearestDist = dist;
+        nearest = sound;
+      }
+    }
+  }
+
+  return nearest;
 }
 
 /**

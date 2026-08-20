@@ -9,6 +9,8 @@ import { CONFIG, state, player } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
 import { EMOJIS } from '../../emojis.js';
 import { getDistanceVisibility } from '../fog/index.js';
+import { getImage, isImageLoaded } from '../../utils/imageLoader.js';
+import { getRandomStairImage, getStairImageKey } from '../../images/stairImages.js';
 
 /**
  * Отрисовка одного портала
@@ -246,7 +248,7 @@ export function drawAllPortals(ctx) {
 }
 
 /**
- * Отрисовка портала выхода с уровня
+ * Отрисовка портала выхода с уровня (ступеньки)
  * 
  * @param {CanvasRenderingContext2D} ctx - Контекст рисования
  * @returns {void}
@@ -281,17 +283,47 @@ function drawExitPortal(ctx) {
         }
         
         if (canShowPortal) {
-          let gdx = CONFIG.goal.x * CONFIG.cellSize;
-          let gdy = CONFIG.goal.y * CONFIG.cellSize;
+          const gdx = CONFIG.goal.x * CONFIG.cellSize;
+          const gdy = CONFIG.goal.y * CONFIG.cellSize;
           
           const portalCenterX = gdx + CONFIG.cellSize / 2;
           const portalCenterY = gdy + CONFIG.cellSize / 2;
           const visibility = getDistanceVisibility(portalCenterX, portalCenterY);
           
           if (visibility > 0.05) {
+            // Определяем биом для ступенек
+            let biome;
+            if (state.isBossLevel) {
+              const level = state.gameLevel;
+              if (level > 10) biome = 'sand';
+              else if (level > 5) biome = 'ice';
+              else biome = 'cave';
+            } else {
+              biome = state.currentBiome || 'cave';
+            }
+            
+            // Получаем случайное изображение ступенек
+            // Используем seed для детерминированного выбора (чтобы на одном уровне всегда были одни ступеньки)
+            const seed = state.gameLevel * 100 + (state.seed || 0);
+            const imagePath = getRandomStairImage(biome, seed);
+            const imageKey = imagePath ? getStairImageKey(imagePath) : null;
+            
             ctx.save();
             ctx.globalAlpha = Math.min(1, visibility * 0.85 + 0.1);
             
+            // Отрисовка ступенек
+            if (imageKey && isImageLoaded(imageKey)) {
+              const img = getImage(imageKey);
+              if (img) {
+                const size = CONFIG.cellSize * 0.85;
+                const offset = (size - CONFIG.cellSize) / 2;
+                ctx.drawImage(img, gdx - offset, gdy - offset, size, size);
+                ctx.restore();
+                return;
+              }
+            }
+            
+            // ===== FALLBACK: если изображение не загрузилось — старый портал =====
             ctx.beginPath();
             ctx.roundRect(gdx + 26, gdy + 26, CONFIG.cellSize - 52, CONFIG.cellSize - 52, 12);
             ctx.fillStyle = COLORS.portals.exit;
@@ -306,11 +338,15 @@ function drawExitPortal(ctx) {
             ctx.globalAlpha = 1.0;
             ctx.restore();
             
+            // Эмодзи портала поверх фона
+            ctx.save();
+            ctx.globalAlpha = Math.min(1, visibility * 0.8 + 0.1);
             ctx.fillStyle = COLORS.player.shadow;
             ctx.font = '32px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(EMOJIS.items.portal, gdx + CONFIG.cellSize / 2, gdy + CONFIG.cellSize / 2);
+            ctx.restore();
           }
         }
       }

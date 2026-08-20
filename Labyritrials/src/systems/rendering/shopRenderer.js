@@ -46,7 +46,7 @@ export function drawShop(ctx) {
   if (isImageLoaded(imageKey)) {
     const img = getImage(imageKey);
     if (img) {
-      const size = 130;
+      const size = 160;
       ctx.save();
       ctx.globalAlpha = Math.min(1, visibility * 0.85 + 0.1);
       ctx.drawImage(img, shopCenterX - size / 2, shopCenterY - size / 2, size, size);

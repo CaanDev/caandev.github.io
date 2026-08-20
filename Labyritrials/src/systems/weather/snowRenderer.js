@@ -30,7 +30,7 @@ class Snowflake {
     this.size = 0.5 + Math.random() * 2.0;
     this.speed = 0.15 + Math.random() * 0.65;
     this.drift = (Math.random() - 0.5) * 0.2;
-    this.opacity = 0.3 + Math.random() * 0.5;
+    this.opacity = 0.5 + Math.random() * 0.5;
     this.driftChange = (Math.random() - 0.5) * 0.002;
   }
 
@@ -66,7 +66,7 @@ class Snowflake {
     this.size = 0.5 + Math.random() * 2.0;
     this.speed = 0.15 + Math.random() * 0.65;
     this.drift = (Math.random() - 0.5) * 0.2;
-    this.opacity = 0.3 + Math.random() * 0.5;
+    this.opacity = 0.5 + Math.random() * 0.5;
     this.driftChange = (Math.random() - 0.5) * 0.002;
   }
 

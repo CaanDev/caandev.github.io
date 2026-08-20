@@ -42,6 +42,7 @@ export {
   restoreTrapsData,
   restoreArtifactsData,
   restoreChestsData,
+  restoreMimicsData,
   restoreShrinesData,
   restoreLootData
 } from './objectRestorer.js';

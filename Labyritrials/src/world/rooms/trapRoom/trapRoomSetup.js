@@ -5,8 +5,9 @@
  * @module world/rooms/trapRoom/trapRoomSetup
  */
 
-import { CONFIG, state } from '../../../core/config/index.js';
+import { CONFIG, state, player } from '../../../core/config/index.js';
 import { COLORS } from '../../../core/config/colors.js';
+import { INVENTORY_IMAGES } from '../../../images/inventoryImages.js';
 import { logger } from '../../../utils/logger.js';
 import { addProtectedCell } from '../../maze.js';
 import { setTorchesColor, showTrapExitNotification } from './trapRoomUtils.js';
@@ -240,4 +241,40 @@ export function showRealExitPortal() {
   } else {
     logger.warn('⚠️ Не найдено место для портала выхода!');
   }
+
+  // Появление сундука с талисманом
+  spawnMimicHunterChest();
+}
+
+/**
+ * Создание сундука с талисманом охотника на мимиков в центре комнаты-ловушки
+ * 
+ * @returns {void}
+ */
+export function spawnMimicHunterChest() {
+  // Проверяем, есть ли уже талисман у игрока
+  if (player.inventory?.items?.equipment?.includes('talismanMimicHunter')) return;
+  // Проверяем, не появлялся ли уже сундук
+  if (state.mimicHunterChestSpawned) return;
+  // Шанс 33.3%
+  if (Math.random() > 0.333) return;
+  
+  const centerX = Math.floor(CONFIG.cols / 2);
+  const centerY = Math.floor(CONFIG.rows / 2);
+  
+  // Проверяем, что центр не занят
+  if (state.grid[centerY]?.[centerX]?.isWall) return;
+  
+  // Создаём сундук в центре
+  state.chests.push({
+    x: centerX * CONFIG.cellSize + CONFIG.cellSize / 2,
+    y: centerY * CONFIG.cellSize + CONFIG.cellSize / 2,
+    type: 'mimic_hunter_chest',
+    opened: false,
+    countedForAchievement: false,
+    spawnX: centerX,
+    spawnY: centerY,
+  });
+  
+  state.mimicHunterChestSpawned = true;
 }

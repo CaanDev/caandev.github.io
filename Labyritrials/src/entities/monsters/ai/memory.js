@@ -18,8 +18,23 @@ import {
 } from './searchStates.js';
 import { transitionToPatrol } from './stuckHandler.js';
 
+/** @type {number} - Длительность памяти о позиции игрока (кадры) ~10 секунд при 60 FPS */
+const MEMORY_DURATION = 600;
+
+/** @type {number} - Длительность усиленной видимости после потери игрока (кадры) ~5 секунд */
+const VISION_BOOST_DURATION = 300;
+
+/** @type {number} - Множитель усиления видимости */
+const VISION_BOOST_MULTIPLIER = 1.8;
+
+// ============================================================
+// УСИЛЕННАЯ ВИДИМОСТЬ
+// ============================================================
+
 /**
  * Активация усиленной видимости монстра
+ * @param {Object} m - Объект монстра
+ * @returns {void}
  */
 function activateVisionBoost(m) {
   if (!m.visionBoosted) {
@@ -33,6 +48,8 @@ function activateVisionBoost(m) {
 
 /**
  * Деактивация усиленной видимости монстра
+ * @param {Object} m - Объект монстра
+ * @returns {void}
  */
 function deactivateVisionBoost(m) {
   if (m.visionBoosted) {
@@ -41,6 +58,10 @@ function deactivateVisionBoost(m) {
     m.visionBoostTimer = 0;
   }
 }
+
+// ============================================================
+// ОСНОВНАЯ ФУНКЦИЯ ПАМЯТИ
+// ============================================================
 
 /**
  * Обновление памяти монстра о последней позиции игрока
@@ -55,14 +76,23 @@ export function updateMonsterMemory(m, distToPlayer, hasLineOfSight) {
     return { isSearching: false };
   }
 
-  // ===== ИНИЦИАЛИЗАЦИЯ _lastX/_lastY =====
-  if (m._lastX === undefined || m._lastY === undefined) {
-    m._lastX = m.x;
-    m._lastY = m.y;
-  }
-  
   // ===== ИНИЦИАЛИЗАЦИЯ =====
   initMovementState(m);
+
+  // ===== УВЕЛИЧИВАЕМ ДЛИТЕЛЬНОСТЬ ПАМЯТИ =====
+  // Если у монстра ещё не установлена длительность памяти — устанавливаем
+  if (m.memoryDuration === undefined || m.memoryDuration < MEMORY_DURATION) {
+    m.memoryDuration = MEMORY_DURATION;
+  }
+  
+  // Устанавливаем длительность усиленной видимости
+  if (m.visionBoostDuration === undefined || m.visionBoostDuration < VISION_BOOST_DURATION) {
+    m.visionBoostDuration = VISION_BOOST_DURATION;
+  }
+  
+  if (m.visionBoostMultiplier === undefined) {
+    m.visionBoostMultiplier = VISION_BOOST_MULTIPLIER;
+  }
 
   // ===== ЕСЛИ ЕСТЬ ВИДИМОСТЬ — ОБНОВЛЯЕМ ПАМЯТЬ =====
   if (hasLineOfSight && distToPlayer < m.vision) {
@@ -121,7 +151,7 @@ export function updateMonsterMemory(m, distToPlayer, hasLineOfSight) {
     // ===== ПРИОРИТЕТ 2: ПОСЛЕДНЯЯ ПОЗИЦИЯ =====
     if (!targetPos) {
       const accuracy = Math.max(0.15, m.memoryTimer / m.memoryDuration);
-      const randomOffset = (1 - accuracy) * 70 + 10;
+      const randomOffset = (1 - accuracy) * 80 + 10;
       
       targetPos = {
         x: m.lastKnownX + (Math.random() - 0.5) * randomOffset,
@@ -131,8 +161,9 @@ export function updateMonsterMemory(m, distToPlayer, hasLineOfSight) {
     
     const distToMemory = Math.hypot(m.x - m.lastKnownX, m.y - m.lastKnownY);
     
-    // ===== ЕСЛИ МОНСТР СЛИШКОМ ДОЛГО СТОИТ НА МЕСТЕ И ДАЛЕКО ОТ ЦЕЛИ =====
-    if (m.isSearching && m.searchTimer > 200 && 
+    // ===== УВЕЛИЧИВАЕМ ВРЕМЯ ПОИСКА =====
+    // Выход в патруль только после очень долгого поиска
+    if (m.isSearching && m.searchTimer > 600 && 
         m.x === m._lastX && m.y === m._lastY && 
         distToMemory > 100) {
       return transitionToPatrol(m, 'долгого стояния на месте');
@@ -157,12 +188,12 @@ export function updateMonsterMemory(m, distToPlayer, hasLineOfSight) {
       // ===== АКТИВНЫЙ ПОИСК =====
 
       // Выход в патруль при слишком долгом поиске
-      if (m.searchTimer > 350) {
+      if (m.searchTimer > 500) {
         return transitionToPatrol(m, 'долгого поиска');
       }
 
       // ===== РАСШИРЕННЫЙ ПОИСК =====
-      if (m.searchTimer > 200) {
+      if (m.searchTimer > 300) {
         return handleExpandedSearch(m, searchProgress, distToMemory);
       }
 

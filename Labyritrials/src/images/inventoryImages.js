@@ -17,6 +17,7 @@ export const INVENTORY_IMAGES = {
   
   // === СНАРЯЖЕНИЕ (equipment/) ===
   talismanFire: 'assets/images/inventory/equipment/talismanFire.png',
+  talismanMimicHunter: 'assets/images/inventory/equipment/talismanMimicHunter.png',
 
   // === ПРЕДМЕТЫ (items/) ===
   mapLevel: 'assets/images/inventory/items/mapLevel.png',

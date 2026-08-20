@@ -11,6 +11,7 @@ import { COLORS } from '../../core/config/colors.js';
 import { hasFireImmunity } from '../monsters/adaptations/index.js';
 import { updateAttackCounter } from '../monsters/adaptations/index.js';
 import { handleMonsterDeath } from '../monsters/death.js';
+import { dealDamageToMimicsFireball } from '../player/mimicCombat.js';
 import { triggerGameOver } from '../../entities/player/gameOver.js';
 import { updateProgress } from '../../systems/achievements/index.js';
 
@@ -28,7 +29,7 @@ export function updateFireballs() {
   for (let i = state.fireballs.length - 1; i >= 0; i--) {
     let fb = state.fireballs[i];
 
-    // ===== КОЛЬЦЕВЫЕ СНАРЯДЫ (босс-стрелок) =====
+    // Кольцевые снаряды (босс-стрелок)
     if (fb.isRingProjectile && fb.ringActive) {
       fb.ringOrbitAngle = (fb.ringOrbitAngle || 0) + (fb.ringOrbitSpeed || 0.15);
 
@@ -78,9 +79,7 @@ export function updateFireballs() {
           });
         }
 
-        if (player.hp <= 0) {
-          triggerGameOver();
-        }
+        if (player.hp <= 0) triggerGameOver();
 
         state.fireballs.splice(i, 1);
         continue;
@@ -112,7 +111,7 @@ export function updateFireballs() {
       continue;
     }
 
-    // ===== ОБЫЧНЫЕ СНАРЯДЫ =====
+    // Обычные снаряды
     fb.x += fb.dirX * fb.speed;
     fb.y += fb.dirY * fb.speed;
     fb.life--;
@@ -208,7 +207,7 @@ function createPillarImpact(x, y) {
 function checkFireballCollision(fb, fireballIndex) {
   let hit = false;
 
-  // ===== ПОПАДАНИЕ В ИГРОКА (снаряды боссов) =====
+  // Попадание в игрока (снаряды боссов)
   if ((fb.isDuoShooterBall || fb.isMindBall) && !fb.ignorePlayer && !fb.hasHitPlayer) {
     const distToPlayer = Math.hypot(player.px - fb.x, player.py - fb.y);
     if (distToPlayer < 30) {
@@ -255,15 +254,13 @@ function checkFireballCollision(fb, fireballIndex) {
         }
       }
 
-      if (player.hp <= 0) {
-        triggerGameOver();
-      }
+      if (player.hp <= 0) triggerGameOver();
 
       return true;
     }
   }
 
-  // ===== ПОПАДАНИЕ В МОНСТРОВ =====
+  // Попадание в монстров
   for (let j = state.monsters.length - 1; j >= 0; j--) {
     let m = state.monsters[j];
 
@@ -278,9 +275,7 @@ function checkFireballCollision(fb, fireballIndex) {
 
       // Обновление счётчика адаптаций (огненные шары игрока)
       if (fb.isFromPlayer && !fb.isMindBall) {
-        if (!hasFireImmunity()) {
-          updateAttackCounter('fireball', 1);
-        }
+        if (!hasFireImmunity()) updateAttackCounter('fireball', 1);
       }
 
       // Дружественный огонь (снаряды стрелка бьют преследователя)
@@ -302,9 +297,7 @@ function checkFireballCollision(fb, fireballIndex) {
 
         if (m.hp <= 0) {
           const currentIndex = state.monsters.findIndex(monster => monster === m);
-          if (currentIndex !== -1) {
-            handleMonsterDeath(m, currentIndex, state.monsters);
-          }
+          if (currentIndex !== -1) handleMonsterDeath(m, currentIndex, state.monsters);
         }
         continue;
       }
@@ -343,15 +336,17 @@ function checkFireballCollision(fb, fireballIndex) {
 
       // Смерть монстра
       if (m.hp <= 0) {
-        if (fb.isFromPlayer) {
-          updateProgress('fireball_kills', 1);
-        }
+        if (fb.isFromPlayer) updateProgress('fireball_kills', 1);
         const currentIndex = state.monsters.findIndex(monster => monster === m);
-        if (currentIndex !== -1) {
-          handleMonsterDeath(m, currentIndex, state.monsters);
-        }
+        if (currentIndex !== -1) handleMonsterDeath(m, currentIndex, state.monsters);
       }
     }
+  }
+
+  // Урон по мимикам от огненного шара (только от игрока)
+  if (fb.isFromPlayer) {
+    const attackRadius = fb.radius * 3;
+    dealDamageToMimicsFireball(fb.x, fb.y, attackRadius);
   }
 
   return hit;
@@ -369,8 +364,6 @@ function updateBeams() {
   for (let i = state.beams.length - 1; i >= 0; i--) {
     const beam = state.beams[i];
     beam.life--;
-    if (beam.life <= 0) {
-      state.beams.splice(i, 1);
-    }
+    if (beam.life <= 0) state.beams.splice(i, 1);
   }
 }

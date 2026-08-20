@@ -508,6 +508,11 @@ function doInitShopHandlers() {
   if (shopUI) {
     const observer = new MutationObserver(() => {
       if (shopUI.style.display === 'flex' || shopUI.style.display === 'block') {
+        // Принудительная остановка сердцебиения
+        import('../../../audio/audioManager.js').then(({ audio }) => {
+          audio.sound.stopLowHPSound();
+        });
+
         // Обновляем видимость талисмана
         updateTalismanVisibilityInShop();
         

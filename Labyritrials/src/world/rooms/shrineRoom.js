@@ -118,6 +118,8 @@ export function generateShrineRoom() {
   state.originalShopPos = { ...CONFIG.shopPos };
   state.originalMonsters = [...state.monsters];
   state.originalHadMonsters = state.hadMonsters;
+  state.originalMimics = state.mimics.map(m => ({ ...m }));
+  state.mimics = [];
   state.originalTraps = [...state.traps];
   state.originalBonusGiven = state.bonusGiven;
   
@@ -381,6 +383,12 @@ export function returnFromShrineRoom() {
 
   state.roomLabel = null;
   state.roomLabelColor = null;
+
+  // Восстанавливаем мимиков
+  if (state.originalMimics) {
+    state.mimics = state.originalMimics.map(m => ({ ...m }));
+    state.originalMimics = [];
+  }
 
   // ===== ВОССТАНОВЛЕНИЕ ПОРТАЛА В БЕЗОПАСНУЮ КОМНАТУ =====
   if (state.originalSafePortal) {

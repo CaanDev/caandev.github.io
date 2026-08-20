@@ -16,6 +16,7 @@ import { updateAttackCounter, hasStunImmunity, getHealingMultiplier } from '../m
 import { addSoundEvent } from '../monsters/ai/hearing.js';
 import { createBloodPuddle } from '../objects/utils/bloodSystem.js';
 import { handleMonsterDeath } from '../monsters/death.js';
+import { dealDamageToMimicsMelee } from './mimicCombat.js';
 import { updateProgress } from '../../systems/achievements/index.js';
 import { triggerGameOver } from './gameOver.js';
 
@@ -32,10 +33,83 @@ const STAMINA_COST = {
   fireball: 25,
 };
 
+/**
+ * @namespace WEAPON_MAX_TARGETS
+ * @description Максимальное количество целей для каждого оружия
+ */
+const WEAPON_MAX_TARGETS = {
+  /** @type {number} - Обычный посох */
+  default: 2,
+  /** @type {number} - Громовой посох */
+  stun: 4,
+  /** @type {number} - Посох вампира */
+  vampire: 3,
+  /** @type {number} - Огненный шар (без ограничений) */
+  fireball: Infinity,
+};
+
 /** @type {number} - Время последней атаки для кулдауна */
 let lastAttackTime = 0;
 /** @type {number} - Кулдаун атаки в миллисекундах */
 const ATTACK_COOLDOWN = 500;
+
+/**
+ * Проверка, перекрывает ли один монстр другого
+ * 
+ * @param {Object} target - Целевой монстр (дальний)
+ * @param {Object} blocker - Монстр-блокер (ближний)
+ * @returns {boolean} - true, если blocker перекрывает target
+ * @private
+ */
+function isBlockedByMonster(target, blocker) {
+  // Не проверяем самого себя
+  if (target === blocker) return false;
+  if (blocker.hp <= 0) return false;
+  
+  // Вектор от игрока к цели
+  const dxTarget = target.x - player.px;
+  const dyTarget = target.y - player.py;
+  const distToTarget = Math.hypot(dxTarget, dyTarget);
+  
+  // Вектор от игрока к блокеру
+  const dxBlocker = blocker.x - player.px;
+  const dyBlocker = blocker.y - player.py;
+  const distToBlocker = Math.hypot(dxBlocker, dyBlocker);
+  
+  // Блокер должен быть ближе к игроку, чем цель
+  if (distToBlocker > distToTarget) return false;
+  
+  // Проверка: блокер на линии к цели
+  // Нормализованное направление к цели
+  if (distToTarget < 5) return false;
+  const nx = dxTarget / distToTarget;
+  const ny = dyTarget / distToTarget;
+  
+  // Проекция блокера на направление к цели
+  const projection = dxBlocker * nx + dyBlocker * ny;
+  
+  // Блокер должен быть между игроком и целью (проекция > 0 и < distToTarget)
+  if (projection < 0 || projection > distToTarget) return false;
+  
+  // Проверка: блокер достаточно близко к линии
+  // Перпендикулярное расстояние от блокера до линии
+  const perpX = -ny;
+  const perpY = nx;
+  const perpDist = Math.abs(dxBlocker * perpX + dyBlocker * perpY);
+  
+  // Радиус блокера + небольшой запас на положение монстров
+  const blockerRadius = blocker.radius || 24;
+  const targetRadius = target.radius || 24;
+  
+  // Используем средний радиус обоих монстров
+  const avgRadius = (blockerRadius + targetRadius) / 2;
+  const threshold = avgRadius + 10;
+  
+  // Если блокер почти на линии, считаем что перекрывает
+  if (perpDist > threshold) return false;
+  
+  return true;
+}
 
 /**
  * Выполнение атаки игрока
@@ -57,13 +131,11 @@ export function executeAttack(isStrong) {
     return;
   }
 
-  // ===== ПРОВЕРКА КУЛДАУНА =====
+  // Проверка кулдауна
   const now = Date.now();
-  if (now - lastAttackTime < ATTACK_COOLDOWN) {
-    return;
-  }
+  if (now - lastAttackTime < ATTACK_COOLDOWN) return;
 
-  // ===== ПРОВЕРКА ВЫНОСЛИВОСТИ =====
+  // Проверка выносливости
   const staminaCost = isStrong ? STAMINA_COST.strongAttack : STAMINA_COST.attack;
 
   if (player.stamina < staminaCost) {
@@ -92,9 +164,7 @@ export function executeAttack(isStrong) {
     dirY = player.lastMoveDirY || 1;
   }
   
-  if (dirX === 0 && dirY === 0) {
-    dirY = 1;
-  }
+  if (dirX === 0 && dirY === 0) dirY = 1;
   
   const attackDirX = dirX;
   const attackDirY = dirY;
@@ -138,8 +208,7 @@ function breakWall(targetX, targetY, isStrong) {
     cell.revealed = true;
     state.screenShake = 15;
 
-    audio.playSound('wallDestroy', 0.6);
-    // Звуковое событие для монстров
+    audio.playSound('interactions.wallDestroy');
     addSoundEvent(targetX * CONFIG.cellSize + CONFIG.cellSize / 2, targetY * CONFIG.cellSize + CONFIG.cellSize / 2, 'wallDestroy');
     
     if (cell.hasTreasurePortal && state.treasurePortal && !state.treasurePortal.active) activateTreasurePortal(targetX, targetY);
@@ -259,7 +328,32 @@ function activateTrapPortal(wallX, wallY) {
 }
 
 /**
- * Нанесение урона монстрам в области атаки
+ * Проверка наличия колонны между двумя точками
+ * 
+ * @param {number} x1 - X начальной точки
+ * @param {number} y1 - Y начальной точки
+ * @param {number} x2 - X конечной точки
+ * @param {number} y2 - Y конечной точки
+ * @returns {boolean} - true, если между точками есть колонна
+ * @private
+ */
+function hasPillarBetween(x1, y1, x2, y2) {
+  const steps = Math.ceil(Math.hypot(x2 - x1, y2 - y1) / 30);
+  for (let i = 1; i < steps; i++) {
+    const t = i / steps;
+    const cx = Math.floor((x1 + (x2 - x1) * t) / CONFIG.cellSize);
+    const cy = Math.floor((y1 + (y2 - y1) * t) / CONFIG.cellSize);
+    if (cy >= 0 && cy < CONFIG.rows && cx >= 0 && cx < CONFIG.cols) {
+      if (state.grid[cy] && state.grid[cy][cx] && state.grid[cy][cx].isPillar) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Нанесение урона монстрам с учётом типа оружия и передней линии
  * 
  * @param {number} attackX - Координата X атаки в пикселях
  * @param {number} attackY - Координата Y атаки в пикселях
@@ -271,98 +365,131 @@ function activateTrapPortal(wallX, wallY) {
  * @private
  */
 function dealDamageToMonsters(attackX, attackY, damage, isStrong, dirX, dirY) {
-  /**
-   * Проверка наличия колонны между двумя точками
-   * 
-   * @param {number} x1 - X начальной точки
-   * @param {number} y1 - Y начальной точки
-   * @param {number} x2 - X конечной точки
-   * @param {number} y2 - Y конечной точки
-   * @returns {boolean} - true, если между точками есть колонна
-   */
-  const hasPillarBetween = (x1, y1, x2, y2) => {
-    const steps = Math.ceil(Math.hypot(x2 - x1, y2 - y1) / 30);
-    for (let i = 1; i < steps; i++) {
-      const t = i / steps;
-      const cx = Math.floor((x1 + (x2 - x1) * t) / CONFIG.cellSize);
-      const cy = Math.floor((y1 + (y2 - y1) * t) / CONFIG.cellSize);
-      if (cy >= 0 && cy < CONFIG.rows && cx >= 0 && cx < CONFIG.cols) {
-        if (state.grid[cy] && state.grid[cy][cx] && state.grid[cy][cx].isPillar) {
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-
   // Обновляем счётчик попаданий для оружия
-  if (player.meleeWeapon === 'default') {
+  const weaponType = player.meleeWeapon || 'default';
+  if (weaponType === 'default') {
     state.gameStats.weaponHits.default++;
-  } else if (player.meleeWeapon === 'stun') {
+  } else if (weaponType === 'stun') {
     state.gameStats.weaponHits.stun++;
-  } else if (player.meleeWeapon === 'vampire') {
+  } else if (weaponType === 'vampire') {
     state.gameStats.weaponHits.vampire++;
   }
 
-  // ===== УРОН ПО МОНСТРАМ =====
+  // Определяем максимальное количество целей
+  const maxTargets = WEAPON_MAX_TARGETS[weaponType] || 2;
+
+  // Ближнее оружие: собираем монстров в радиусе
+  const monstersInRange = [];
+  const attackRadius = CONFIG.cellSize * 0.85;
+  const mimicHit = dealDamageToMimicsMelee(attackX, attackY, attackRadius);
+  
   for (let i = state.monsters.length - 1; i >= 0; i--) {
     const m = state.monsters[i];
     
-    if (Math.hypot(m.x - attackX, m.y - attackY) < CONFIG.cellSize * 0.85) {
-      if (hasLineOfSight(player.px, player.py, m.x, m.y) && !hasPillarBetween(player.px, player.py, m.x, m.y)) {
-        // ===== ЗАПОМИНАЕМ ВРЕМЯ АТАКИ (для определения статуса "в бою") =====
-        player.lastAttackTime = Date.now();
-
-        const finalDamage = getEventDamageMultiplier(damage);
-        m.hp -= finalDamage;
-        m.state = 'chase';
-
-        // Прерывание подготовки луча у босса
-        if (m.isPreparingBeam && m.abilities && m.abilities.tremor) {
-          m.abilities.tremor.interruptBeam(m);
-        }
-
-        // Эффекты вампиризма
-        if (player.meleeWeapon === 'vampire') {
-          spawnBloodDrops(m.x, m.y, isStrong);
-        }
-            
-        applyWeaponEffects(m, damage, isStrong);
-        
-        // Отображение урона
-        state.damageTexts.push({ 
-          x: m.x, y: m.y - 15, 
-          text: `-${finalDamage}`, 
-          color: isStrong ? COLORS.ui.textGold : COLORS.ui.textRed,
-          size: isStrong ? 28 : 20, 
-          life: 40, 
-          speedy: 1.5 
-        });
-
-        // Эффекты громового посоха
-        if (player.meleeWeapon === 'stun') {
-          spawnLightningSparks(m.x, m.y, isStrong);
-        }
-        
-        // Смерть монстра
-        if (m.hp <= 0) { 
-          handleMonsterDeath(m, i, state.monsters); 
-        }
-      } else {
-        // Блок (колонна или стена)
-        state.damageTexts.push({
-          x: attackX, y: attackY - 20,
-          text: '🏛️ БЛОК!',
-          color: COLORS.ui.textDark,
-          size: 14,
-          life: 25,
-          speedy: 0.8
-        });
-      }
-    }
+    const distToAttack = Math.hypot(m.x - attackX, m.y - attackY);
+    if (distToAttack > attackRadius) continue;
+    
+    // Проверка видимости (стены и колонны)
+    if (!hasLineOfSight(player.px, player.py, m.x, m.y)) continue;
+    if (hasPillarBetween(player.px, player.py, m.x, m.y)) continue;
+    
+    monstersInRange.push({
+      monster: m,
+      index: i,
+      distToPlayer: Math.hypot(m.x - player.px, m.y - player.py)
+    });
   }
 
-  // ===== ОТРАЖЕНИЕ СНАРЯДОВ БОССА =====
+  // Сортируем по расстоянию от игрока
+  monstersInRange.sort((a, b) => a.distToPlayer - b.distToPlayer);
+
+  // Наносим урон только передней линии
+  const damagedMonsters = [];
+  let targetsHit = 0;
+  
+  for (const item of monstersInRange) {
+    const m = item.monster;
+    const i = item.index;
+    
+    // Если достигли лимита целей — останавливаемся
+    if (targetsHit >= maxTargets) break;
+    
+    // Проверяем, не перекрыт ли этот монстр другим (уже обработанным) монстром
+    let isBlocked = false;
+    
+    for (const damaged of damagedMonsters) {
+      if (isBlockedByMonster(m, damaged)) {
+        isBlocked = true;
+        break;
+      }
+    }
+    
+    // Если перекрыт — пропускаем
+    if (isBlocked) continue;
+    
+    // Наносим урон
+    applyDamageToMonster(m, i, damage, isStrong);
+    damagedMonsters.push(m);
+    targetsHit++;
+  }
+
+  // Отражение снарядов босса
+  reflectBossProjectiles(attackX, attackY);
+}
+
+/**
+ * Применение урона к одному монстру
+ * 
+ * @param {Object} m - Объект монстра
+ * @param {number} index - Индекс монстра в массиве
+ * @param {number} damage - Базовый урон
+ * @param {boolean} isStrong - Является ли атака усиленной
+ * @returns {void}
+ * @private
+ */
+function applyDamageToMonster(m, index, damage, isStrong) {
+  // Запоминаем время атаки (для определения статуса "в бою")
+  player.lastAttackTime = Date.now();
+
+  const finalDamage = getEventDamageMultiplier(damage);
+  m.hp -= finalDamage;
+  m.state = 'chase';
+
+  // Прерывание подготовки луча у босса
+  if (m.isPreparingBeam && m.abilities && m.abilities.tremor) m.abilities.tremor.interruptBeam(m);
+  // Эффекты вампиризма
+  if (player.meleeWeapon === 'vampire') spawnBloodDrops(m.x, m.y, isStrong);
+      
+  applyWeaponEffects(m, damage, isStrong);
+  
+  // Отображение урона
+  const damageColor = isStrong ? COLORS.ui.textGold : COLORS.ui.textRed;
+  const damageSize = isStrong ? 28 : 20;
+  
+  state.damageTexts.push({ 
+    x: m.x, y: m.y - 15, 
+    text: `-${finalDamage}`, 
+    color: damageColor,
+    size: damageSize, 
+    life: 40, 
+    speedy: 1.5 
+  });
+
+  // Эффекты громового посоха
+  if (player.meleeWeapon === 'stun') spawnLightningSparks(m.x, m.y, isStrong);
+  // Смерть монстра
+  if (m.hp <= 0) handleMonsterDeath(m, index, state.monsters); 
+}
+
+/**
+ * Отражение снарядов босса
+ * 
+ * @param {number} attackX - Координата X атаки
+ * @param {number} attackY - Координата Y атаки
+ * @returns {void}
+ * @private
+ */
+function reflectBossProjectiles(attackX, attackY) {
   for (let i = state.fireballs.length - 1; i >= 0; i--) {
     const fb = state.fireballs[i];
     
@@ -396,7 +523,7 @@ function dealDamageToMonsters(attackX, attackY, damage, isStrong, dirX, dirY) {
  * @private
  */
 function applyWeaponEffects(m, damage, isStrong) {
-  // ===== ГРОМОВОЙ ПОСОХ (оглушение) =====
+  // Громовой посох (оглушение)
   if (player.meleeWeapon === 'stun') {
     if (!hasStunImmunity() && !m.isBoss && !m.isDuoBoss) {
       const stunDuration = isStrong ? 180 : 120;
@@ -441,7 +568,7 @@ function applyWeaponEffects(m, damage, isStrong) {
     }
   }
   
-  // ===== ПОСОХ ВАМПИРА (лечение) =====
+  // Посох вампира (лечение)
   if (player.meleeWeapon === 'vampire') {
     let healPercent;
     
@@ -456,7 +583,6 @@ function applyWeaponEffects(m, damage, isStrong) {
     let healAmount = Math.floor((player.maxHp * healPercent) / 100);
     if (healAmount < 1 && healPercent > 0) healAmount = 1;
     
-    // Защита от NaN
     if (isNaN(healAmount) || healAmount < 0) healAmount = 0;
     if (isNaN(player.hp)) player.hp = player.maxHp || 100;
     
@@ -464,11 +590,9 @@ function applyWeaponEffects(m, damage, isStrong) {
     player.hp = Math.min(player.maxHp, player.hp + healAmount);
     const actualHeal = player.hp - oldHp;
     
-    // Обновляем прогресс достижения "Повелитель вампиров"
     if (actualHeal > 0) {
       updateProgress('vampire_heal', actualHeal);
       
-      // Визуальный эффект лечения
       state.damageTexts.push({
         x: player.px,
         y: player.py - 40,
@@ -480,7 +604,6 @@ function applyWeaponEffects(m, damage, isStrong) {
       });
     }
     
-    // Обновляем счётчик адаптаций (для системы адаптации монстров)
     const points = isStrong ? 3 : 1;
     updateAttackCounter('vampirism', points);
     if (isStrong) updateAttackCounter('magic', points);
@@ -489,7 +612,6 @@ function applyWeaponEffects(m, damage, isStrong) {
 
 /**
  * Обработка получения урона игроком от монстров
- * Используется для сброса флага "Железный человек"
  * 
  * @param {number} damage - Полученный урон
  * @returns {void}
@@ -497,7 +619,6 @@ function applyWeaponEffects(m, damage, isStrong) {
 export function playerTakeDamageFromMonster(damage) {
   if (player.hp <= 0) return;
   
-  // Сбрасываем флаг "железный человек"
   state.ironManActive = false;
   
   let actualDamage = damage;
@@ -516,7 +637,5 @@ export function playerTakeDamageFromMonster(damage) {
     speedy: 1.2
   });
   
-  if (player.hp <= 0) {
-    triggerGameOver();
-  }
+  if (player.hp <= 0) triggerGameOver();
 }

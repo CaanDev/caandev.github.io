@@ -17,6 +17,8 @@ import {
   hasFeature
 } from './floorConfig.js';
 import { drawSolidFloor, drawCheckeredFloor } from './patterns.js';
+import { getFloorImageForCell, getBiomeForFloor } from '../../../../images/floorImages.js';
+import { getImage, isImageLoaded } from '../../../../utils/imageLoader.js';
 import { 
   drawMagicCircle, 
   drawCornerRunes, 
@@ -47,30 +49,33 @@ export function drawFloor(ctx, visibleRange) {
   const features = getFloorFeatures(floorType);
 
   // ===== ОПРЕДЕЛЯЕМ ЦВЕТ ПОЛА В ЗАВИСИМОСТИ ОТ БИОМА =====
-  // Для тайных комнат и безопасной комнаты используем цвета из FLOOR_TYPES
   const isSecretRoom = state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom || state.inSafeRoom;
   
   let floorColor;
   if (isSecretRoom) {
-    // В тайных комнатах используем цвета из FLOOR_TYPES
     floorColor = colors[0] || '#0b0d13';
   } else {
-    // В обычном лабиринте используем цвет из биома
     const biomeColor = getFloorColorForBiome(state.currentBiome);
     floorColor = biomeColor || colors[0] || '#0b0d13';
   }
+
+  // ===== ОПРЕДЕЛЯЕМ БИОМ И SEED =====
+  const biome = getBiomeForFloor(state);
+  const seed = state.seed || 0;
+
+  const isBossLevel = state.isBossLevel || false;
 
   // ===== РИСУЕМ ПОЛ =====
   if (isCheckeredFloor) {
     drawCheckeredFloor(ctx, minX, maxX, minY, maxY, state.grid, player, colors);
   } else {
-    drawSolidFloor(ctx, minX, maxX, minY, maxY, state.grid, player, floorColor);
+    drawSolidFloor(ctx, minX, maxX, minY, maxY, state.grid, player, floorColor, biome, seed, isBossLevel);
   }
   
   // ===== РИСУЕМ ОСОБЕННОСТИ =====
   drawFloorFeatures(ctx, features);
 
-  // ===== РУНЫ В КОМНАТЕ С АЛТАРЁМ =====
+  // ===== РУНЫ =====
   if (state.inShrineRoom) {
     drawRunes(ctx, visibleRange);
   }
@@ -126,7 +131,6 @@ function drawShrineGlowForRoom(ctx) {
  * @private
  */
 function drawTrapGlowForRoom(ctx) {
-  // Используем центр комнаты или позицию портала
   if (state.trapPortal) {
     const x = state.trapPortal.x * CONFIG.cellSize + CONFIG.cellSize / 2;
     const y = state.trapPortal.y * CONFIG.cellSize + CONFIG.cellSize / 2;

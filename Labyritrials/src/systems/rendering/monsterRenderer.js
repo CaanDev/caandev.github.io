@@ -21,6 +21,15 @@ import { isVisibleWithRadius } from './visibilityUtils.js';
  * @param {HTMLCanvasElement} canvas - Элемент холста
  * @returns {void}
  */
+/**
+ * Отрисовка всех монстров
+ * 
+ * @param {CanvasRenderingContext2D} ctx - Контекст рисования
+ * @param {number} camX - Смещение камеры по X
+ * @param {number} camY - Смещение камеры по Y
+ * @param {HTMLCanvasElement} canvas - Элемент холста
+ * @returns {void}
+ */
 export function drawMonsters(ctx, camX, camY, canvas) {
   if (!state.monsters || state.monsters.length === 0) return;
   
@@ -130,12 +139,24 @@ export function drawMonsters(ctx, camX, camY, canvas) {
       drawBeamIndicator(ctx, m);
     }
     
-    // Полоска здоровья для обычных монстров
+    // ===== ПОЛОСКА ЗДОРОВЬЯ ДЛЯ ОБЫЧНЫХ МОНСТРОВ =====
+    // Используем baseRadius для консистентной ширины полоски
+    const drawRadius = m.baseRadius || m.radius;
+    
     if (!isInDark && visibility > 0.3 && !m.isBoss && !m.isDuoBoss) {
+      const barWidth = drawRadius * 2;
+      const barHeight = 6;
+      const barX = m.x - drawRadius;
+      const barY = m.y - drawRadius - 12;
+      const hpPercent = Math.max(0, Math.min(1, m.hp / m.maxHp));
+      
+      // Фон полоски
       ctx.fillStyle = COLORS.monsters.healthBar.bg;
-      ctx.fillRect(m.x - m.radius, m.y - m.radius - 12, m.radius * 2, 6);
+      ctx.fillRect(barX, barY, barWidth, barHeight);
+      
+      // Заполнение
       ctx.fillStyle = COLORS.monsters.healthBar.fill;
-      ctx.fillRect(m.x - m.radius, m.y - m.radius - 12, (m.radius * 2) * (m.hp / m.maxHp), 6);
+      ctx.fillRect(barX, barY, barWidth * hpPercent, barHeight);
     }
   }
 }

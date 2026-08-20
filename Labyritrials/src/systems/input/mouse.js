@@ -94,12 +94,23 @@ export function updateMousePosition(e) {
   const dy = mouseWorldY - player.py;
   const length = Math.hypot(dx, dy);
   
-  if (length > 10) {
+  // Всегда обновляем направление, даже если длина < 10
+  if (length > 5) {
     player.targetX = mouseWorldX;
     player.targetY = mouseWorldY;
     player.dirX = dx / length;
     player.dirY = dy / length;
+  } else {
+    // Если курсор слишком близко к игроку — используем последнее направление
+    if (player.lastMoveDirX !== 0 || player.lastMoveDirY !== 0) {
+      player.dirX = player.lastMoveDirX;
+      player.dirY = player.lastMoveDirY;
+    }
   }
+  
+  // Всегда обновляем последнее направление при движении мыши
+  player.lastMoveDirX = player.dirX;
+  player.lastMoveDirY = player.dirY;
 }
 
 /**
@@ -125,6 +136,37 @@ export function handleMouseDown(e) {
     state.keys['mouse0'] = true;
     player.isCharging = true;
     player.chargeTime = 0;
+    
+    // Обновляем направление при клике
+    const canvas = document.getElementById('gameCanvas');
+    const rect = canvas.getBoundingClientRect();
+    const mouseScreenX = e.clientX - rect.left;
+    const mouseScreenY = e.clientY - rect.top;
+    const camX = canvas.width / 2 - player.px;
+    const camY = canvas.height / 2 - player.py;
+    const mouseWorldX = mouseScreenX - camX;
+    const mouseWorldY = mouseScreenY - camY;
+    
+    const dx = mouseWorldX - player.px;
+    const dy = mouseWorldY - player.py;
+    const length = Math.hypot(dx, dy);
+    
+    if (length > 10) {
+      player.dirX = dx / length;
+      player.dirY = dy / length;
+      // ВСЕГДА обновляем lastMoveDir при клике
+      player.lastMoveDirX = player.dirX;
+      player.lastMoveDirY = player.dirY;
+    } else {
+      // Если клик прямо на игрока — используем последнее направление
+      if (player.lastMoveDirX !== 0 || player.lastMoveDirY !== 0) {
+        // lastMoveDir уже есть, ничего не делаем
+      } else {
+        // Если нет последнего направления — юг
+        player.lastMoveDirX = 0;
+        player.lastMoveDirY = 1;
+      }
+    }
   }
 }
 
@@ -150,11 +192,28 @@ export function handleMouseUp(e) {
   if (e.button === 0 && player.isCharging) {
     state.keys['mouse0'] = false;
     player.isCharging = false;
+
+    // Проверка выносливости
+    const isStrong = player.chargeTime > 30;
+    const staminaCost = isStrong ? 35 : 20;
+
+    if (player.stamina < staminaCost) {
+      // Недостаточно выносливости — не запускаем анимацию атаки
+      state.damageTexts.push({
+        x: player.px,
+        y: player.py - 60,
+        text: '⚡ Недостаточно выносливости!',
+        color: '#ffcc00',
+        size: 20,
+        life: 40,
+        speedy: 0.5
+      });
+      return;
+    }
+
+    // Запускаем атаку
     player.isAttacking = true;
-    player.attackTimer = 10;
-    
-    // Определяем, была ли атака заряжена (более 30 кадров)
-    let isStrong = player.chargeTime > 30;
+    player.attackTimer = 50;
     executeAttack(isStrong);
   }
 }
@@ -187,5 +246,6 @@ export function initBlurHandler() {
     state.keys['mouse0'] = false;
     player.isCharging = false;
     player.chargeTime = 0;
+    if (player) player.isMoving = false;
   });
 }

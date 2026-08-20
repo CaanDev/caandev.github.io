@@ -39,10 +39,12 @@ export function initBookshelfHandlers() {
  */
 function doOpenBookshelf() {
   const ui = document.getElementById('bookshelf-ui');
-  if (!ui) {
-    logger.warn('❌ bookshelf-ui не найдено в DOM!');
-    return;
-  }
+  if (!ui) return;
+
+  // Принудительная остановка сердцебиения
+  import('../../audio/audioManager.js').then(({ audio }) => {
+    audio.sound.stopLowHPSound();
+  });
   
   bookshelfOpen = true;
   
@@ -266,6 +268,9 @@ function showNoteFromBookshelf(note, foundNotes, module) {
     textEl.innerHTML = formattedText;
   }
   if (countEl) countEl.textContent = `${foundNotes.length}/12`;
+
+  // Воспроизведение звука чтения записки
+  audio.playSound('interactions.noteRead');
   
   module.pauseGameForNote();
   registerModalOpen('note');

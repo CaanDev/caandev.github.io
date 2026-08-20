@@ -1,64 +1,61 @@
 /**
- * @fileoverview Менеджер аудио — центральный контроллер для музыки и звуковых эффектов.
- * Объединяет MusicManager и SoundManager, предоставляя единый интерфейс.
+ * @fileoverview Центральный контроллер аудиосистемы
+ * @module audio/audioManager
  */
 
-import { music } from './musicManager.js';
-import { sound } from './soundManager.js';
+import { music } from './music/index.js';
+import { sound } from './sounds/index.js';
 import { state } from '../core/config/state.js';
+import { logger } from '../utils/logger.js'; 
 
 /**
- * Класс AudioManager — управление всей аудиосистемой игры
- * 
  * @class AudioManager
- * @property {MusicManager} music - Менеджер музыки
- * @property {SoundManager} sound - Менеджер звуковых эффектов
- * @property {boolean} isGameActive - Активна ли игра (не меню)
- * @property {boolean} isInitialized - Инициализирован ли аудиоменеджер
- * @property {boolean} isMainMenu - Находится ли игрок в главном меню
- * @property {boolean} _hasLoadError - Флаг ошибки загрузки аудио
+ * @description Центральный контроллер для музыки и звуковых эффектов
  */
 class AudioManager {
   constructor() {
+    /** @type {MusicManager} */
     this.music = music;
+    /** @type {SoundManager} */
     this.sound = sound;
+    /** @type {boolean} - Активна ли игра */
     this.isGameActive = false;
+    /** @type {boolean} - Инициализирован ли аудиоменеджер */
     this.isInitialized = false;
+    /** @type {boolean} - В главном меню */
     this.isMainMenu = true;
+    /** @type {boolean} - Флаг ошибки загрузки */
     this._hasLoadError = false;
   }
 
   /**
    * Инициализация аудиосистемы
-   * Вызывается один раз при старте игры
-   * 
-   * @returns {void}
+   * @returns {Promise<void>}
    */
-  init() {
+  async init() {
     if (this.isInitialized) return;
-    
-    this.music.init();
-    this.sound.init();
-    
+
+    await this.music.init();
+    await this.sound.init();
+
     this.isInitialized = true;
     this.isMainMenu = true;
+    this.isGameActive = false;
   }
 
   /**
    * Запуск длительного звукового эффекта с зацикливанием
-   * 
-   * @param {string} name - Имя звукового эффекта
-   * @param {number} [volumeMultiplier=0.3] - Множитель громкости (0-1)
-   * @returns {Audio|null} - Объект Audio для управления или null при ошибке
+   * @param {string} key - Ключ звука
+   * @param {number} volumeMultiplier - Множитель громкости (0-1)
+   * @returns {Audio|null}
    */
-  playEffect(name, volumeMultiplier = 0.3) {
-    return this.sound.playEffect(name, volumeMultiplier);
+  playEffect(key, volumeMultiplier = 0.3) {
+    return this.sound.playEffect(key, volumeMultiplier);
   }
 
   /**
    * Остановка конкретного звука эффекта
-   * 
-   * @param {Audio} audio - Объект Audio, который нужно остановить
+   * @param {Audio} audio - Объект Audio
    * @returns {void}
    */
   stopEffectSound(audio) {
@@ -67,7 +64,6 @@ class AudioManager {
 
   /**
    * Остановка всех активных звуков эффектов
-   * 
    * @returns {void}
    */
   stopAllEffects() {
@@ -76,22 +72,20 @@ class AudioManager {
 
   /**
    * Определяет местоположение игрока и переключает музыку
-   * Автоматически выбирает режим: 'game', 'safeRoom'
-   * 
    * @returns {void}
    */
   updateMusicByLocation() {
     if (this.isMainMenu) return;
-    if (this.music._hasLoadError) return; // Не переключаем при ошибке
-    
+    if (this.music._hasLoadError) return;
+
     let mode = 'game';
-    
+
     if (state.inSafeRoom) {
       mode = 'safeRoom';
     } else if (state.inTreasureRoom || state.inShrineRoom || state.inTrapRoom) {
       mode = 'game';
     }
-    
+
     if (this.music.isEnabled) {
       this.forcePlayMusic(mode);
     } else {
@@ -101,7 +95,6 @@ class AudioManager {
 
   /**
    * Устанавливает состояние игры (активна/неактивна)
-   * 
    * @param {boolean} isActive - Активна ли игра
    * @returns {void}
    */
@@ -113,8 +106,7 @@ class AudioManager {
 
   /**
    * Устанавливает режим музыки без принудительного воспроизведения
-   * 
-   * @param {string} mode - Режим музыки ('game', 'menu', 'safeRoom')
+   * @param {string} mode - Режим музыки
    * @returns {void}
    */
   setMusicMode(mode) {
@@ -122,23 +114,20 @@ class AudioManager {
   }
 
   /**
-   * Принудительное переключение музыки с полной остановкой текущего трека
-   * 
-   * @param {string} mode - Режим музыки ('game', 'menu', 'safeRoom')
+   * Принудительное переключение музыки
+   * @param {string} mode - Режим музыки
    * @returns {void}
    */
   forcePlayMusic(mode) {
     if (this.music._hasLoadError) {
-      // Если была ошибка — пробуем перезагрузить
       this.music.reload();
       return;
     }
-    
+
     this.music.stop();
     this.music.isPlaying = false;
-    
     this.music.setMode(mode);
-    
+
     if (this.music.isEnabled) {
       this.music.play(mode);
     }
@@ -146,7 +135,6 @@ class AudioManager {
 
   /**
    * Ставит музыку на паузу
-   * 
    * @returns {void}
    */
   pause() {
@@ -155,12 +143,11 @@ class AudioManager {
 
   /**
    * Возобновляет воспроизведение музыки
-   * 
    * @returns {void}
    */
   resume() {
-    if (this.music._hasLoadError) return; // Не возобновляем при ошибке
-    
+    if (this.music._hasLoadError) return;
+
     if (this.isGameActive && this.music.isEnabled) {
       this.music.resume();
     } else if (this.isMainMenu && this.music.isEnabled) {
@@ -170,7 +157,6 @@ class AudioManager {
 
   /**
    * Полная остановка музыки
-   * 
    * @returns {void}
    */
   stop() {
@@ -180,33 +166,30 @@ class AudioManager {
   }
 
   /**
-   * Сброс аудиоменеджера в начальное состояние
-   * 
+   * Сброс аудиоменеджера
    * @returns {void}
    */
   reset() {
-    this.music.stop();
-    this.music.isPlaying = false;
+    this.music.reset();
+    this.sound.reset();
     this.isGameActive = false;
-    this.music._hasLoadError = false;
-    this.music._errorReported = false;
+    this.isMainMenu = true;
+    this._hasLoadError = false;
   }
 
   /**
    * Воспроизведение короткого звука
-   * 
-   * @param {string} name - Имя звука
-   * @param {number|null} [volume=null] - Громкость (0-1) или null для стандартной
-   * @returns {void}
+   * @param {string} key - Ключ звука
+   * @param {number|null} volume - Громкость (0-1)
+   * @returns {Promise<void>}
    */
-  playSound(name, volume = null) {
-    this.sound.play(name, volume);
+  playSound(key, volume = null) {
+    return this.sound.play(key, volume);
   }
 
   /**
    * Воспроизведение звука шага
-   * 
-   * @param {string|null} [dir=null] - Направление движения ('up', 'down', 'left', 'right')
+   * @param {string|null} dir - Направление движения
    * @returns {void}
    */
   playStep(dir = null) {
@@ -214,8 +197,7 @@ class AudioManager {
   }
 
   /**
-   * Обновление состояния шагов (кулдаун)
-   * 
+   * Обновление состояния шагов
    * @returns {void}
    */
   updateSteps() {
@@ -224,17 +206,6 @@ class AudioManager {
 
   /**
    * Переключение звука (вкл/выкл)
-   * @deprecated Используйте toggleMute()
-   * 
-   * @returns {void}
-   */
-  toggleSoundMute() {
-    this.sound.toggleMute();
-  }
-
-  /**
-   * Переключение звука (вкл/выкл)
-   * 
    * @returns {void}
    */
   toggleMute() {
@@ -243,7 +214,6 @@ class AudioManager {
 
   /**
    * Установка громкости музыки
-   * 
    * @param {number} value - Громкость (0-1)
    * @returns {void}
    */
@@ -253,7 +223,6 @@ class AudioManager {
 
   /**
    * Установка громкости звуковых эффектов
-   * 
    * @param {number} value - Громкость (0-1)
    * @returns {void}
    */
@@ -263,7 +232,6 @@ class AudioManager {
 
   /**
    * Установка громкости для всей аудиосистемы
-   * 
    * @param {number} value - Громкость (0-1)
    * @returns {void}
    */
@@ -274,8 +242,7 @@ class AudioManager {
 
   /**
    * Проверка, играет ли музыка
-   * 
-   * @returns {boolean} - true, если музыка играет
+   * @returns {boolean}
    */
   isMusicPlaying() {
     return this.music.isMusicPlaying();
@@ -283,8 +250,7 @@ class AudioManager {
 
   /**
    * Проверка, активна ли игра
-   * 
-   * @returns {boolean} - true, если игра активна
+   * @returns {boolean}
    */
   isGameActive() {
     return this.isGameActive;
@@ -292,21 +258,19 @@ class AudioManager {
 
   /**
    * Включение/отключение музыки
-   * 
    * @param {boolean} enabled - true — музыка включена
    * @returns {void}
    */
   setMusicEnabled(enabled) {
     this.music.setEnabled(enabled);
-    
+
     if (enabled && this.isGameActive) {
       this.updateMusicByLocation();
     }
   }
 
   /**
-   * Обновление состояния музыки (синхронизация)
-   * 
+   * Обновление состояния музыки
    * @returns {void}
    */
   updateMusicState() {
@@ -315,13 +279,21 @@ class AudioManager {
 
   /**
    * Получение текущего режима музыки
-   * 
-   * @returns {string} - Режим музыки ('game', 'menu', 'safeRoom')
+   * @returns {string}
    */
   getMusicMode() {
     return this.music.getMode();
   }
+
+  /**
+   * Предзагрузка дополнительных звуков
+   * @param {string[]} keys - Массив ключей звуков
+   * @returns {Promise<void>}
+   */
+  preloadSounds(keys) {
+    return this.sound.preloadSounds(keys);
+  }
 }
 
-/** @type {AudioManager} - Экспортируемый экземпляр менеджера аудио */
+/** @type {AudioManager} - Экземпляр менеджера аудио */
 export const audio = new AudioManager();

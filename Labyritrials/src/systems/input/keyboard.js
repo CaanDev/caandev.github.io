@@ -131,18 +131,30 @@ export function handleKeyDown(e) {
   if (mappedKey === 'e') {
     if (state.isBossLevel) return;
 
-    if (isNearBookshelf()) {
+    // Интерактивные предметы
+    if (state.interactiveItems.showPrompt && state.interactiveItems.nearestItem) {
       e.preventDefault();
-      openBookshelf();
+      import('../../entities/player/interaction.js').then(module => {
+        module.pickupInteractiveItem();
+      });
       return;
     }
 
+    // Записки
     if (state.showNotePrompt && state.notePromptId) {
       e.preventDefault();
       openNoteWindow(state.notePromptId);
       return;
     }
 
+    // Библиотека
+    if (isNearBookshelf()) {
+      e.preventDefault();
+      openBookshelf();
+      return;
+    }
+
+    // Лавка торговца
     handleShopToggle();
   }
 }
@@ -318,6 +330,7 @@ export function resetAllKeys() {
     player.isAttacking = false;
     player.attackTimer = 0;
     player.attackExecuted = false;
+    player.isMoving = false;
   }
 }
 
@@ -329,10 +342,15 @@ export function resetAllKeys() {
  */
 export async function openNoteWindow(noteId) {
   const note = getNoteById(noteId);
-  if (!note) {
-    logger.warn(`📜 Записка #${noteId} не найдена!`);
-    return;
-  }
+  if (!note) return;
+
+  // Принудительная остановка сердцебиения
+  import('../../audio/audioManager.js').then(({ audio }) => {
+    audio.sound.stopLowHPSound();
+  });
+
+  // Воспроизведение звука чтения записки
+  audio.playSound('interactions.noteRead');
 
   // Регистрируем открытие модального окна
   const { registerModalOpen } = await import('../ui/modalManager.js');

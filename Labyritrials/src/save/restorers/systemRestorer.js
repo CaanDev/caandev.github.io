@@ -94,9 +94,6 @@ export function restoreGameStatsData(save) {
 
     state.gameStats.playTime = stats.playTime || 0;
     state.playTimeAccumulator = state.gameStats.playTime;
-
-    logger.save('📀 Восстановлена статистика игры');
-    logger.save(`⏱️ Время игры: ${stats.playTimeFormatted || formatPlayTime(state.gameStats.playTime)}`);
   } else {
     state.gameStats = {
       maxHpAtEnd: 0,

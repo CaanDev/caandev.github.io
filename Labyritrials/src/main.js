@@ -27,12 +27,15 @@ import { initInventory, handleInventoryKey } from './systems/ui/inventory/index.
 import { clearSoundEvents } from './entities/monsters/ai/hearing.js';
 
 // Импорты для изображений
+import { playerAnimator } from './sprites/index.js';
 import { registerImages, loadAllImages } from './utils/imageLoader.js';
+import { getAllWallImagesForRegistration } from './images/wallImages.js';
+import { FLOOR_IMAGES_REGISTRATION } from './images/floorImages.js';
+import { STAIR_IMAGES_REGISTRATION } from './images/stairImages.js';
 import { SHOP_IMAGES } from './images/shopImages.js';
+import { INVENTORY_IMAGES } from './images/inventoryImages.js';
 import { ITEM_IMAGES } from './images/itemImages.js';
 import { OBJECT_IMAGES } from './images/objectImages.js';
-import { INVENTORY_IMAGES } from './images/inventoryImages.js';
-import { getAllWallImagesForRegistration } from './images/wallImages.js';
 import { UI_IMAGES } from './images/uiImages.js';
 
 /** @type {boolean} - Флаг: находится ли игрок в секции сохранения */
@@ -480,11 +483,13 @@ async function init() {
 
   updateLoader('Загрузка изображений...', '🖼️', 'Подготовка спрайтов...', 45);
   // Регистрируем изображения
+  registerImages(getAllWallImagesForRegistration());
+  registerImages(FLOOR_IMAGES_REGISTRATION);
+  registerImages(STAIR_IMAGES_REGISTRATION);
   registerImages(SHOP_IMAGES);
+  registerImages(INVENTORY_IMAGES);
   registerImages(ITEM_IMAGES);
   registerImages(OBJECT_IMAGES);
-  registerImages(INVENTORY_IMAGES);
-  registerImages(getAllWallImagesForRegistration());
   registerImages(UI_IMAGES);
 
   // Загружаем с прогрессом
@@ -492,6 +497,14 @@ async function init() {
     // Прогресс от 45% до 65%
     const mappedProgress = 45 + (progress * 0.2);
     updateLoader(null, null, null, Math.min(65, mappedProgress));
+  });
+
+  // Загрузка спрайтов
+  updateLoader('Загрузка спрайтов...', '🖼️', 'Подготовка персонажа...', 70);
+  
+  await playerAnimator.loadSprites((progress) => {
+    const mappedProgress = 70 + (progress * 0.15); // 70-85%
+    updateLoader(null, null, null, Math.min(85, mappedProgress));
   });
 
   // Очистка кэшей

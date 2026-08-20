@@ -72,6 +72,25 @@ export function shootFireball() {
   // Списываем выносливость
   player.stamina -= STAMINA_COST.fireball;
 
+  // Запускаем анимацию атаки
+  // Определяем направление атаки (в сторону цели)
+  const dx = player.targetX - player.px;
+  const dy = player.targetY - player.py;
+  const length = Math.hypot(dx, dy);
+  
+  if (length > 5) {
+    player.dirX = dx / length;
+    player.dirY = dy / length;
+  } else {
+    player.dirX = player.lastMoveDirX || 0;
+    player.dirY = player.lastMoveDirY || 1;
+  }
+  
+  player.isAttacking = true;
+  player.attackTimer = 50;
+  player.attackExecuted = true;
+  player.isFireballAttack = true;
+
   // Обновляем статистику использования оружия
   state.gameStats.weaponHits.fireball++;
   
@@ -79,18 +98,16 @@ export function shootFireball() {
   player.fireballCooldown = player.fireballMaxCooldown;
   
   // Определяем направление полёта шара
-  const dx = player.targetX - player.px;
-  const dy = player.targetY - player.py;
-  const length = Math.hypot(dx, dy);
-  
-  let dirX, dirY;
+  let dirX = player.dirX;
+  let dirY = player.dirY;
+
   if (length > 5) {
     dirX = dx / length;
     dirY = dy / length;
   } else {
     // Если цель слишком близко — используем последнее направление движения
-    dirX = player.dirX || 0;
-    dirY = player.dirY || 1;
+    dirX = player.lastMoveDirX || 0;
+    dirY = player.lastMoveDirY || 1;
   }
   
   // Создаём огненный шар

@@ -25,6 +25,7 @@ import {
   collectPositionData,
   collectMazeData,
   collectMonstersData,
+  collectMimicsData,
   collectTrapsData,
   collectArtifactsData,
   collectChestsData,
@@ -53,6 +54,7 @@ import {
   restorePositionData,
   restoreMazeData,
   restoreMonstersData,
+  restoreMimicsData,
   restoreTrapsData,
   restoreArtifactsData,
   restoreChestsData,
@@ -120,6 +122,7 @@ export function saveGame() {
       frostDamageTimer: frostState.damageTimer,
     },
     monsters: collectMonstersData(),
+    mimics: collectMimicsData(),
     traps: collectTrapsData(),
     artifacts: collectArtifactsData(),
     chests: collectChestsData(),
@@ -192,6 +195,7 @@ export async function loadGame() {
     restoreTrapsData(save);
     restoreArtifactsData(save);
     restoreChestsData(save);
+    restoreMimicsData(save);
     restoreShrinesData(save);
     restoreLootData(save);
     restoreTorchesData(save);
@@ -252,12 +256,8 @@ export async function loadGame() {
         snowState.active = false;
         snowState.targetOpacity = 0;
         snowState.opacity = 0;
-        logger.info('❄️ Снегопад отключен при загрузке: не подходит биом или комната');
       }
     }
-
-    logger.save('📀 Игра загружена! Уровень:', state.gameLevel);
-    logger.save(`🏆 Достижений разблокировано: ${state.achievements.unlocked.length}`);
 
     // ===== ПРИМЕНЕНИЕ НАСТРОЕК =====
     await applySettingsAfterLoad();
@@ -279,7 +279,6 @@ export async function loadGame() {
       if (notesFound > currentProgress) {
         const { setProgress } = await import('../systems/achievements/manager.js');
         setProgress('notes_found', notesFound);
-        logger.save(`📚 Синхронизировано записок: ${notesFound}`);
       }
     }
 
@@ -346,17 +345,15 @@ async function applySettingsAfterLoad() {
  */
 async function restoreMimicFlies() {
   if (state.isBossLevel) return;
-
-  if (state.flies && state.flies.length > 0) {
-    state.flies = [];
-  }
+  if (state.flies && state.flies.length > 0) state.flies = [];
 
   const biome = state.currentBiome || 'cave';
 
-  for (let chest of state.chests) {
-    if (chest.type === 'mimic' && !chest.opened) {
+  // Восстанавливаем мух над мимиками
+  for (const mimic of state.mimics) {
+    if (!mimic.isDead && !mimic.opened) {
       const { createFlies } = await import('../entities/objects/fly.js');
-      createFlies(chest.x, chest.y, biome);
+      createFlies(mimic.x, mimic.y, biome);
     }
   }
 }

@@ -78,15 +78,43 @@
   transform: rotate(90deg);
 }
 
-/* ============ ВКЛАДКИ ============ */
+/* ============================================================
+   ВКЛАДКИ (ОБЁРТКА)
+   ============================================================ */
+
+.settings-tabs-wrapper {
+  padding: 0 24px;
+  border-bottom: 1px solid rgba(100, 60, 140, 0.15);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* ============ ВКЛАДКИ (КОНТЕЙНЕР С ПРОКРУТКОЙ) ============ */
 
 .settings-tabs {
   display: flex;
   gap: 4px;
-  padding: 0 24px;
-  border-bottom: 1px solid rgba(100, 60, 140, 0.15);
-  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+  padding: 0 4px;
 }
+
+/* Скрываем скролбар для Chrome/Safari/Edge */
+.settings-tabs::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.settings-tabs::-webkit-scrollbar-thumb {
+  display: none;
+}
+
+/* ===== КНОПКИ ВКЛАДОК ===== */
 
 .settings-tab {
   padding: 10px 18px;
@@ -99,6 +127,10 @@
   cursor: pointer;
   transition: all 0.3s ease;
   border-bottom: 2px solid transparent;
+  flex-shrink: 0;
+  white-space: nowrap;
+  user-select: none;
+  touch-action: manipulation;
   margin-bottom: -1px;
 }
 
@@ -381,6 +413,105 @@
   transform: translateY(-1px);
 }
 
+/* ============================================================
+   СТИЛИ ДЛЯ ВКЛАДКИ "УПРАВЛЕНИЕ"
+   ============================================================ */
+
+/* ===== СЕТКА УПРАВЛЕНИЯ ===== */
+
+.settings-controls-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0 12px 0;
+}
+
+/* ===== СТРОКА УПРАВЛЕНИЯ ===== */
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.control-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ===== КЛАВИШИ ===== */
+
+.control-keys {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+  width: 50%;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.control-keys .key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-text-light);
+  text-align: center;
+}
+
+/* Специальный стиль для клавиш в одном ряду (WASD) */
+.control-keys .key:first-child {
+  margin-left: 0;
+}
+
+.control-keys .key:last-child {
+  margin-right: 0;
+}
+
+/* Отдельный стиль для клавиш-модификаторов */
+.control-keys .key.long {
+  min-width: 48px;
+}
+
+/* ===== ДЕЙСТВИЕ ===== */
+
+.control-action {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  width: 50%;
+  flex-shrink: 0;
+  text-align: left;
+}
+
+/* ===== ПОДВАЛ ===== */
+
+.settings-controls-footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  text-align: center;
+}
+
+.settings-controls-footer .controls-hint {
+  font-size: 12px;
+  color: var(--color-text-dark);
+}
+
 /* ============ АНИМАЦИИ ============ */
 
 @keyframes fadeInPause {
@@ -409,7 +540,7 @@
     font-size: 18px;
   }
 
-  .settings-tabs {
+  .settings-tabs-wrapper {
     padding: 0 16px;
   }
 
@@ -480,6 +611,44 @@
     width: 100% !important;
     flex: none !important;
   }
+
+  .control-row {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .control-keys {
+    min-width: 80px;
+  }
+
+  .control-keys .key {
+    min-width: 24px;
+    height: 20px;
+    font-size: 11px;
+    padding: 0 6px;
+  }
+
+  .control-action {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 500px) {
+  .control-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .control-keys {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .control-action {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 @media (max-width: 400px) {
@@ -492,7 +661,7 @@
     letter-spacing: 1px;
   }
 
-  .settings-tabs {
+  .settings-tabs-wrapper {
     padding: 0 12px;
   }
 
@@ -539,5 +708,25 @@
 
   .settings-toggle input:checked+.toggle-slider::after {
     transform: translateX(14px);
+  }
+
+  .control-row {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .control-keys {
+    min-width: 60px;
+  }
+
+  .control-keys .key {
+    min-width: 20px;
+    height: 18px;
+    font-size: 10px;
+    padding: 0 4px;
+  }
+
+  .control-action {
+    font-size: 11px;
   }
 }

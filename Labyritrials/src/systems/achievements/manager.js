@@ -198,7 +198,7 @@ export function unlockAchievement(id) {
 
   // Воспроизводим звук
   try {
-    audio.playSound('achievementCompleted', 0.8);
+    audio.playSound('interactions.achievementCompleted');
   } catch (e) {
     logger.warn('⚠️ Не удалось воспроизвести звук достижения:', e);
   }

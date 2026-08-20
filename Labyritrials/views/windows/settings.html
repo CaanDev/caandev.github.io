@@ -7,10 +7,13 @@
     </div>
 
     <!-- Вкладки -->
-    <div class="settings-tabs">
-      <button class="settings-tab active" data-tab="audio">🔊 АУДИО</button>
-      <button class="settings-tab" data-tab="graphics">🖥️ ГРАФИКА</button>
-      <button class="settings-tab" data-tab="save">💾 СОХРАНЕНИЕ</button>
+    <div class="settings-tabs-wrapper">
+      <div class="settings-tabs">
+        <button class="settings-tab active" data-tab="audio">🔊 АУДИО</button>
+        <button class="settings-tab" data-tab="graphics">🖥️ ГРАФИКА</button>
+        <button class="settings-tab" data-tab="controls">🎮 УПРАВЛЕНИЕ</button>
+        <button class="settings-tab" data-tab="save">💾 СОХРАНЕНИЕ</button>
+      </div>
     </div>
 
     <!-- Содержимое вкладок -->
@@ -85,6 +88,77 @@
               <input type="checkbox" id="settings-smoothing-toggle" checked>
               <span class="toggle-slider"></span>
             </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ВКЛАДКА: УПРАВЛЕНИЕ ===== -->
+      <div class="settings-tab-content" id="settings-tab-controls">
+        <div class="settings-section">          
+          <div class="settings-controls-grid">
+            <!-- Движение -->
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key">W</span>
+                <span class="key">A</span>
+                <span class="key">S</span>
+                <span class="key">D</span>
+              </div>
+              <span class="control-action">Движение (вверх, влево, вниз, вправо)</span>
+            </div>
+            
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key">&#9650;</span>
+                <span class="key">&#9668;</span>
+                <span class="key">&#9660;</span>
+                <span class="key">&#9658;</span>
+              </div>
+              <span class="control-action">Движение (стрелки)</span>
+            </div>
+            
+            <!-- Атака -->
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key">ЛКМ</span>
+              </div>
+              <span class="control-action">Ближняя атака (зажать для усиленного удара)</span>
+            </div>
+            
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key">Q</span>
+              </div>
+              <span class="control-action">Дальняя атака</span>
+            </div>
+            
+            <!-- Взаимодействие -->
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key">E</span>
+              </div>
+              <span class="control-action">Взаимодействие с предметами и объектами</span>
+            </div>
+            
+            <!-- Инвентарь -->
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key">I</span>
+              </div>
+              <span class="control-action">Открыть / закрыть инвентарь</span>
+            </div>
+            
+            <!-- Пауза -->
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key">ESC</span>
+              </div>
+              <span class="control-action">Меню паузы</span>
+            </div>
+          </div>
+          
+          <div class="settings-controls-footer">
+            <span class="controls-hint">💡 При приближении к объектам могут появляться подсказки</span>
           </div>
         </div>
       </div>

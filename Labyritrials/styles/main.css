@@ -75,19 +75,22 @@
 /* 5.4. Инвентарь */
 @import url('windows/inventory.css');
 
-/* 5.5. Библиотека */
+/* 5.5. Окно с информацией о предмете */
+@import url('windows/itemInfoPopup.css');
+
+/* 5.6. Библиотека */
 @import url('windows/bookshelf.css');
 
-/* 5.6. Пауза */
+/* 5.7. Пауза */
 @import url('windows/pause.css');
 
-/* 5.7. Смерть */
+/* 5.8. Смерть */
 @import url('windows/gameOver.css');
 
-/* 5.8. Переход уровня */
+/* 5.9. Переход уровня */
 @import url('windows/levelUp.css');
 
-/* 5.9. Финал */
+/* 5.10. Финал */
 @import url('windows/final.css');
 
 /* ============================================================

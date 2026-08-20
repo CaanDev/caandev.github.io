@@ -67,7 +67,20 @@ export function collectMonstersData() {
     phaseThresholds: m.phaseThresholds || null,
     attackCooldown: m.attackCooldown || 0,
     invertedControls: m.invertedControls || false,
-    invertTimer: m.invertTimer || 0
+    invertTimer: m.invertTimer || 0,
+    patrolPath: m.patrolPath || [],
+    patrolIndex: m.patrolIndex || 0,
+    patrolTimer: m.patrolTimer || 0,
+    patrolPhase: m.patrolPhase || 'moving',
+    idleTimer: m.idleTimer || 0,
+    idleDuration: m.idleDuration || 0,
+    investigationTarget: m.investigationTarget || null,
+    investigationTimer: m.investigationTimer || 0,
+    lookDirection: m.lookDirection || 0,
+    lookTimer: m.lookTimer || 0,
+    interests: m.interests || [],
+    checkedInterests: m.checkedInterests || [],
+    curiosity: m.curiosity || 50,
   }));
 }
 

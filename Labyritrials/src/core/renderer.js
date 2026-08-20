@@ -11,10 +11,9 @@ import { drawBackground, drawBossSummonCircle, drawBossLightFade } from '../syst
 import { drawSnow } from '../systems/weather/snowRenderer.js';
 import { drawBloodPuddles } from '../systems/rendering/bloodRenderer.js';
 import { drawTorches, updateTorchParticles } from '../systems/rendering/torchRenderer.js';
-import { drawAllPortals, drawShop } from '../systems/rendering/index.js';
+import { drawAllPortals, drawShop, drawLoot, drawChests, drawFlies } from '../systems/rendering/index.js';
 import { drawTraps } from '../systems/rendering/trapRenderer.js';
 import { drawShrines } from '../systems/rendering/shrineRenderer.js';
-import { drawLoot, drawChests, drawFlies } from '../systems/rendering/chestRenderer.js';
 import { drawMonsters } from '../systems/rendering/monsterRenderer.js';
 import { drawFireballs, drawDamageTexts, drawSparks, drawBeams, drawPsionicWave } from '../systems/rendering/projectileRenderer.js';
 import { drawPlayer } from '../systems/rendering/player/playerRenderer.js';

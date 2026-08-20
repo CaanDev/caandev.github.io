@@ -28,6 +28,12 @@ export function updateAttackAnimation() {
     player.chargeTime = 0;
     player.attackTimer = 0;
     player.attackExecuted = false;
+    // Сбрасываем аниматор
+    import('../../sprites/index.js').then(({ playerAnimator }) => {
+      if (playerAnimator.isAttackPlaying()) {
+        playerAnimator.reset();
+      }
+    });
     if (chargeVal) chargeVal.innerText = "Обычный";
     return;
   }
@@ -35,33 +41,36 @@ export function updateAttackAnimation() {
   // ===== СОСТОЯНИЕ ЗАРЯДКИ =====
   if (player.isCharging) {
     player.chargeTime++;
-    
     if (chargeVal) {
-      if (state.keys['mouse0']) {
-        chargeVal.innerText = player.chargeTime > 30 ? "🔥 УСИЛЕННЫЙ!" : "Зарядка...";
-      } else {
-        chargeVal.innerText = "Обычный";
-      }
+      chargeVal.innerText = player.chargeTime > 30 ? "🔥 УСИЛЕННЫЙ!" : "Зарядка...";
     }
-  } 
+    return;
+  }
+
   // ===== СОСТОЯНИЕ АТАКИ =====
-  else if (player.isAttacking) {
+  if (player.isAttacking) {
+    // Уменьшаем таймер синхронно
     player.attackTimer--;
     
     if (chargeVal) {
       chargeVal.innerText = player.chargeTime > 30 ? "💥 ВСПЫШКА!" : "⚔️ ВЗМАХ!";
     }
     
+    // Если таймер истёк — сбрасываем состояние
     if (player.attackTimer <= 0) {
-      player.isAttacking = false;
-      player.attackExecuted = false; 
+      // Проверяем, не играет ли ещё анимация
+      import('../../sprites/index.js').then(({ playerAnimator }) => {
+        if (!playerAnimator.isAttackPlaying()) {
+          player.isAttacking = false;
+          player.attackExecuted = false;
+        }
+      });
     }
-  } 
-  // ===== НЕЙТРАЛЬНОЕ СОСТОЯНИЕ =====
-  else {
-    if (chargeVal) chargeVal.innerText = "Обычный";
-    // Доп. защита: сброс висящих значений
-    if (player.chargeTime !== 0) player.chargeTime = 0;
-    player.attackExecuted = false;
+    return;
   }
+
+  // ===== НЕЙТРАЛЬНОЕ СОСТОЯНИЕ =====
+  if (chargeVal) chargeVal.innerText = "Обычный";
+  player.chargeTime = 0;
+  player.attackExecuted = false;
 }

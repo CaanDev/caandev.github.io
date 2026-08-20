@@ -120,6 +120,7 @@ export function generateTreasureMap() {
   state.originalGoal = { ...CONFIG.goal };
   state.originalShopPos = { ...CONFIG.shopPos };
   state.originalMonsters = [...state.monsters];
+  state.originalMimics = state.mimics.map(m => ({ ...m }));
   state.originalHadMonsters = state.hadMonsters;
   state.originalTraps = [...state.traps];
   state.originalBonusGiven = state.bonusGiven;
@@ -194,6 +195,7 @@ export function generateTreasureMap() {
   state.roomLabelColor = '#f39c12';
   
   state.monsters = [];
+  state.mimics = [];
   state.traps = [];
   state.artifacts = [];
   state.chests = [];
@@ -315,6 +317,12 @@ export function returnFromTreasureRoom() {
 
   state.roomLabel = null;
   state.roomLabelColor = null;
+
+  // Восстанавливаем мимиков
+  if (state.originalMimics) {
+    state.mimics = state.originalMimics.map(m => ({ ...m }));
+    state.originalMimics = [];
+  }
 
   // ===== ВОССТАНАВЛИВАЕМ ПОРТАЛ В БЕЗОПАСНУЮ КОМНАТУ =====
   if (state.originalSafePortal) {

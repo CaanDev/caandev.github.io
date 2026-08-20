@@ -127,6 +127,8 @@ export function generateTrapRoom() {
   state.originalShopPos = { ...CONFIG.shopPos };
   state.originalMonsters = [...state.monsters];
   state.originalHadMonsters = state.hadMonsters;
+  state.originalMimics = state.mimics.map(m => ({ ...m }));
+  state.mimics = [];
   state.originalTraps = [...state.traps];
   state.originalTorches = [...state.torches];
   state.originalMapCols = CONFIG.cols;
@@ -244,6 +246,12 @@ export function returnFromTrapRoom() {
 
   state.roomLabel = null;
   state.roomLabelColor = null;
+
+  // Восстанавливаем мимиков
+  if (state.originalMimics) {
+    state.mimics = state.originalMimics.map(m => ({ ...m }));
+    state.originalMimics = [];
+  }
   
   state.monsters = state.originalMonsters || [];
   state.traps = state.originalTraps || [];

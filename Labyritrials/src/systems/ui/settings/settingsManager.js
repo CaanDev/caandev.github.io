@@ -16,8 +16,8 @@ const SETTINGS_KEY = 'labirithria_settings';
  * @description Настройки по умолчанию
  */
 export const DEFAULT_SETTINGS = {
-  musicVolume: 40,
-  soundVolume: 30,
+  musicVolume: 50,
+  soundVolume: 50,
   musicEnabled: true,
   soundEnabled: true,
   showFps: false,

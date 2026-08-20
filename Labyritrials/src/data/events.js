@@ -105,27 +105,73 @@ export const EVENTS_DATA = {
 
   /**
    * Ярость монстров — отрицательное событие
-   * +30% урона и скорости монстров
+   * +30% урона и скорости монстров, +40% радиус видимости и слуха
    */
   monsterRage: {
     id: 'monsterRage',
     name: '👹 ЯРОСТЬ МОНСТРОВ 👹',
-    message: 'Монстры в ярости на этом уровне!<br>Их урон и скорость увеличены на 30%!',
+    message: 'Монстры в ярости на этом уровне!<br>Их урон, скорость, видимость и слух увеличены!',
     color: COLORS.effects.fire,
     icon: '👹',
     category: 'negative',
     effects: {
       apply: (player, state) => {
         state.eventMonsterRageActive = true;
+
+        // Применяем эффекты ко всем монстрам
+        for (let monster of state.monsters) {
+          // Сохраняем оригинальные значения
+          monster.originalVision = monster.vision;
+          monster.originalBaseVision = monster.baseVision || monster.vision;
+          monster.originalHearingRadius = monster.originalHearingRadius || 600;
+          
+          // Увеличиваем видимость на 40%
+          monster.vision = Math.floor(monster.vision * 1.4);
+          if (monster.baseVision) {
+            monster.baseVision = Math.floor(monster.baseVision * 1.4);
+          }
+          
+          // Увеличиваем радиус слуха на 40%
+          monster.hearingRadius = Math.floor(600 * 1.4);
+          
+          // Остальные бонусы (урон, скорость) уже есть в monsterSpawner
+          // Но если монстр уже существует — применяем и их
+          if (!monster.isEventBoosted) {
+            monster.originalDamage = monster.damage;
+            monster.originalSpeed = monster.speed;
+            monster.damage = Math.floor(monster.damage * 1.3);
+            monster.speed = monster.speed * 1.3;
+            monster.isEventBoosted = true;
+          }
+        }
       },
       remove: (player, state) => {
         state.eventMonsterRageActive = false;
         // Восстанавливаем параметры монстров
         for (let monster of state.monsters) {
+          // Восстанавливаем видимость
+          if (monster.originalVision !== undefined) {
+            monster.vision = monster.originalVision;
+            monster.originalVision = undefined;
+          }
+          if (monster.originalBaseVision !== undefined) {
+            monster.baseVision = monster.originalBaseVision;
+            monster.originalBaseVision = undefined;
+          }
+          
+          // Восстанавливаем слух
+          if (monster.originalHearingRadius !== undefined) {
+            monster.hearingRadius = monster.originalHearingRadius;
+            monster.originalHearingRadius = undefined;
+          }
+          
+          // Восстанавливаем урон и скорость
           if (monster.isEventBoosted) {
             monster.damage = monster.originalDamage || monster.damage;
             monster.speed = monster.originalSpeed || monster.speed;
             monster.isEventBoosted = false;
+            monster.originalDamage = undefined;
+            monster.originalSpeed = undefined;
           }
         }
       }

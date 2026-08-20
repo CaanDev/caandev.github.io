@@ -41,6 +41,7 @@ const TEMPLATE_MAP = {
   'settings': 'windows/settings',
   'shop': 'windows/shop',
   'inventory': 'windows/inventory',
+  'itemInfoPopup': 'components/itemInfoPopup',
   'bookshelf': 'windows/bookshelf',
   'pause': 'windows/pause',
   'gameOver': 'windows/gameOver',
@@ -59,6 +60,7 @@ const ESSENTIAL_TEMPLATES = [
   'windows/gameOver',   // Экран смерти (нужен мгновенно)
   'components/notification', // Уведомления о достижениях (нужны всегда)
   'windows/shop',
+  'components/itemInfoPopup',
 ];
 
 /**
@@ -163,6 +165,11 @@ export async function initTemplateHandlers(name) {
 
     case 'inventory':
       // Пока без дополнительной логики, только базовое открытие/закрытие
+      success = true;
+      break;
+
+     case 'itemInfoPopup':
+      // Не требует дополнительной логики
       success = true;
       break;
       

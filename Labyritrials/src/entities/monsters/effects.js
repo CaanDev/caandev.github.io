@@ -25,7 +25,7 @@ export function updateFreezeEffect(m) {
     m.freezeTimer--;
     if (m.freezeTimer <= 0) {
       m.isFrozen = false;
-      audio.playSound('trapIceFinish', 0.6);
+      audio.playSound('traps.trapIceFinish');
     }
   }
   return false;

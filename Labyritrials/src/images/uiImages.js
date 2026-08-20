@@ -10,7 +10,10 @@
 export const ACHIEVEMENT_IMAGES = {
   // Боевые
   combat: {
+    firstKill: 'assets/images/ui/achievements/combat/firstKill.png',
     monsterSlayer: 'assets/images/ui/achievements/combat/monsterSlayer.png',
+    monsterMassacre: 'assets/images/ui/achievements/combat/monsterMassacre.png',
+    monsterLegend: 'assets/images/ui/achievements/combat/monsterLegend.png',
     bossHunter5: 'assets/images/ui/achievements/combat/bossHunter5.png',
     bossHunter10: 'assets/images/ui/achievements/combat/bossHunter10.png',
     bossHunter15: 'assets/images/ui/achievements/combat/bossHunter15.png',
@@ -72,7 +75,10 @@ export const UI_IMAGES = {
   // ============================================================
 
   // Combat
+  firstKill: 'assets/images/ui/achievements/combat/firstKill.png',
   monsterSlayer: 'assets/images/ui/achievements/combat/monsterSlayer.png',
+  monsterMassacre: 'assets/images/ui/achievements/combat/monsterMassacre.png',
+  monsterLegend: 'assets/images/ui/achievements/combat/monsterLegend.png',
   bossHunter5: 'assets/images/ui/achievements/combat/bossHunter5.png',
   bossHunter10: 'assets/images/ui/achievements/combat/bossHunter10.png',
   bossHunter15: 'assets/images/ui/achievements/combat/bossHunter15.png',

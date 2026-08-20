@@ -96,6 +96,19 @@ export function restoreMonstersData(save) {
       restored.attackCooldown = m.attackCooldown || 0;
       restored.invertedControls = m.invertedControls || false;
       restored.invertTimer = m.invertTimer || 0;
+      restored.patrolPath = m.patrolPath || [];
+      restored.patrolIndex = m.patrolIndex || 0;
+      restored.patrolTimer = m.patrolTimer || 0;
+      restored.patrolPhase = m.patrolPhase || 'moving';
+      restored.idleTimer = m.idleTimer || 0;
+      restored.idleDuration = m.idleDuration || 0;
+      restored.investigationTarget = m.investigationTarget || null;
+      restored.investigationTimer = m.investigationTimer || 0;
+      restored.lookDirection = m.lookDirection || 0;
+      restored.lookTimer = m.lookTimer || 0;
+      restored.interests = m.interests || [];
+      restored.checkedInterests = m.checkedInterests || [];
+      restored.curiosity = m.curiosity !== undefined ? m.curiosity : 50;
 
       if (restored.isBoss || restored.isDuoBoss) {
         restoreBossAbilities(restored);

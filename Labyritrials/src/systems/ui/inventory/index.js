@@ -92,6 +92,11 @@ export function openInventory() {
 function showInventory() {
   const inventoryUI = document.getElementById('inventory-ui');
   if (!inventoryUI) return;
+
+  // Принудительная остановка сердцебиения
+  import('../../../audio/audioManager.js').then(({ audio }) => {
+    audio.sound.stopLowHPSound();
+  });
   
   isInventoryOpen = true;
   inventoryUI.style.display = 'flex';

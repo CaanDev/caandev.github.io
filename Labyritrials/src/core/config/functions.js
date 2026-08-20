@@ -219,8 +219,8 @@ export function resetGameFull() {
   player.lastAttackTime = 0;
   player.staminaUpgradeCount = 0;
 
-  player.baseSpeed = 7;
-  player.speed = 7;
+  player.baseSpeed = 6;
+  player.speed = 6;
   player.originalSpeed = undefined;
   player.slowTimer = 0;
   player.poisonTimer = 0;

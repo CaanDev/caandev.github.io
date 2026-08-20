@@ -58,6 +58,11 @@ function showSettings() {
   const settingsUI = document.getElementById('settings-ui');
   if (!settingsUI) return;
 
+  // Принудительная остановка сердцебиения игрока
+  import('../../../audio/audioManager.js').then(({ audio }) => {
+    audio.sound.stopLowHPSound();
+  });
+
   settingsOpen = true;
   loadSettings();
   updateSettingsUI();
@@ -161,6 +166,7 @@ function updateSettingsUI() {
  * @returns {void}
  */
 export function initSettingsHandlers() {
+  // ===== ВКЛАДКИ =====
   document.querySelectorAll('.settings-tab').forEach(tab => {
     const newTab = tab.cloneNode(true);
     tab.parentNode.replaceChild(newTab, tab);
@@ -169,7 +175,11 @@ export function initSettingsHandlers() {
       switchSettingsTab(tabId);
     });
   });
+  
+  // ===== ПРОКРУТКА ВКЛАДОК =====
+  initTabsScrolling();
 
+  // ===== КНОПКА ЗАКРЫТИЯ =====
   const closeBtn = document.getElementById('settings-close-btn');
   if (closeBtn) {
     const newCloseBtn = closeBtn.cloneNode(true);
@@ -234,6 +244,109 @@ export function initSettings() {
   if (pauseMenu) {
     observer.observe(pauseMenu, { attributes: true, attributeFilter: ['style'] });
   }
+}
+
+/**
+ * Инициализация обработчиков вкладок (прокрутка колёсиком + тапы)
+ * 
+ * @returns {void}
+ * @private
+ */
+function initTabsScrolling() {
+  const tabsWrapper = document.querySelector('.settings-tabs-wrapper');
+  const tabsContainer = document.querySelector('.settings-tabs');
+  if (!tabsWrapper || !tabsContainer) return;
+  
+  // ===== 1. ПРОКРУТКА КОЛЁСИКОМ МЫШИ =====
+  tabsContainer.addEventListener('wheel', (e) => {
+    if (tabsContainer.scrollWidth > tabsContainer.clientWidth) {
+      e.preventDefault();
+      tabsContainer.scrollLeft += e.deltaY;
+      updateTabsScrollState(tabsWrapper, tabsContainer);
+    }
+  }, { passive: false });
+  
+  // ===== 2. ИНИЦИАЛИЗАЦИЯ СОСТОЯНИЯ =====
+  updateTabsScrollState(tabsWrapper, tabsContainer);
+  
+  // ===== 3. ОБНОВЛЕНИЕ ПРИ РЕСАЙЗЕ И ПРОКРУТКЕ =====
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      updateTabsScrollState(tabsWrapper, tabsContainer);
+    }, 100);
+  });
+  
+  tabsContainer.addEventListener('scroll', () => {
+    updateTabsScrollState(tabsWrapper, tabsContainer);
+  });
+
+  // ===== 4. ТАЧ-ПРОКРУТКА (свайп по вкладкам) =====
+  let touchStartX = 0;
+  let touchCurrentX = 0;
+  let isDragging = false;
+  let startScrollLeft = 0;
+
+  tabsContainer.addEventListener('touchstart', (e) => {
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchCurrentX = touch.clientX;
+    startScrollLeft = tabsContainer.scrollLeft;
+    isDragging = false;
+  }, { passive: true });
+
+  tabsContainer.addEventListener('touchmove', (e) => {
+    const touch = e.touches[0];
+    touchCurrentX = touch.clientX;
+    const deltaX = touchCurrentX - touchStartX;
+    
+    if (Math.abs(deltaX) > 10) {
+      isDragging = true;
+      e.preventDefault();
+      tabsContainer.scrollLeft = startScrollLeft - deltaX;
+      updateTabsScrollState(tabsWrapper, tabsContainer);
+    }
+  }, { passive: false });
+
+  tabsContainer.addEventListener('touchend', (e) => {
+    if (isDragging) {
+      e.preventDefault();
+      const target = e.target;
+      if (target && target.closest) {
+        const tab = target.closest('.settings-tab');
+        if (tab) {
+          tab.style.pointerEvents = 'none';
+          setTimeout(() => {
+            tab.style.pointerEvents = '';
+          }, 100);
+        }
+      }
+    }
+    isDragging = false;
+  }, { passive: false });
+}
+
+/**
+ * Обновление состояния прокрутки вкладок (градиенты)
+ * 
+ * @param {HTMLElement} tabsWrapper - Обёртка вкладок
+ * @param {HTMLElement} tabsContainer - Контейнер с вкладками
+ * @returns {void}
+ * @private
+ */
+function updateTabsScrollState(tabsWrapper, tabsContainer) {
+  if (!tabsWrapper || !tabsContainer) return;
+  
+  const canScrollRight = tabsContainer.scrollWidth > tabsContainer.clientWidth;
+  const isAtStart = tabsContainer.scrollLeft <= 5;
+  const isAtEnd = tabsContainer.scrollLeft >= tabsContainer.scrollWidth - tabsContainer.clientWidth - 5;
+  
+  // Правое затенение (есть контент справа)
+  tabsWrapper.classList.toggle('can-scroll-right', canScrollRight && !isAtEnd);
+  
+  // Левое затенение (есть контент слева)
+  tabsWrapper.classList.toggle('can-scroll-left', canScrollRight && !isAtStart);
 }
 
 export { updateFpsDisplay, shouldSkipFrame, getFrameInterval, updateFpsLimit };

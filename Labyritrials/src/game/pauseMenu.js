@@ -54,7 +54,8 @@ function showPauseMenu() {
   if (!pauseMenu) return;
   
   isPaused = true;
-  
+  audio.sound.stopLowHPSound();
+
   Game.stopLoop();
   updatePauseStats();
   pauseMenu.style.display = 'flex';
@@ -161,25 +162,24 @@ async function saveGameFromPause() {
  * @private
  */
 function handleExitToMainMenu() {
+  // Закрываем паузу
   const pauseMenu = document.getElementById('pause-menu');
   if (pauseMenu) pauseMenu.style.display = 'none';
   
   isPaused = false;
+  registerModalClose('pause');
   
+  // Сбрасываем клавиши
   resetAllKeys();
   
-  const ui = document.getElementById('ui');
-  if (ui) ui.style.display = 'block';
-  
-  const controlButtons = document.getElementById('control-buttons-container');
-  if (controlButtons) controlButtons.style.display = 'flex';
-  
+  // Запускаем игровой цикл (чтобы UI обновился)
   Game.startLoop();
   
   audio.isGameActive = true;
   audio.resume();
   
-  const result = exitToMainMenu();
+  // Выходим в главное меню (с confirm)
+  exitToMainMenu();
 }
 
 /**

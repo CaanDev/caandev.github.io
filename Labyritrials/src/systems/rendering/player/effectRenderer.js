@@ -81,7 +81,7 @@ export function drawShockEffect(ctx) {
  * @returns {void}
  * @private
  */
-function drawShockSparks(ctx) {
+export function drawShockSparks(ctx) {
   if (!state.shockSparks) state.shockSparks = [];
   
   // Создание новых искр
@@ -173,7 +173,7 @@ export function drawPoisonEffect(ctx) {
  * @returns {void}
  * @private
  */
-function drawPoisonBubbles(ctx) {
+export function drawPoisonBubbles(ctx) {
   if (!state.poisonBubbles) state.poisonBubbles = [];
   
   // Создание новых пузырьков

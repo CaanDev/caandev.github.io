@@ -11,6 +11,7 @@ import {
   setLastSelectedItem 
 } from './descriptionRenderer.js';
 import { getWeaponIconHTML } from './utils.js';
+import { audio } from '../../../../audio/audioManager.js';
 
 /**
  * Рендеринг сетки ближнего оружия
@@ -79,20 +80,22 @@ export function renderWeaponGrid() {
       el.addEventListener('click', () => {
         const weaponId = el.dataset.weapon;
         if (weaponId) {
-          // ===== ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ОРУЖИЯ =====
-          // 1. Если кликаем на уже экипированное оружие (не default) — снимаем его
+          const previousWeapon = player.meleeWeapon;
+          
+          // Логика переключения оружия
           if (player.meleeWeapon === weaponId && weaponId !== 'default') {
             player.meleeWeapon = 'default';
-          } 
-          // 2. Если кликаем на default, а экипировано другое — переключаем на default
-          else if (weaponId === 'default' && player.meleeWeapon !== 'default') {
+          } else if (weaponId === 'default' && player.meleeWeapon !== 'default') {
             player.meleeWeapon = 'default';
-          } 
-          // 3. Если кликаем на другое оружие (не default) — экипируем его
-          else if (weaponId !== 'default' && player.meleeWeapon !== weaponId) {
+          } else if (weaponId !== 'default' && player.meleeWeapon !== weaponId) {
             player.meleeWeapon = weaponId;
           }
-          // 4. Если кликаем на уже экипированное default — ничего не делаем
+          
+          // Звук только если оружие действительно изменилось
+          if (previousWeapon !== player.meleeWeapon) {
+            // Воспроизведение звука экипировки
+            audio.playSound('interactions.equip');
+          }
           
           if (window._inventoryRefreshCallback) {
             window._inventoryRefreshCallback();
@@ -170,12 +173,21 @@ export function renderRangedGrid() {
       el.addEventListener('click', () => {
         const weaponId = el.dataset.weapon;
         if (weaponId) {
-          // Логика для дальнего оружия (проще — просто переключаем)
+          const previousRanged = player.rangedWeapon;
+          
+          // Логика для дальнего оружия
           if (player.rangedWeapon === weaponId) {
             player.rangedWeapon = null;
           } else {
             player.rangedWeapon = weaponId;
           }
+          
+          // Звук только если оружие действительно изменилось
+          if (previousRanged !== player.rangedWeapon) {
+            // Воспроизведение звука экипировки
+            audio.playSound('interactions.equip');
+          }
+          
           if (window._inventoryRefreshCallback) {
             window._inventoryRefreshCallback();
           }

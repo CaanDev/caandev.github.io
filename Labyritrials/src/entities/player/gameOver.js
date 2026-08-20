@@ -37,6 +37,11 @@ export function triggerGameOver() {
   if (isGameOverInProgress) return;
   isGameOverInProgress = true;
 
+  // Принудительная остановка сердцебиения игрока
+  import('../../audio/audioManager.js').then(({ audio }) => {
+    audio.sound.stopLowHPSound();
+  });
+
   // ===== СОХРАНЕНИЕ ЗОЛОТА =====
   goldAtDeath = player.gold;
 

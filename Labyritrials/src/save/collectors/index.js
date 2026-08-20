@@ -42,6 +42,7 @@ export {
   collectTrapsData,
   collectArtifactsData,
   collectChestsData,
+  collectMimicsData,
   collectShrinesData,
   collectLootData
 } from './objectCollector.js';

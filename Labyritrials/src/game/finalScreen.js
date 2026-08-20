@@ -20,6 +20,11 @@ import { loadTemplateIfNeeded, isTemplateLoaded } from '../utils/htmlLoader.js';
  */
 function doShowFinalScreen() {
   Game.stopLoop();
+
+  // Принудительная остановка сердцебиения игрока
+  import('../../audio/audioManager.js').then(({ audio }) => {
+    audio.sound.stopLowHPSound();
+  });
   
   const gameUI = document.getElementById('ui');
   if (gameUI) gameUI.style.display = 'none';

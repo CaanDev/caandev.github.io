@@ -19,8 +19,8 @@ export { drawAttackTrails, updateAttackTrails };
  * @returns {void}
  */
 export function drawAttackLine(ctx) {
-  // Проверка, активна ли атака
-  if (!player.isAttacking || !player.attackExecuted) return;
+  // Проверка, активна ли атака и не является ли она огненным шаром
+  if (!player.isAttacking || !player.attackExecuted || player.isFireballAttack) return;
   
   const isCharged = player.chargeTime > 30;
   const isVampire = player.meleeWeapon === 'vampire';

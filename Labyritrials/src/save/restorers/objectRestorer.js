@@ -89,6 +89,32 @@ export function restoreChestsData(save) {
 }
 
 /**
+ * Восстановление данных о мимиках
+ * 
+ * @param {Object} save - Объект сохранения
+ * @returns {void}
+ */
+export function restoreMimicsData(save) {
+  if (save.mimics && Array.isArray(save.mimics)) {
+    state.mimics = save.mimics.map(m => ({
+      x: m.x, y: m.y, gridX: m.gridX, gridY: m.gridY,
+      type: m.type || 'mimic',
+      opened: m.opened || false,
+      isDead: m.isDead || false,
+      hp: m.hp || 100,
+      maxHp: m.maxHp || 100,
+      countedForAchievement: m.countedForAchievement || false,
+      lastHitTime: m.lastHitTime || 0,
+      lastAttackTime: m.lastAttackTime || 0,
+      hpBarVisible: m.hpBarVisible || false,
+      biome: m.biome || 'cave'
+    }));
+  } else {
+    state.mimics = [];
+  }
+}
+
+/**
  * Восстановление данных о святилищах (алтарях)
  * 
  * @param {Object} save - Объект сохранения

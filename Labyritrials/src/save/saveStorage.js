@@ -24,7 +24,6 @@ export function saveToLocalStorage(data) {
   try {
     const result = compressWithStats(data);
     localStorage.setItem(SAVE_KEY, result.compressed);
-    logger.save(`💾 Игра сохранена! (${result.originalSize} байт)`);
   } catch (e) {
     logger.error('❌ Ошибка сохранения:', e);
   }
@@ -41,7 +40,6 @@ export function loadFromLocalStorage() {
 
   try {
     const data = JSON.parse(raw);
-    logger.save('📀 Данные загружены');
     return data;
   } catch (e) {
     logger.error('❌ Ошибка загрузки сохранения:', e);
@@ -67,7 +65,6 @@ function isSaveExpired(saveDate) {
  */
 export function deleteSave() {
   localStorage.removeItem(SAVE_KEY);
-  logger.save('🗑️ Сохранение удалено');
 }
 
 /**
@@ -199,5 +196,4 @@ export function showSaveNotification() {
 export function deleteAllSaveData() {
   localStorage.removeItem(SAVE_KEY);
   deleteNotesStorage();
-  logger.save('🗑️ Все данные игры удалены (включая записки)');
 }

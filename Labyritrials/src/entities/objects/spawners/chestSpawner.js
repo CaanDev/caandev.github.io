@@ -25,12 +25,14 @@ import {
 export function spawnChests(isTreasureRoom = false, isProtectedCell = () => false) {
   if (state.isBossLevel) {
     state.chests = [];
+    state.mimics = [];
     return;
   }
 
   state.chests = [];
+  state.mimics = [];
 
-  // ===== ПОИСК ТУПИКОВ (dead ends) =====
+  // Поиск тупиков (dead ends)
   let deadEnds = [];
   for (let y = 1; y < CONFIG.rows - 1; y++) {
     for (let x = 1; x < CONFIG.cols - 1; x++) {
@@ -55,20 +57,18 @@ export function spawnChests(isTreasureRoom = false, isProtectedCell = () => fals
         if (state.grid[y][x-1].isBreakable) breakableWalls++;
         if (state.grid[y][x+1].isBreakable) breakableWalls++;
 
-        if (wallCount === 3) {
-          deadEnds.push({ x, y, breakableWalls });
-        }
+        if (wallCount === 3) deadEnds.push({ x, y, breakableWalls });
       }
     }
   }
 
-  // ===== ПЕРЕМЕШИВАНИЕ ТУПИКОВ =====
+  // Перемешивание тупиков
   for (let i = deadEnds.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
     [deadEnds[i], deadEnds[j]] = [deadEnds[j], deadEnds[i]];
   }
 
-  // ===== ВЫБОР КОЛИЧЕСТВА СУНДУКОВ =====
+  // Выбор количества сундуков
   let targetCount = Math.min(Math.floor(Math.random() * 5) + 1, deadEnds.length);
 
   for (let i = 0; i < targetCount; i++) {
@@ -90,7 +90,42 @@ export function spawnChests(isTreasureRoom = false, isProtectedCell = () => fals
       chestType = 'empty';
     }
 
-    // ===== СОЗДАНИЕ СУНДУКА =====
+    // Создание мимика
+    if (chestType === 'mimic') {
+      const biome = state.currentBiome || 'cave';
+      
+      state.mimics.push({
+        x: pos.x * CONFIG.cellSize + CONFIG.cellSize / 2,
+        y: pos.y * CONFIG.cellSize + CONFIG.cellSize / 2,
+        gridX: pos.x,
+        gridY: pos.y,
+        type: 'mimic',
+        opened: false,
+        isDead: false,
+        hp: 100,
+        maxHp: 100,
+        countedForAchievement: false,
+        lastHitTime: 0,
+        lastAttackTime: 0,
+        hpBarVisible: false,
+        // Для отрисовки
+        mimicImageKey: null,
+        mimicImagePath: null,
+        biome: biome,
+      });
+      
+      // Создаём мух над мимиком
+      createFlies(
+        pos.x * CONFIG.cellSize + CONFIG.cellSize / 2,
+        pos.y * CONFIG.cellSize + CONFIG.cellSize / 2,
+        biome
+      );
+      
+      markCellUsed(pos.x, pos.y);
+      continue;
+    }
+
+    // Создание сундука
     const chestData = {
       x: pos.x * CONFIG.cellSize + CONFIG.cellSize / 2,
       y: pos.y * CONFIG.cellSize + CONFIG.cellSize / 2,
@@ -120,17 +155,6 @@ export function spawnChests(isTreasureRoom = false, isProtectedCell = () => fals
     }
 
     state.chests.push(chestData);
-
-    // Мухи для мимиков
-    if (chestType === 'mimic') {
-      const biome = state.currentBiome || 'cave';
-      createFlies(
-        pos.x * CONFIG.cellSize + CONFIG.cellSize / 2,
-        pos.y * CONFIG.cellSize + CONFIG.cellSize / 2,
-        biome
-      );
-    }
-
     markCellUsed(pos.x, pos.y);
   }
 }
@@ -141,7 +165,7 @@ export function spawnChests(isTreasureRoom = false, isProtectedCell = () => fals
  * @returns {void}
  */
 export function spawnTreasureRoomLoot() {
-  // ===== ЗОЛОТО =====
+  // Золото
   for (let i = 0; i < 5; i++) {
     const cell = getRandomFreeCell((x, y) => {
       if (!state.grid[y] || !state.grid[y][x]) return false;
@@ -165,7 +189,7 @@ export function spawnTreasureRoomLoot() {
     }
   }
 
-  // ===== АРТЕФАКТЫ =====
+  // Артефакты
   for (let i = 0; i < 2; i++) {
     const cell = getRandomFreeCell((x, y) => {
       if (!state.grid[y] || !state.grid[y][x]) return false;
@@ -187,7 +211,7 @@ export function spawnTreasureRoomLoot() {
     }
   }
 
-  // ===== СУНДУКИ С ЗОЛОТОМ =====
+  // Сундуки с золотом
   for (let i = 0; i < 2; i++) {
     const cell = getRandomFreeCell((x, y) => {
       if (!state.grid[y] || !state.grid[y][x]) return false;
@@ -212,7 +236,7 @@ export function spawnTreasureRoomLoot() {
     }
   }
 
-  // ===== ЗЕЛЬЯ =====
+  // Зелья
   for (let i = 0; i < 3; i++) {
     const cell = getRandomFreeCell((x, y) => {
       if (!state.grid[y] || !state.grid[y][x]) return false;

@@ -1,6 +1,6 @@
 /**
  * @fileoverview Рендерер записок на стенах.
- * Отрисовывает метки записок на разрушаемых стенах.
+ * Отрисовывает метки записок на стенах.
  * 
  * @module systems/rendering/maze/walls/noteRenderer
  */
@@ -28,77 +28,77 @@ export function drawNoteOnWall(ctx, dx, dy, noteId) {
   const availableWidth = cellSize - margin * 2;
   const availableHeight = cellSize - margin * 2;
   
+  // Позиция метки (случайная в пределах стены)
   const posX = margin + seededRandom(100) * availableWidth;
   const posY = margin + seededRandom(200) * availableHeight;
   
-  const size = 14 + seededRandom(300) * 6;
-  const halfSize = size / 2;
-  const thickness = 1.8;
-  
-  const rotationIndex = Math.floor(seededRandom(400) * 3);
-  let finalRotation;
-  if (rotationIndex === 0) finalRotation = 0;
-  else if (rotationIndex === 1) finalRotation = Math.PI / 4;
-  else finalRotation = 3 * Math.PI / 4;
-  
   const time = Date.now() * 0.001;
-  const pulse = 0.6 + 0.4 * Math.sin(time * 2 + noteId);
   
   ctx.save();
   ctx.translate(dx + posX, dy + posY);
-  ctx.rotate(finalRotation);
   
-  const alpha = 0.7 + 0.3 * pulse;
-  ctx.shadowBlur = 10 * pulse;
-  ctx.shadowColor = `rgba(200, 200, 100, ${0.3 * pulse})`;
+  // Размер звезды (фиксированный, зависит только от ID записки)
+  const size = 6 + seededRandom(300) * 4;
   
-  ctx.lineWidth = thickness;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
+  // Пульсация яркости
+  const pulse = 0.6 + 0.4 * Math.sin(time * 2.5 + noteId * 0.7);
   
-  const lineGradient = ctx.createLinearGradient(-halfSize, 0, halfSize, 0);
-  lineGradient.addColorStop(0, `rgba(200, 200, 100, ${0.05 * alpha})`);
-  lineGradient.addColorStop(0.15, `rgba(200, 200, 100, ${0.3 * alpha})`);
-  lineGradient.addColorStop(0.4, `rgba(200, 200, 100, ${0.7 * alpha})`);
-  lineGradient.addColorStop(0.6, `rgba(200, 200, 100, ${0.7 * alpha})`);
-  lineGradient.addColorStop(0.85, `rgba(200, 200, 100, ${0.3 * alpha})`);
-  lineGradient.addColorStop(1, `rgba(200, 200, 100, ${0.05 * alpha})`);
+  const glowSize = size * 3.2;
+  const glowGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
+  glowGradient.addColorStop(0, `rgba(255, 230, 100, ${0.2 * pulse})`);
+  glowGradient.addColorStop(0.15, `rgba(255, 225, 90, ${0.18 * pulse})`);
+  glowGradient.addColorStop(0.35, `rgba(255, 215, 80, ${0.12 * pulse})`);
+  glowGradient.addColorStop(0.6, `rgba(255, 200, 60, ${0.06 * pulse})`);
+  glowGradient.addColorStop(0.85, `rgba(255, 190, 50, ${0.02 * pulse})`);
+  glowGradient.addColorStop(1, 'rgba(255, 180, 40, 0)');
   
-  ctx.strokeStyle = lineGradient;
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = glowGradient;
   ctx.beginPath();
-  ctx.moveTo(-halfSize, 0);
-  ctx.lineTo(halfSize, 0);
-  ctx.stroke();
+  ctx.arc(0, 0, glowSize, 0, Math.PI * 2);
+  ctx.fill();
   
-  const lineGradientV = ctx.createLinearGradient(0, -halfSize, 0, halfSize);
-  lineGradientV.addColorStop(0, `rgba(200, 200, 100, ${0.05 * alpha})`);
-  lineGradientV.addColorStop(0.15, `rgba(200, 200, 100, ${0.3 * alpha})`);
-  lineGradientV.addColorStop(0.4, `rgba(200, 200, 100, ${0.7 * alpha})`);
-  lineGradientV.addColorStop(0.6, `rgba(200, 200, 100, ${0.7 * alpha})`);
-  lineGradientV.addColorStop(0.85, `rgba(200, 200, 100, ${0.3 * alpha})`);
-  lineGradientV.addColorStop(1, `rgba(200, 200, 100, ${0.05 * alpha})`);
+  const rays = 4;
   
-  ctx.strokeStyle = lineGradientV;
-  ctx.beginPath();
-  ctx.moveTo(0, -halfSize);
-  ctx.lineTo(0, halfSize);
-  ctx.stroke();
+  for (let i = 0; i < rays; i++) {
+    const angle = (Math.PI * 2 / rays) * i + time * 0.3;
+    const rayLength = size * 1.5;
+    const rayWidth = size * 0.2;
+    
+    ctx.save();
+    ctx.rotate(angle);
+    ctx.shadowBlur = 12 * pulse; // ← было 15, стало 12
+    ctx.shadowColor = `rgba(255, 230, 100, ${0.5 * pulse})`;
+    ctx.fillStyle = `rgba(255, 240, 150, ${0.4 + 0.3 * pulse})`;
+    ctx.beginPath();
+    ctx.moveTo(0, -rayLength);
+    ctx.lineTo(rayWidth, -size * 0.15);
+    ctx.lineTo(0, -size * 0.05);
+    ctx.lineTo(-rayWidth, -size * 0.15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
   
   ctx.shadowBlur = 20 * pulse;
-  ctx.shadowColor = `rgba(200, 200, 100, ${0.12 * pulse})`;
+  ctx.shadowColor = `rgba(255, 230, 100, ${0.7 * pulse})`;
   
-  ctx.strokeStyle = `rgba(255, 255, 200, ${0.12 * alpha})`;
-  ctx.lineWidth = 1;
+  const coreGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.5);
+  coreGradient.addColorStop(0, `rgba(255, 255, 240, ${0.9 + 0.1 * pulse})`);
+  coreGradient.addColorStop(0.3, `rgba(255, 240, 180, ${0.75 + 0.15 * pulse})`);
+  coreGradient.addColorStop(0.6, `rgba(255, 225, 130, ${0.5 + 0.15 * pulse})`);
+  coreGradient.addColorStop(1, `rgba(255, 210, 90, ${0.2 + 0.1 * pulse})`);
   
+  ctx.fillStyle = coreGradient;
   ctx.beginPath();
-  ctx.moveTo(-halfSize * 0.4, 0);
-  ctx.lineTo(halfSize * 0.4, 0);
-  ctx.stroke();
+  ctx.arc(0, 0, size * 0.5, 0, Math.PI * 2);
+  ctx.fill();
   
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = `rgba(255, 255, 255, ${0.6 + 0.3 * pulse})`;
   ctx.beginPath();
-  ctx.moveTo(0, -halfSize * 0.4);
-  ctx.lineTo(0, halfSize * 0.4);
-  ctx.stroke();
+  ctx.arc(-size * 0.15, -size * 0.15, size * 0.2, 0, Math.PI * 2);
+  ctx.fill();
   
   ctx.restore();
 }

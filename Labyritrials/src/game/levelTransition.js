@@ -144,6 +144,11 @@ function setupContinueButton() {
  * @private
  */
 function showLevelUpWindow() {
+  // Принудительная остановка сердцебиения игрока
+  import('../audio/audioManager.js').then(({ audio }) => {
+    audio.sound.stopLowHPSound();
+  });
+  
   // ==== ЗАГРУЗКА ШАБЛОНА (ЕСЛИ НУЖНО) =====
   if (!isTemplateLoaded('levelUp')) {
     loadTemplateIfNeeded('levelUp').then(() => {

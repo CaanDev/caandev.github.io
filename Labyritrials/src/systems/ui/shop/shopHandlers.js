@@ -40,7 +40,7 @@ export function initBuyHpHandler(updateShopUICallback) {
         player.hpCost = Math.min(newCost, CONFIG.shop.hpMaxCost);
         
         // Эффекты и обновление
-        audio.playSound('shopBuyItem', 0.6);
+        audio.playSound('interactions.shopBuyItem');
         
         // ===== ОБНОВЛЕНИЕ UI =====
         // Сначала вызываем колбэк
@@ -97,7 +97,7 @@ export function initBuyDamageHandler(updateShopUICallback) {
         const newCost = Math.floor(player.dmgCost * CONFIG.shop.dmgCostMultiplier);
         player.dmgCost = Math.min(newCost, CONFIG.shop.dmgMaxCost);
         
-        audio.playSound('shopBuyItem', 0.6);
+        audio.playSound('interactions.shopBuyItem');
         
         updateShopUICallback();
         
@@ -158,7 +158,7 @@ export function initBuyStaminaHandler(updateShopUICallback) {
       player.staminaUpgradeCount++;
       player.staminaUpgradeCost = Math.floor(cost * 1.25);
 
-      audio.playSound('shopBuyItem', 0.6);
+      audio.playSound('interactions.shopBuyItem');
       
       // Обновляем UI через колбэк
       updateShopUICallback();
@@ -226,7 +226,7 @@ export function initBuyVampireStaffHandler(updateShopUICallback) {
         
         updateWeaponsBoughtProgress();
         
-        audio.playSound('shopBuyItem', 0.6);
+        audio.playSound('interactions.shopBuyItem');
         updateShopUICallback();
         Game.updateUI();
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.vampireStaff));
@@ -269,7 +269,7 @@ export function initBuyStunStaffHandler(updateShopUICallback) {
         
         updateWeaponsBoughtProgress();
         
-        audio.playSound('shopBuyItem', 0.6);
+        audio.playSound('interactions.shopBuyItem');
         updateShopUICallback();
         Game.updateUI();
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.stunStaff));
@@ -312,7 +312,7 @@ export function initBuyFireballHandler(updateShopUICallback) {
         
         updateWeaponsBoughtProgress();
         
-        audio.playSound('shopBuyItem', 0.6);
+        audio.playSound('interactions.shopBuyItem');
         updateShopUICallback();
         Game.updateUI();
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.fireball));
@@ -346,7 +346,7 @@ export function initBuyMapHandler(updateShopUICallback) {
         updateProgress('map_bought', 1);
 
         // Эффекты и обновление
-        audio.playSound('shopBuyItem', 0.6);
+        audio.playSound('interactions.shopBuyItem');
         updateShopUICallback();
         Game.updateUI();
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.map));
@@ -395,7 +395,7 @@ export function initBuyTalismanFireHandler(updateShopUICallback) {
         player.inventory.items.equipment.push('talismanFire');
 
         // Эффекты
-        audio.playSound('shopBuyItem', 0.6);
+        audio.playSound('interactions.shopBuyItem');
         updateShopUICallback();
         Game.updateUI();
         updateShopkeeperSpeech(getRandomSpeech(SPEECH.talismanFire));

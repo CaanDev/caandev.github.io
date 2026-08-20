@@ -24,6 +24,8 @@
  * @property {string|null} useColor - Цвет сообщения при использовании
  * @property {string|null} slot - Слот для экипировки (для предметов типа 'equipment')
  * @property {boolean} isNew - Новинка (для отображения в магазине)
+ * @property {boolean} requiresInteraction - Требуется ли нажатие E для подбора с пола
+ * @property {boolean} showPopup - Показывать ли окно с информацией при подборе
  */
 
 /**
@@ -50,10 +52,11 @@ export const ITEMS_DATA = {
     useMessage: '🗺️ Карта активирована!',
     useColor: '#f1c40f',
     isNew: false,
+    requiresInteraction: false,
   },
 
   /**
-   * Огненный талисман — усиливает атаку огнём
+   * Огненный талисман — защищает от холода
    */
   talismanFire: {
     id: 'talismanFire',
@@ -73,8 +76,38 @@ export const ITEMS_DATA = {
     useColor: null,
     slot: 'item1',
     isNew: true,
+    requiresInteraction: false,
+  },
+
+  /**
+   * Талисман охотника на мимиков — позволяет наносить урон мимикам
+   */
+  talismanMimicHunter: {
+    id: 'talismanMimicHunter',
+    name: 'Талисман охотника на мимиков',
+    icon: '🗡️',
+    imageKey: 'talismanMimicHunter',
+    desc: 'Позволяет наносить урон сундукам-мимикам',
+    type: 'equipment',
+    price: 0,
+    minLevel: 1,
+    hideUntilLevel: null,
+    stackable: false,
+    maxStack: 1,
+    persistent: true,
+    oneTimeUse: false,
+    useMessage: null,
+    useColor: null,
+    slot: 'item1',
+    isNew: false,
+    requiresInteraction: true,
+    showPopup: true,
   },
 };
+
+// ============================================================
+// ФУНКЦИИ ДЛЯ РАБОТЫ С ДАННЫМИ
+// ============================================================
 
 /**
  * Получение данных о предмете по ID

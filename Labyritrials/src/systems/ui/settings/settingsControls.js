@@ -1,19 +1,15 @@
 /**
  * @fileoverview Обработчики элементов управления в настройках.
- * Инициализирует слайдеры, переключатели, выпадающие списки и кнопки
- * в окне настроек.
- * 
  * @module systems/ui/settings/settingsControls
  */
 
-import { updateSetting } from './settingsManager.js';
+import { updateSetting, DEFAULT_SETTINGS } from './settingsManager.js';  // ← добавить импорт DEFAULT_SETTINGS
 import { updateFpsVisibility } from './settingsFps.js';
 import { clearAllGameData, exportSaveData, importSaveData } from './settingsData.js';
 import { closeSettings } from './settingsUI.js';
 
 /**
  * Инициализация слайдеров громкости
- * 
  * @returns {void}
  */
 export function initSliders() {
@@ -25,11 +21,28 @@ export function initSliders() {
   sliders.forEach(({ id, valueId, key, suffix }) => {
     const slider = document.getElementById(id);
     const valueDisplay = document.getElementById(valueId);
+    
     if (slider && valueDisplay) {
+      // Обычный клик
       slider.addEventListener('input', () => {
         const value = parseInt(slider.value);
         valueDisplay.textContent = `${value}${suffix}`;
         updateSetting(key, value);
+      });
+
+      // Двойной клик для сброса до значений по умолчанию
+      slider.addEventListener('dblclick', () => {
+        const defaultValue = DEFAULT_SETTINGS[key];
+        slider.value = defaultValue;
+        valueDisplay.textContent = `${defaultValue}${suffix}`;
+        updateSetting(key, defaultValue);
+        
+        // Визуальная обратная связь
+        slider.style.transition = 'box-shadow 0.2s ease';
+        slider.style.boxShadow = '0 0 20px rgba(46, 204, 113, 0.5)';
+        setTimeout(() => {
+          slider.style.boxShadow = 'none';
+        }, 400);
       });
     }
   });

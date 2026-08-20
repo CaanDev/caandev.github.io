@@ -13,7 +13,11 @@ export { updateMonsterMemory } from './memory.js';
 export { 
   updateChaseMovement, 
   updatePatrolMovement, 
-  updateFleeMovement 
+  updateFleeMovement,
+  generatePatrolPath,
+  findInterestingPoints,
+  startInvestigation,
+  updateInvestigation
 } from './movement.js';
 
 // ===== ДВИЖЕНИЕ С ИНЕРЦИЕЙ =====

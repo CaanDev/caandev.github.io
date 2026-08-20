@@ -11,6 +11,7 @@ import {
 } from './descriptionRenderer.js';
 import { getItemIconHTML } from './utils.js';
 import { EQUIPMENT_CONFIG } from '../inventoryData.js';
+import { audio } from '../../../../audio/audioManager.js';
 
 /**
  * Рендеринг сетки снаряжения
@@ -107,6 +108,9 @@ export function renderEquipmentGrid() {
             player.inventory.equipped[freeSlot] = itemId;
           }
         }
+
+        // Воспроизведение звука экипировки
+        audio.playSound('interactions.equip');
         
         // Обновляем рендеринг
         if (window._inventoryRefreshCallback) {

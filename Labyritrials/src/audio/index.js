@@ -1,24 +1,41 @@
 /**
- * @fileoverview Точка входа для аудиосистемы.
- * Экспортирует все основные компоненты аудио: AudioManager, MusicManager, SoundManager.
- * 
- * @module audio
+ * @fileoverview Точка входа для аудиосистемы
+ * @module audio/index
  */
 
-/**
- * Экспорт менеджера аудио — центрального контроллера
- * @see module:audio/audioManager
- */
+// ============================================================
+// МУЗЫКА
+// ============================================================
+
+export {
+  music,
+  musicLoader,
+  MUSIC_TRACKS,
+  getTrackConfig,
+  hasTrack,
+  getTrackKeys,
+  getPreloadTracks,
+} from './music/index.js';
+
+// ============================================================
+// ЗВУКОВЫЕ ЭФФЕКТЫ
+// ============================================================
+
+export {
+  sound,
+  soundLoader,
+  SOUNDS,
+  FLAT_SOUNDS,
+  getSoundConfig,
+  hasSound,
+  getSoundKeys,
+  getSoundsByCategory,
+  getSoundCategories,
+  getPreloadSounds,
+} from './sounds/index.js';
+
+// ============================================================
+// АУДИО МЕНЕДЖЕР (ЦЕНТРАЛЬНЫЙ КОНТРОЛЛЕР)
+// ============================================================
+
 export { audio } from './audioManager.js';
-
-/**
- * Экспорт менеджера музыки — управление фоновой музыкой
- * @see module:audio/musicManager
- */
-export { music } from './musicManager.js';
-
-/**
- * Экспорт менеджера звуков — управление звуковыми эффектами
- * @see module:audio/soundManager
- */
-export { sound } from './soundManager.js';

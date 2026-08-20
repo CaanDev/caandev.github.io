@@ -23,6 +23,8 @@ export const state = {
   lightZones: [],
   /** @type {Array} - Монстры на уровне */
   monsters: [],
+  /** @type {Array} - Мимики */
+  mimics: [],
   /** @type {Array} - Предметы на полу (золото, зелья) */
   lootItems: [],
   /** @type {Array} - Ловушки */
@@ -45,6 +47,16 @@ export const state = {
   torches: [],
   /** @type {Array} - Частицы огня от факелов */
   fireParticles: [],
+
+  /** @type {Object} - Состояние интерактивных предметов на полу */
+  interactiveItems: {
+    /** @type {boolean} - Показывать ли подсказку [E] */
+    showPrompt: false,
+    /** @type {Object|null} - Ближайший предмет для взаимодействия */
+    nearestItem: null,
+    /** @type {string|null} - Тип действия (для отображения в подсказке) */
+    actionLabel: null,
+  },
   
   // ============================================================
   // ВВОД
@@ -379,6 +391,8 @@ export const state = {
   originalShrinePortal: null,
   /** @type {boolean} - Оригинальный флаг наличия монстров */
   originalHadMonsters: false,
+  /** @type {Array} - Оригинальные мимики для восстановления */
+  originalMimics: [],
   
   // ============================================================
   // КОМНАТА-ЛОВУШКА
@@ -410,6 +424,8 @@ export const state = {
   trapExitRevealed: false,
   /** @type {boolean} - Загружена ли волна */
   trapWaveLoaded: false,
+  /** @type {boolean} - Был ли заспавнен сундук с талисманом охотника на мимиков */
+  mimicHunterChestSpawned: false,
   
   // ============================================================
   // ЭФФЕКТЫ РЕАЛЬНОСТИ

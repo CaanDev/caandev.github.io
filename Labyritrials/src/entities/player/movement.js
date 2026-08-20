@@ -61,9 +61,10 @@ function isPillarCollision(px, py, radius = 24) {
  * Обновление движения игрока
  * Обрабатывает ввод, коллизии со стенами и колоннами
  * 
+ * @param {number} deltaTime - Время с последнего обновления (мс)
  * @returns {void}
  */
-export function updateMovement() {
+export function updateMovement(deltaTime = 16) {
   // Блокировка движения во время появления босса
   if (state.isBossLevel && state.bossSpawnTriggered && !state.bossReady) return;
   
@@ -102,6 +103,7 @@ export function updateMovement() {
   else if (moveY > 0) moveDir = 'down';
   else if (moveY < 0) moveDir = 'up';
 
+  // ===== СОХРАНЯЕМ ПОСЛЕДНЕЕ НАПРАВЛЕНИЕ ДВИЖЕНИЯ =====
   if (moveX !== 0 || moveY !== 0) {
     player.lastMoveDirX = moveX;
     player.lastMoveDirY = moveY;
@@ -133,6 +135,10 @@ export function updateMovement() {
 
   // Звук шагов
   const didMove = (player.px !== oldPx || player.py !== oldPy);
+
+  // Устанавливаем флаг движения
+  player.isMoving = didMove;
+
   if (didMove && moveDir !== null) audio.playStep(moveDir);
 }
 
@@ -153,7 +159,7 @@ export function updateTorchActivation() {
       if (distToTorch < ACTIVATION_RADIUS) {
         torch.active = true;
 
-        audio.playSound('torchActivate', 0.4);
+        audio.playSound('interactions.torchActivate');
 
         // Установка цветов факела
         if (torch.flameColor === undefined) torch.flameColor = COLORS.torches.flame;
@@ -174,14 +180,6 @@ export function updateTorchActivation() {
         if (state.grid[torch.y] && state.grid[torch.y][torch.x]) {
           state.grid[torch.y][torch.x].revealed = true;
         }
-
-        // Визуальный эффект
-        state.damageTexts.push({
-          x: torchWorldX, y: torchWorldY - 20,
-          text: `✨🕯️`,
-          color: torch.flameColor || COLORS.torches.flame,
-          size: 20, life: 30, speedy: 0.8
-        });
 
         state.screenShake = 3;
       }

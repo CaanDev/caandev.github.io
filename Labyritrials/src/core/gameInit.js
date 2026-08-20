@@ -31,8 +31,8 @@ export const GameInit = {
     this.canvas = canvas;
 
     // Принудительный сброс скорости при инициализации
-    player.baseSpeed = 7;
-    player.speed = 7;
+    player.baseSpeed = 6;
+    player.speed = 6;
     player.originalSpeed = undefined;
 
     // Восстановление выносливости

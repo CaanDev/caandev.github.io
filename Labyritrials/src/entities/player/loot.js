@@ -8,6 +8,7 @@
 import { state, player } from '../../core/config/index.js';
 import { COLORS } from '../../core/config/colors.js';
 import { Game } from '../../core/game.js';
+import { audio } from '../../audio/audioManager.js';
 import { updateProgress } from '../../systems/achievements/index.js';
 
 /**
@@ -19,6 +20,10 @@ import { updateProgress } from '../../systems/achievements/index.js';
 export function collectLoot() {
   for (let i = state.lootItems.length - 1; i >= 0; i--) {
     let item = state.lootItems[i];
+
+    // Пропускаем интерактивные предметы (их подбирают по E)
+    if (item.requiresInteraction === true) continue;
+
     if (Math.hypot(player.px - item.x, player.py - item.y) < 35) {
       if (item.type === 'gold') {
         handleGoldPickup(item);

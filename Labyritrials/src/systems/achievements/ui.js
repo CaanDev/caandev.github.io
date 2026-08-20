@@ -42,7 +42,10 @@ let achievementsOpen = false;
 function getAchievementImageKey(id) {
   const imageMap = {
     // Combat
+    'first_kill': 'firstKill',
     'monster_slayer': 'monsterSlayer',
+    'monster_massacre': 'monsterMassacre',
+    'monster_legend': 'monsterLegend',
     'boss_hunter_5': 'bossHunter5',
     'boss_hunter_10': 'bossHunter10',
     'boss_hunter_15': 'bossHunter15',
@@ -231,6 +234,11 @@ function showAchievementsWindow() {
 
   import('./manager.js').then(module => {
     module.forceLoadAchievements();
+  });
+
+  // Принудительная остановка сердцебиения игрока
+  import('../../audio/audioManager.js').then(({ audio }) => {
+    audio.sound.stopLowHPSound();
   });
   
   achievementsOpen = true;

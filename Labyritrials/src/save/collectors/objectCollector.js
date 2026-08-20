@@ -40,6 +40,24 @@ export function collectChestsData() {
 }
 
 /**
+ * Сбор данных о мимиках
+ * 
+ * @returns {Object[]} - Массив данных о мимиках
+ */
+export function collectMimicsData() {
+  return state.mimics.map(m => ({
+    x: m.x, y: m.y, gridX: m.gridX, gridY: m.gridY,
+    type: m.type, opened: m.opened, isDead: m.isDead,
+    hp: m.hp, maxHp: m.maxHp,
+    countedForAchievement: m.countedForAchievement || false,
+    lastHitTime: m.lastHitTime || 0,
+    lastAttackTime: m.lastAttackTime || 0,
+    hpBarVisible: m.hpBarVisible || false,
+    biome: m.biome || 'cave'
+  }));
+}
+
+/**
  * Сбор данных о святилищах (алтарях)
  * 
  * @returns {Object[]} - Массив данных о святилищах

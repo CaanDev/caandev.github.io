@@ -69,8 +69,22 @@ export function drawTraps(ctx) {
     if (img && img.complete && img.naturalWidth > 0) {
       const size = 48;
       
-      // Яркость: 10% если не сработала, 100% если сработала
-      const alpha = t.hasDealtDamage ? 1.0 : 0.10;
+      // ===== ОПРЕДЕЛЯЕМ ПРОЗРАЧНОСТЬ =====
+      let alpha;
+      
+      if (t.hasDealtDamage) {
+        // Активированная ловушка — полностью видима
+        alpha = 1.0;
+      } else {
+        // Неактивированная ловушка — в зависимости от типа
+        if (trapType === 'ice') {
+          // Ледяная ловушка — 20% прозрачности
+          alpha = 0.80;
+        } else {
+          // Остальные ловушки — 65% прозрачности
+          alpha = 0.35;
+        }
+      }
       
       ctx.save();
       ctx.globalAlpha = alpha;
@@ -86,7 +100,17 @@ export function drawTraps(ctx) {
     else if (t.type === 'lightning') emoji = EMOJIS.traps.lightning;
     else if (t.type === 'psionic') emoji = EMOJIS.traps.psionic;
     
-    const alpha = t.hasDealtDamage ? 1.0 : 0.10;
+    let alpha;
+    
+    if (t.hasDealtDamage) {
+      alpha = 1.0;
+    } else {
+      if (t.type === 'ice') {
+        alpha = 0.80;
+      } else {
+        alpha = 0.35;
+      }
+    }
     
     ctx.save();
     ctx.globalAlpha = alpha;

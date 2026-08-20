@@ -35,7 +35,7 @@ import { updateProgress, setProgress } from '../../systems/achievements/index.js
  */
 export function handleMonsterDeath(m, index, monstersArray) {
   // Звук смерти (кроме боссов)
-  if (!m.isBoss && !m.isDuoBoss) audio.playSound('monsterDeath', 0.3);
+  if (!m.isBoss && !m.isDuoBoss) audio.playSound('monsters.monsterDeath');
 
   // Останавливаем звук эффекта шока (если есть)
   if (m._shockSound) {
@@ -171,7 +171,7 @@ export function handleMonsterDeath(m, index, monstersArray) {
  */
 export function handleNormalMonsterDeath(m, idx, monstersArray) {
   // Звук смерти
-  audio.playSound('monsterDeath', 0.3);
+  audio.playSound('monsters.monsterDeath');
 
   // Обновление статистики
   addMonsterKilled();

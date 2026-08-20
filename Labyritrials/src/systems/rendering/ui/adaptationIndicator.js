@@ -7,6 +7,7 @@
 
 import { state } from '../../../core/config/index.js';
 import { COLORS } from '../../../core/config/colors.js';
+import { roundedRect } from './utils.js';
 
 /**
  * Отрисовка индикатора адаптаций монстров
@@ -35,7 +36,7 @@ export function drawAdaptationIndicator(ctx, canvas) {
   if (adaptations.length === 0) return;
   
   const startX = 20;
-  const startY = 240;
+  const startY = 261;
   const itemWidth = 200;
   const itemHeight = 38;
   const gap = 10;
@@ -44,11 +45,27 @@ export function drawAdaptationIndicator(ctx, canvas) {
   ctx.save();
   
   // ===== ЗАГОЛОВОК =====
+  const headerHeight = 24;
+  const headerPadding = 10;
+  const headerX = startX;
+  const headerY = startY - headerHeight - 4;
+  const headerWidth = itemWidth;
+  const headerRadius = 6;
+  
+  // Фон заголовка
+  ctx.beginPath();
+  roundedRect(ctx, headerX, headerY, headerWidth, headerHeight, headerRadius);
   ctx.fillStyle = COLORS.ui.indicator.adaptation.bg || 'rgba(10, 10, 15, 0.85)';
-  ctx.fillRect(startX, startY - 25, itemWidth, 22);
+  ctx.fill();
+  
+  // Текст заголовка
   ctx.font = 'bold 11px Arial';
   ctx.fillStyle = COLORS.ui.indicator.adaptation.border || '#e74c3c';
-  ctx.fillText('⚔️ АДАПТАЦИИ МОНСТРОВ', startX + 10, startY - 10);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  
+  const textCenterY = headerY + headerHeight / 2 + 1;
+  ctx.fillText('⚔️ АДАПТАЦИИ МОНСТРОВ', startX + headerPadding, textCenterY);
   
   // ===== СПИСОК АДАПТАЦИЙ =====
   for (let i = 0; i < adaptations.length; i++) {

@@ -28,6 +28,7 @@ import { handleMonsterDamageToPlayer } from './combat.js';
 import { checkAdaptations } from './adaptations/index.js';
 import { snowState } from '../../systems/weather/snowManager.js';
 import { hasLineOfSight } from '../../world/physics.js';
+import { handleMonsterDeath } from './death.js';
 
 /** @type {number} - Счётчик кадров для восстановления HP монстров во время снега */
 let snowHealCounter = 0;
@@ -62,26 +63,52 @@ let updateCounter = 0;
  * Получение интервала обновления для монстра на основе расстояния до игрока
  * 
  * @param {number} distToPlayer - Расстояние до игрока в пикселях
+ * @param {Object} m - Объект монстра (для проверки состояния)
  * @returns {number} - Интервал обновления (в кадрах)
  */
-function getUpdateInterval(distToPlayer) {
-  if (distToPlayer <= UPDATE_ZONES.CLOSE.maxDist) return UPDATE_ZONES.CLOSE.interval;
-  if (distToPlayer <= UPDATE_ZONES.MID.maxDist) return UPDATE_ZONES.MID.interval;
-  if (distToPlayer <= UPDATE_ZONES.FAR.maxDist) return UPDATE_ZONES.FAR.interval;
-  return UPDATE_ZONES.VERY_FAR.interval;
+function getUpdateInterval(distToPlayer, m) {  
+  // Если монстр в режиме поиска — обновляем каждый кадр (независимо от памяти!)
+  if (m.isSearching) return 1;
+  
+  // Если монстр в режиме преследования И видит игрока (или уверен, где он) — обновляем каждый кадр
+  const isInActiveChase = m.state === 'chase' && (m.lastKnownX !== null && m.memoryTimer > 0);
+  
+  // Боссы всегда обновляются
+  if (m.isBoss || m.isDuoBoss) return 1;
+  
+  // Если монстр активно преследует — обновляем каждый кадр
+  if (isInActiveChase) return 1;
+  
+  // Иначе — стандартная логика по зонам
+  // Используем интервалы в секундах (при 60 FPS)
+  const DISTANCE_THRESHOLDS = {
+    CLOSE: 600,    // 10 клеток
+    MID: 1000,     // ~16 клеток
+    FAR: 1600      // ~26 клеток
+  };
+  
+  if (distToPlayer <= DISTANCE_THRESHOLDS.CLOSE) return 1;
+  if (distToPlayer <= DISTANCE_THRESHOLDS.MID) return 2;
+  if (distToPlayer <= DISTANCE_THRESHOLDS.FAR) return 4;
+  return 8;
 }
 
 /**
  * Проверка, нужно ли обновлять монстра в текущем кадре
  * 
  * @param {number} distToPlayer - Расстояние до игрока в пикселях
- * @param {number} monsterId - Уникальный ID монстра (для распределения по кадрам)
+ * @param {Object} m - Объект монстра
  * @param {number} frameCount - Текущий номер кадра
  * @returns {boolean} - true, если монстра нужно обновить
  */
-function shouldUpdateMonster(distToPlayer, monsterId, frameCount) {
-  const interval = getUpdateInterval(distToPlayer);
+function shouldUpdateMonster(distToPlayer, m, frameCount) {
+  const interval = getUpdateInterval(distToPlayer, m);
+  
+  // Если интервал = 1 — обновляем всегда
+  if (interval === 1) return true;
+  
   // Используем ID монстра для равномерного распределения по кадрам
+  const monsterId = m.id || Math.floor(m.x + m.y * 100);
   const hash = (monsterId * 31 + 17) % interval;
   return (frameCount % interval) === hash;
 }
@@ -93,9 +120,10 @@ function shouldUpdateMonster(distToPlayer, monsterId, frameCount) {
 /**
  * Основная функция обновления всех монстров
  * 
+ * @param {number} deltaTime - Время с последнего обновления (сек)
  * @returns {void}
  */
-export function updateMonsters() {
+export function updateMonsters(deltaTime = 1/60) {
   // Если мы в комнате-ловушке и волна приостановлена (сохранение) — пропускаем обновление
   if (state.inTrapRoom && state.trapActivated && !state.trapWaveActive) {
     // Возобновляем волну при первом обновлении после загрузки
@@ -124,9 +152,11 @@ export function updateMonsters() {
   const isSnowActive = snowState.active;
   
   if (isIceBiome && isSnowActive && !isInSecretRoom && !state.isBossLevel) {
-    snowHealCounter++;
+    // Используем deltaTime для накопления времени
+    snowHealCounter += deltaTime;
     
-    if (snowHealCounter >= SNOW_HEAL_INTERVAL) {
+    // Восстанавливаем каждую секунду
+    if (snowHealCounter >= 1.0) {
       snowHealCounter = 0;
       
       for (const m of state.monsters) {
@@ -161,9 +191,8 @@ export function updateMonsters() {
     const hasLineOfSightToPlayer = hasLineOfSight(m.x, m.y, player.px, player.py);
     
     if (!isBoss) {
-      // Используем уникальный ID монстра или индекс для распределения по кадрам
-      const monsterId = m.id || i;
-      if (!shouldUpdateMonster(distToPlayer, monsterId, updateCounter)) {
+      // Используем функцию с учётом состояния монстра
+      if (!shouldUpdateMonster(distToPlayer, m, updateCounter)) {
         // Пропускаем обновление этого монстра в текущем кадре
         continue;
       }
@@ -200,8 +229,10 @@ export function updateMonsters() {
     // Обновление свечения призрака
     updateGhostGlow(m);
 
-    // Уменьшение таймера оглушения
-    if (m.stunTimer > 0) m.stunTimer--;
+    // Уменьшение таймера оглушения (используем deltaTime)
+    if (m.stunTimer > 0) {
+      m.stunTimer = Math.max(0, m.stunTimer - deltaTime);
+    }
 
     // ===== ОБНОВЛЕНИЕ РЕАКЦИИ НА ЗВУКИ (ДО ПАМЯТИ!) =====
     const hearingResult = updateMonsterHearing(m, distToPlayer, hasLineOfSightToPlayer);
@@ -239,7 +270,7 @@ export function updateMonsters() {
       if (distToPlayer < m.radius + 24 && hasLineOfSightToPlayer) {
         // Нашёл игрока! Сбрасываем память и переключаемся в режим преследования
         m.isSearching = false;
-        m.memoryTimer = 0;
+        m.memoryTimer = m.memoryDuration;
         m.state = 'chase';
         // Продолжаем обычную логику
       } else {
@@ -255,29 +286,29 @@ export function updateMonsters() {
 
     // ===== ОБНОВЛЕНИЕ ДВИЖЕНИЯ =====
     if (m.isBoss || m.isDuoBoss) {
-      // Боссы: логика, атаки, состояние, движение
-      updateBossLogic(m, i);
-      updateBossAttack(m);
-      updateBossState(m, distToPlayer);
-      updateBossMovement(m);
+      // Боссы: логика, атаки, состояние, движение (передаем deltaTime)
+      updateBossLogic(m, i, deltaTime);
+      updateBossAttack(m, deltaTime);
+      updateBossState(m, distToPlayer, deltaTime);
+      updateBossMovement(m, deltaTime);
     } else {
-      // Обычные монстры: ИИ и движение
-      updateMonsterState(m, distToPlayer);
+      // Обычные монстры: ИИ и движение (передаем deltaTime)
+      updateMonsterState(m, distToPlayer, deltaTime);
 
       if (m.state === 'chase') {
         // Использование зелья
         const usedPotion = usePotionIfNearby(m);
 
         // Преследование
-        if (m.stunTimer <= 0 && !m.isFrozen) updateChaseMovement(m);
+        if (m.stunTimer <= 0 && !m.isFrozen) updateChaseMovement(m, deltaTime);
         if (handleMonsterTrapInteraction(m, i)) continue;
-        updateLostGhostBehavior(m);
+        updateLostGhostBehavior(m, deltaTime);
       } else if (m.state === 'flee') {
         // Бегство от игрока
-        if (m.stunTimer <= 0 && !m.isFrozen) updateFleeMovement(m);
+        if (m.stunTimer <= 0 && !m.isFrozen) updateFleeMovement(m, deltaTime);
       } else {
         // Патруль
-        updatePatrolMovement(m);
+        updatePatrolMovement(m, deltaTime);
       }
     }
 

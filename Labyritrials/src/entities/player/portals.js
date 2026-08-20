@@ -24,7 +24,7 @@ export function checkSecretPortal() {
   const isOnPortal = (player.x === state.treasurePortal.x && player.y === state.treasurePortal.y);
 
   if (isOnPortal) {
-    audio.playSound('portalActivate', 0.7);
+    audio.playSound('interactions.portalActivate');
     
     state.gameStats.secretRoomsVisited++;
     updateProgress('treasure_room_found', 1);
@@ -54,7 +54,7 @@ export function checkExitPortal() {
   const isOnPortal = (player.x === state.treasureExitPortal.x && player.y === state.treasureExitPortal.y);
 
   if (isOnPortal) {
-    audio.playSound('portalActivate', 0.7);
+    audio.playSound('interactions.portalActivate');
     
     resetTrailPosition();
     state.screenShake = 8;
@@ -79,7 +79,7 @@ export function checkShrinePortal() {
   const isOnPortal = (player.x === state.shrinePortal.x && player.y === state.shrinePortal.y);
 
   if (isOnPortal) {
-    audio.playSound('portalActivate', 0.7);
+    audio.playSound('interactions.portalActivate');
     
     state.gameStats.secretRoomsVisited++;
     updateProgress('shrine_room_found', 1);
@@ -109,7 +109,7 @@ export function checkShrineRoomExit() {
   const isOnExit = (player.x === state.shrineExitPortal.x && player.y === state.shrineExitPortal.y);
 
   if (isOnExit) {
-    audio.playSound('portalActivate', 0.7);
+    audio.playSound('interactions.portalActivate');
     
     resetTrailPosition();
     state.screenShake = 8;
@@ -134,7 +134,7 @@ export function checkTrapPortal() {
   const isOnPortal = (player.x === state.trapPortal.x && player.y === state.trapPortal.y);
 
   if (isOnPortal) {
-    audio.playSound('portalActivate', 0.7);
+    audio.playSound('interactions.portalActivate');
     
     state.gameStats.secretRoomsVisited++;
     updateProgress('trap_room_found', 1);
@@ -164,7 +164,7 @@ export function checkTrapRoomExit() {
   const isOnExit = (player.x === state.trapExitPortal.x && player.y === state.trapExitPortal.y);
 
   if (isOnExit) {
-    audio.playSound('portalActivate', 0.7);
+    audio.playSound('interactions.portalActivate');
     
     resetTrailPosition();
     state.screenShake = 8;
@@ -190,7 +190,7 @@ export function checkFakeTrapPortal() {
   const isOnFakePortal = (player.x === state.trapFakePortal.x && player.y === state.trapFakePortal.y);
 
   if (isOnFakePortal) {
-    audio.playSound('portalActivate', 0.7);
+    audio.playSound('interactions.portalActivate');
     
     import('../../world/rooms/trapRoom/index.js').then(module => {
       module.activateTrapRoom();
@@ -216,7 +216,7 @@ export function checkSafePortal() {
   const isOnPortal = (player.x === state.safePortal.x && player.y === state.safePortal.y);
 
   if (isOnPortal) {
-    audio.playSound('portalActivate', 0.7);
+    audio.playSound('interactions.portalActivate');
     
     state.gameStats.secretRoomsVisited++;
     
@@ -240,7 +240,7 @@ export function checkSafeRoomExit() {
   const isOnExit = (player.x === state.safeExitPortal.x && player.y === state.safeExitPortal.y);
 
   if (isOnExit) {
-    audio.playSound('portalActivate', 0.7);
+    audio.playSound('interactions.portalActivate');
     
     import('../../world/rooms/safeRoom.js').then(module => {
       module.returnFromSafeRoom();
