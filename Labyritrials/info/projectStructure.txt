@@ -4,7 +4,8 @@
 ├── assets/
 │   ├── audio/
 │   ├── icons/
-│   └── images/
+│   ├── images/
+│   └── spritesheets/
 │
 ├── src/
 │   ├── emojis.js
@@ -13,8 +14,18 @@
 │   ├── audio/
 │   │   ├── audioManager.js
 │   │   ├── index.js
-│   │   ├── musicManager.js
-│   │   └── soundManager.js
+│   │   │
+│   │   ├── music/
+│   │   │   ├── index.js
+│   │   │   ├── musicConfig.js
+│   │   │   ├── musicLoader.js
+│   │   │   └── musicManager.js
+│   │   │
+│   │   └── sounds/
+│   │       ├── index.js
+│   │       ├── soundConfig.js
+│   │       ├── soundLoader.js
+│   │       └── soundManager.js
 │   │
 │   ├── core/
 │   │   ├── game.js
@@ -118,6 +129,7 @@
 │   │       ├── index.js
 │   │       ├── interaction.js
 │   │       ├── loot.js
+│   │       ├── mimicCombat.js
 │   │       ├── movement.js
 │   │       ├── portals.js
 │   │       ├── shrines.js
@@ -131,10 +143,12 @@
 │   │   └── playTimeTracker.js
 │   │
 │   ├── images/
+│   │   ├── floorImages.js
 │   │   ├── inventoryImages.js
 │   │   ├── itemImages.js
 │   │   ├── objectImages.js
 │   │   ├── shopImages.js
+│   │   ├── stairImages.js
 │   │   ├── uiImages.js
 │   │   └── wallImages.js
 │   │
@@ -168,6 +182,12 @@
 │   │       ├── playerRestorer.js
 │   │       ├── secretRoomRestorer.js
 │   │       └── systemRestorer.js
+│   │
+│   ├── sprites/
+│   │   ├── index.js
+│   │   ├── playerAnimator.js
+│   │   ├── spriteAtlas.js
+│   │   └── spriteConfig.js
 │   │
 │   ├── systems/
 │   │   ├── achievements/
@@ -218,6 +238,7 @@
 │   │   │   ├── bloodRenderer.js
 │   │   │   ├── chestRenderer.js
 │   │   │   ├── index.js
+│   │   │   ├── lootRenderer.js
 │   │   │   ├── mazeRenderer.js
 │   │   │   ├── monsterRenderer.js
 │   │   │   ├── particleRenderer.js
@@ -277,6 +298,7 @@
 │   │   │   ├── bookshelfUI.js
 │   │   │   ├── controlButtons.js
 │   │   │   ├── index.js
+│   │   │   ├── itemInfoPopup.js
 │   │   │   ├── modalManager.js
 │   │   │   ├── statsUpdater.js
 │   │   │   │
@@ -376,6 +398,7 @@
 │       ├── final.css
 │       ├── gameOver.css
 │       ├── inventory.css
+│       ├── itemInfoPopup.css
 │       ├── levelUp.css
 │       ├── pause.css
 │       ├── settings.css
@@ -383,6 +406,7 @@
 │
 └── views/                                  # HTML (на уровне корня)
     ├── components/
+    │   ├── itemInfoPopup.html
     │   ├── noteWindow.html
     │   ├── notification.html
     │   └── ui.html
