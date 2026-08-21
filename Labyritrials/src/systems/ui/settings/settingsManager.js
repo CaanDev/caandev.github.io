@@ -23,7 +23,7 @@ export const DEFAULT_SETTINGS = {
   showFps: false,
   fpsLimit: 0,
   vsyncEnabled: true,
-  smoothingEnabled: true,
+  smoothingEnabled: false,
 };
 
 /** @type {Object} - Текущие настройки */

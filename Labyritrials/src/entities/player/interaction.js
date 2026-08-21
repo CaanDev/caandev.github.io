@@ -271,6 +271,11 @@ function handlePotionChest(ch) {
  * @private
  */
 function handleMimicAttack(mimic) {
+  // Открываем мимика при атаке
+  mimic.opened = true;
+  // Сбрасываем таймер закрытия (будет закрыт через 500мс)
+  mimic.closeTimer = Date.now() + 500;
+
   removeFlies(mimic.x, mimic.y);
   
   let maxDamage = Math.floor(player.hp * 0.33);

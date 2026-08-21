@@ -623,12 +623,12 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 5px;
+  gap: 10px;
   min-height: 140px;
   align-content: flex-start;
 }
 
-/* ===== ЯЧЕЙКИ СНАРЯЖЕНИЯ (уменьшенные) ===== */
+/* ===== ЯЧЕЙКИ СНАРЯЖЕНИЯ ===== */
 #inventory-equipment-grid .inventory-item-cell {
   display: flex;
   flex-direction: column;
