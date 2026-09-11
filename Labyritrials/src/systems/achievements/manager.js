@@ -1,0 +1,378 @@
+/**
+ * @fileoverview Менеджер достижений.
+ * Управляет логикой проверки, разблокировки, прогресса и сохранения достижений.
+ * 
+ * @module systems/achievements/manager
+ */
+
+import { state } from '../../core/config/state.js';
+import { ACHIEVEMENTS_DATA, getTotalAchievementsCount } from '../../data/achievements.js';
+import { logger } from '../../utils/logger.js';
+import { showAchievementNotification } from './ui.js';
+import { saveGame } from '../../save/saveSystem.js';
+import { audio } from '../../audio/audioManager.js';
+
+/** @type {string} - Ключ для хранения достижений в localStorage */
+const ACHIEVEMENTS_STORAGE_KEY = 'labirithria_achievements';
+
+/**
+ * Загрузка достижений из localStorage
+ * 
+ * @returns {Object|null} - Загруженные данные или null при ошибке
+ * @private
+ */
+function loadAchievementsFromStorage() {
+  try {
+    const raw = localStorage.getItem(ACHIEVEMENTS_STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      return {
+        unlocked: data.unlocked || [],
+        progress: data.progress || {}
+      };
+    }
+  } catch (e) {
+    logger.warn('⚠️ Не удалось загрузить достижения из localStorage:', e);
+  }
+  return null;
+}
+
+/**
+ * Сохранение достижений в localStorage
+ * 
+ * @returns {void}
+ * @private
+ */
+function saveAchievementsToStorage() {
+  try {
+    const data = {
+      unlocked: state.achievements.unlocked || [],
+      progress: state.achievements.progress || {}
+    };
+    localStorage.setItem(ACHIEVEMENTS_STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    logger.warn('⚠️ Не удалось сохранить достижения в localStorage:', e);
+  }
+}
+
+/**
+ * Инициализация системы достижений
+ * 
+ * Загружает сохранённые достижения из localStorage или создаёт новую структуру.
+ * Выполняет проверку достижений при старте.
+ * 
+ * @returns {void}
+ */
+export function initAchievements() {
+  // Проверка, что структура данных существует
+  if (!state.achievements) {
+    // Попытка загрузить из localStorage
+    const saved = loadAchievementsFromStorage();
+    if (saved) {
+      state.achievements = saved;
+    } else {
+      state.achievements = {
+        unlocked: [],
+        progress: {}
+      };
+    }
+  }
+  
+  // Проверяем достижения при старте
+  checkAchievements();
+}
+
+/**
+ * Получение текущего прогресса всех достижений
+ * 
+ * @returns {Object} - Объект с прогрессом достижений
+ */
+export function getProgress() {
+  return state.achievements.progress || {};
+}
+
+/**
+ * Получение списка разблокированных достижений
+ * 
+ * @returns {string[]} - Массив ID разблокированных достижений
+ */
+export function getUnlocked() {
+  return state.achievements.unlocked || [];
+}
+
+/**
+ * Обновление прогресса достижения
+ * 
+ * Добавляет значение к текущему прогрессу указанного ключа,
+ * сохраняет изменения и проверяет достижения.
+ * 
+ * @param {string} key - Ключ прогресса (например, 'monsters_killed')
+ * @param {number} value - Значение для добавления
+ * @returns {void}
+ */
+export function updateProgress(key, value) {
+  if (!state.achievements.progress) state.achievements.progress = {};
+  
+  const current = state.achievements.progress[key] || 0;
+  state.achievements.progress[key] = current + value;
+  
+  // Сохранение в localStorage
+  saveAchievementsToStorage();
+  // Проверка достижений после обновления прогресса
+  checkAchievements();
+}
+
+/**
+ * Установка прогресса (для точных значений)
+ * 
+ * @param {string} key - Ключ прогресса
+ * @param {number} value - Точное значение прогресса
+ * @returns {void}
+ */
+export function setProgress(key, value) {
+  if (!state.achievements.progress) state.achievements.progress = {};
+  state.achievements.progress[key] = value;
+  
+  // Сохранение в localStorage
+  saveAchievementsToStorage();
+  checkAchievements();
+}
+
+/**
+ * Проверка всех достижений
+ * 
+ * @returns {void}
+ */
+export function checkAchievements() {
+  const progress = state.achievements.progress || {};
+  const unlocked = state.achievements.unlocked || [];
+  
+  let hasNewUnlock = false;
+  
+  for (const [id, achievement] of Object.entries(ACHIEVEMENTS_DATA)) {
+    // Пропуск уже разблокированных
+    if (unlocked.includes(id)) continue;
+    
+    // Проверка условия
+    if (achievement.check(progress)) {
+      unlockAchievement(id);
+      hasNewUnlock = true;
+    }
+  }
+  
+  // Если были новые разблокировки - сохранение
+  if (hasNewUnlock) saveAchievementsToStorage();
+}
+
+/**
+ * Разблокировка достижения
+ * 
+ * @param {string} id - ID достижения
+ * @returns {void}
+ */
+export function unlockAchievement(id) {
+  const achievement = ACHIEVEMENTS_DATA[id];
+  if (!achievement) {
+    logger.warn(`⚠️ Достижение "${id}" не найдено`);
+    return;
+  }
+  
+  // Проверка, не разблокировано ли уже
+  if (state.achievements.unlocked.includes(id)) return;
+  
+  // Добавление в список разблокированных
+  state.achievements.unlocked.push(id);
+  
+  logger.achievement(`🏆 Достижение разблокировано: ${achievement.name}`);
+  
+  // Отображение уведомления
+  showAchievementNotification(id);
+
+  // Воспроизведение звука
+  try {
+    audio.playSound('interactions.achievementCompleted');
+  } catch (e) {
+    logger.warn('⚠️ Не удалось воспроизвести звук достижения:', e);
+  }
+  
+  // Сохранение в localStorage
+  saveAchievementsToStorage();
+  
+  // Сохранение игры
+  try {
+    saveGame();
+  } catch (e) {
+    logger.warn('⚠️ Не удалось сохранить достижение:', e);
+  }
+}
+
+/**
+ * Проверка, разблокировано ли достижение
+ * 
+ * @param {string} id - ID достижения
+ * @returns {boolean} - true, если достижение разблокировано
+ */
+export function isUnlocked(id) {
+  return (state.achievements.unlocked || []).includes(id);
+}
+
+/**
+ * Получение статуса достижения
+ * 
+ * @param {string} id - ID достижения
+ * @returns {Object|null} - Объект с данными достижения или null
+ */
+export function getAchievementState(id) {
+  const achievement = ACHIEVEMENTS_DATA[id];
+  if (!achievement) return null;
+  
+  const unlocked = isUnlocked(id);
+  const progress = state.achievements.progress || {};
+  const current = achievement.getProgress(progress);
+  const max = achievement.maxProgress;
+  const isCompleted = current >= max;
+  
+  return {
+    ...achievement,
+    unlocked,
+    current,
+    max,
+    isCompleted,
+    progressPercent: Math.min(100, (current / max) * 100)
+  };
+}
+
+/**
+ * Получение всех достижений с их статусами
+ * 
+ * @returns {Array} - Массив объектов достижений с статусами
+ */
+export function getAllAchievementsState() {
+  const result = [];
+  for (const [id] of Object.entries(ACHIEVEMENTS_DATA)) {
+    result.push(getAchievementState(id));
+  }
+  return result;
+}
+
+/**
+ * Получение достижений по категории с их статусами
+ * 
+ * @param {string} categoryId - ID категории
+ * @returns {Array} - Массив объектов достижений в категории
+ */
+export function getAchievementsByCategoryState(categoryId) {
+  const result = [];
+  for (const [id, achievement] of Object.entries(ACHIEVEMENTS_DATA)) {
+    if (achievement.category === categoryId) result.push(getAchievementState(id));
+  }
+  return result;
+}
+
+/**
+ * Получение статистики достижений
+ * 
+ * @returns {Object} - Объект со статистикой { total, unlocked }
+ */
+export function getAchievementsStats() {
+  const total = getTotalAchievementsCount();
+  const unlocked = (state.achievements.unlocked || []).length;
+  return { total, unlocked };
+}
+
+/**
+ * Сброс всех достижений
+ * 
+ * Полностью очищает все достижения и прогресс.
+ * Требует подтверждения через UI.
+ * 
+ * @returns {void}
+ */
+export function resetAchievements() {
+  state.achievements.unlocked = [];
+  state.achievements.progress = {};
+  
+  // Удаление ключа из localStorage
+  try {
+    localStorage.removeItem('labirithria_achievements');
+  } catch (e) {
+    logger.warn('⚠️ Не удалось очистить localStorage:', e);
+  }
+  
+  // Сохранение пустых данных
+  saveAchievementsToStorage();
+  
+  try {
+    saveGame();
+  } catch (e) {
+    logger.warn('⚠️ Не удалось сохранить после сброса достижений:', e);
+  }
+  
+  logger.info('🗑️ Все достижения сброшены');
+}
+
+/**
+ * Получение списка скрытых достижений
+ * 
+ * @returns {string[]} - Массив ID скрытых достижений
+ */
+export function getHiddenAchievements() {
+  const result = [];
+  for (const [id, achievement] of Object.entries(ACHIEVEMENTS_DATA)) {
+    if (achievement.hidden === true) result.push(id);
+  }
+  return result;
+}
+
+/**
+ * Проверка, является ли достижение скрытым
+ * 
+ * @param {string} id - ID достижения
+ * @returns {boolean} - true, если достижение скрытое
+ */
+export function isHidden(id) {
+  const achievement = ACHIEVEMENTS_DATA[id];
+  return achievement ? achievement.hidden === true : false;
+}
+
+/**
+ * Получение количества достижений в категории
+ * 
+ * @param {string} categoryId - ID категории ('all' для всех)
+ * @returns {Object} - Объект { total, unlocked }
+ */
+export function getCategoryStats(categoryId) {
+  let achievements;
+  achievements = (categoryId === 'all') ? getAllAchievementsState() : achievements = getAchievementsByCategoryState(categoryId);
+  
+  const total = achievements.length;
+  const unlocked = achievements.filter(a => a.unlocked).length;
+  
+  return { total, unlocked };
+}
+
+/**
+ * Принудительная загрузка достижений из localStorage в состояние
+ * Используется при открытии окна достижений в главном меню
+ * 
+ * @returns {void}
+ */
+export function forceLoadAchievements() {
+  try {
+    const raw = localStorage.getItem(ACHIEVEMENTS_STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (!state.achievements) {
+        state.achievements = {
+          unlocked: data.unlocked || [],
+          progress: data.progress || {}
+        };
+      } else {
+        state.achievements.unlocked = data.unlocked || [];
+        state.achievements.progress = data.progress || {};
+      }
+    }
+  } catch (e) {
+    logger.warn('⚠️ Не удалось загрузить достижения:', e);
+  }
+}
