@@ -1,0 +1,132 @@
+/**
+ * @fileoverview Обработчики элементов управления в настройках.
+ * @module systems/ui/settings/settingsControls
+ */
+
+import { updateSetting, DEFAULT_SETTINGS } from './settingsManager.js';  // ← добавить импорт DEFAULT_SETTINGS
+import { updateFpsVisibility } from './settingsFps.js';
+import { clearAllGameData, exportSaveData, importSaveData } from './settingsData.js';
+import { closeSettings } from './settingsUI.js';
+import { showConfirm } from '../confirm.js';
+
+/**
+ * Инициализация слайдеров громкости
+ * @returns {void}
+ */
+export function initSliders() {
+  const sliders = [
+    { id: 'settings-music-volume', valueId: 'settings-music-value', key: 'musicVolume', suffix: '%' },
+    { id: 'settings-sound-volume', valueId: 'settings-sound-value', key: 'soundVolume', suffix: '%' }
+  ];
+
+  sliders.forEach(({ id, valueId, key, suffix }) => {
+    const slider = document.getElementById(id);
+    const valueDisplay = document.getElementById(valueId);
+    
+    if (slider && valueDisplay) {
+      // Обычный клик
+      slider.addEventListener('input', () => {
+        const value = parseInt(slider.value);
+        valueDisplay.textContent = `${value}${suffix}`;
+        updateSetting(key, value);
+      });
+
+      // Двойной клик для сброса до значений по умолчанию
+      slider.addEventListener('dblclick', () => {
+        const defaultValue = DEFAULT_SETTINGS[key];
+        slider.value = defaultValue;
+        valueDisplay.textContent = `${defaultValue}${suffix}`;
+        updateSetting(key, defaultValue);
+        
+        // Визуальная обратная связь
+        slider.style.transition = 'box-shadow 0.2s ease';
+        slider.style.boxShadow = '0 0 20px rgba(46, 204, 113, 0.5)';
+        setTimeout(() => {
+          slider.style.boxShadow = 'none';
+        }, 400);
+      });
+    }
+  });
+}
+
+/**
+ * Инициализация переключателей (toggle)
+ * 
+ * @returns {void}
+ */
+export function initToggles() {
+  const toggles = [
+    { id: 'settings-music-toggle', key: 'musicEnabled' },
+    { id: 'settings-sound-toggle', key: 'soundEnabled' },
+    { id: 'settings-show-fps', key: 'showFps' },
+    { id: 'settings-vsync-toggle', key: 'vsyncEnabled' },
+    { id: 'settings-smoothing-toggle', key: 'smoothingEnabled' },
+  ];
+
+  toggles.forEach(({ id, key }) => {
+    const toggle = document.getElementById(id);
+    if (toggle) {
+      toggle.addEventListener('change', () => {
+        updateSetting(key, toggle.checked);
+        if (key === 'showFps') updateFpsVisibility();
+      });
+    }
+  });
+}
+
+/**
+ * Инициализация выпадающего списка ограничения FPS
+ * 
+ * @returns {void}
+ */
+export function initSelects() {
+  const select = document.getElementById('settings-fps-limit');
+  if (select) {
+    select.addEventListener('change', () => {
+      const value = parseInt(select.value);
+      updateSetting('fpsLimit', value);
+    });
+  }
+}
+
+/**
+ * Инициализация кнопок (сброс прогресса, экспорт, импорт)
+ * 
+ * @returns {void}
+ */
+export function initButtons() {
+  // Кнопка сброса прогресса
+  const resetBtn = document.getElementById('settings-reset-progress');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async () => {
+      const confirmed = await showConfirm(
+        'Будут удалены:\n' +
+        '📀 Прогресс игры\n' +
+        '🏆 Все достижения\n' +
+        '📜 Все найденные записки\n\n' +
+        'Это действие НЕОБРАТИМО!',
+        { title: '⚠️ Очистить все данные?', yesText: 'Очистить', noText: 'Отмена' }
+      );
+      
+      if (confirmed) clearAllGameData();
+    });
+  }
+
+  // Кнопка экспорта
+  const exportBtn = document.getElementById('settings-export-save');
+  if (exportBtn) exportBtn.addEventListener('click', exportSaveData);
+
+  // Кнопка импорта
+  const importBtn = document.getElementById('settings-import-save');
+  const importFile = document.getElementById('settings-import-file');
+  if (importBtn && importFile) {
+    importBtn.addEventListener('click', () => {
+      importFile.click();
+    });
+    importFile.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) importSaveData(file);
+      importFile.value = '';
+    });
+  }
+}
