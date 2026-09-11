@@ -1,8 +1,9 @@
-/
+﻿/
 ├── index.html
 │
 ├── assets/
 │   ├── audio/
+│   ├── fonts/
 │   ├── icons/
 │   ├── images/
 │   └── spritesheets/
@@ -48,6 +49,7 @@
 │   │   ├── biomes.js
 │   │   ├── bosses.js
 │   │   ├── events.js
+│   │   ├── genderConfig.js
 │   │   ├── index.js
 │   │   ├── items.js
 │   │   ├── monsters.js
@@ -123,6 +125,7 @@
 │   │   │
 │   │   └── player/
 │   │       ├── animation.js
+│   │       ├── bloodTrails.js
 │   │       ├── combat.js
 │   │       ├── effects.js
 │   │       ├── gameOver.js
@@ -141,16 +144,6 @@
 │   │   ├── levelTransition.js
 │   │   ├── pauseMenu.js
 │   │   └── playTimeTracker.js
-│   │
-│   ├── images/
-│   │   ├── floorImages.js
-│   │   ├── inventoryImages.js
-│   │   ├── itemImages.js
-│   │   ├── objectImages.js
-│   │   ├── shopImages.js
-│   │   ├── stairImages.js
-│   │   ├── uiImages.js
-│   │   └── wallImages.js
 │   │
 │   ├── save/
 │   │   ├── index.js
@@ -184,10 +177,17 @@
 │   │       └── systemRestorer.js
 │   │
 │   ├── sprites/
+│   │   ├── characters/
+│   │   │   ├── index.js
+│   │   │   ├── playerAnimator.js
+│   │   │   ├── spriteAtlas.js
+│   │   │   └── spriteConfig.js
+│   │   │
+│   │   ├── achievementSprites.js
 │   │   ├── index.js
-│   │   ├── playerAnimator.js
-│   │   ├── spriteAtlas.js
-│   │   └── spriteConfig.js
+│   │   ├── spriteLoader.js
+│   │   ├── spriteUtils.js
+│   │   └── stairSprites.js
 │   │
 │   ├── systems/
 │   │   ├── achievements/
@@ -264,8 +264,7 @@
 │   │   │   │   │   ├── features.js
 │   │   │   │   │   ├── floorConfig.js
 │   │   │   │   │   ├── floorRenderer.js
-│   │   │   │   │   ├── index.js
-│   │   │   │   │   └── patterns.js
+│   │   │   │   │   └── index.js
 │   │   │   │   │
 │   │   │   │   └── walls/
 │   │   │   │       ├── bookshelfRenderer.js
@@ -296,6 +295,8 @@
 │   │   │
 │   │   ├── ui/
 │   │   │   ├── bookshelfUI.js
+│   │   │   ├── characterSelect.js
+│   │   │   ├── confirm.js
 │   │   │   ├── controlButtons.js
 │   │   │   ├── index.js
 │   │   │   ├── itemInfoPopup.js
@@ -341,9 +342,9 @@
 │   │   ├── cache.js
 │   │   ├── compression.js
 │   │   ├── exitToMainMenu.js
+│   │   ├── formatNumber.js
 │   │   ├── gameLoader.js
 │   │   ├── htmlLoader.js
-│   │   ├── imageLoader.js
 │   │   ├── index.js
 │   │   └── logger.js
 │   │
@@ -378,6 +379,7 @@
 │   │
 │   ├── base/
 │   │   ├── base.css
+│   │   ├── fonts.css
 │   │   ├── typography.css
 │   │   └── variables.css
 │   │
@@ -395,6 +397,8 @@
 │   └── windows/
 │       ├── achievements.css
 │       ├── bookshelf.css
+│       ├── characterSelect.css
+│       ├── confirm.css
 │       ├── final.css
 │       ├── gameOver.css
 │       ├── inventory.css
@@ -406,6 +410,7 @@
 │
 └── views/                                  # HTML (на уровне корня)
     ├── components/
+    │   ├── confirm.html
     │   ├── itemInfoPopup.html
     │   ├── noteWindow.html
     │   ├── notification.html
@@ -418,6 +423,7 @@
     └── windows/
         ├── achievements.html
         ├── bookshelf.html
+        ├── characterSelect.html
         ├── final.html
         ├── gameOver.html
         ├── inventory.html
