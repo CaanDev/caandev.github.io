@@ -1,0 +1,43 @@
+<!-- Окно выбора персонажа -->
+<div id="character-select-ui" style="display: none;">
+  <div class="character-select-overlay">
+    <div class="character-select-content">
+      <div class="character-select-corner-tl"></div>
+      <div class="character-select-corner-br"></div>
+      
+      <div class="character-select-header">
+        <h2>ВЫБЕРИТЕ ГЕРОЯ</h2>
+      </div>
+      
+      <div class="character-select-grid">
+        <!-- Мужской персонаж -->
+        <div class="character-card" data-gender="male">
+          <div class="character-card-sprite" id="male-sprite-container">
+            <!-- Спрайт будет вставлен через JS -->
+          </div>
+          <button class="character-select-btn male-btn">ВЫБРАТЬ</button>
+        </div>
+        
+        <!-- Случайный выбор -->
+        <div class="character-card character-card-random" data-gender="random">
+          <div class="character-card-sprite character-card-sprite-random" id="random-sprite-container">
+            <span class="random-dice">🎲</span>
+          </div>
+          <button class="character-select-btn random-btn">СЛУЧАЙНО</button>
+        </div>
+        
+        <!-- Женский персонаж -->
+        <div class="character-card" data-gender="female">
+          <div class="character-card-sprite" id="female-sprite-container">
+            <!-- Спрайт будет вставлен через JS -->
+          </div>
+          <button class="character-select-btn female-btn">ВЫБРАТЬ</button>
+        </div>
+      </div>
+      
+      <div class="character-select-footer">
+        <button id="character-select-cancel" class="character-cancel-btn">↩ НАЗАД</button>
+      </div>
+    </div>
+  </div>
+</div>

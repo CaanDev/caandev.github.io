@@ -1,0 +1,508 @@
+/**
+ * Стили для окна выбора персонажа
+ */
+
+/* ОСНОВНОЕ ОКНО */
+
+#character-select-ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(10px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  animation: fadeInPause 0.3s ease forwards;
+}
+
+.character-select-overlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.character-select-content {
+  background: var(--color-ui-panel);
+  background: var(--gradient-panel);
+  border: 1.5px solid var(--color-border-primary);
+  border-radius: 16px;
+  padding: 30px 35px 25px;
+  max-width: 780px;
+  width: auto;
+  min-width: 300px;
+  max-height: 92vh;
+  color: var(--color-text-primary);
+  font-family: var(--font-ui, 'Comfortaa', 'Courier New', monospace);
+  box-shadow: 0 0 80px rgba(80, 20, 120, 0.2),
+              0 0 40px rgba(40, 10, 80, 0.15),
+              inset 0 0 60px rgba(40, 10, 80, 0.05);
+  animation: pauseSlideIn 0.3s ease forwards;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.character-select-corner-tl {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 30px;
+  height: 30px;
+  border-top: 2px solid var(--color-border-primary);
+  border-left: 2px solid var(--color-border-primary);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.character-select-corner-br {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-bottom: 2px solid var(--color-border-primary);
+  border-right: 2px solid var(--color-border-primary);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* ЗАГОЛОВОК */
+
+.character-select-header {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(100, 60, 140, 0.15);
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.character-select-header h2 {
+  margin: 0;
+  color: var(--color-text-light);
+  font-family: var(--font-title, 'Comfortaa', 'Courier New', monospace);
+  font-weight: 200;
+  font-size: 24px;
+  letter-spacing: 3px;
+  text-shadow: 0 0 30px rgba(140, 80, 180, 0.2);
+}
+
+/* СЕТКА КАРТОЧЕК */
+
+.character-select-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  padding: 4px 0;
+  width: 100%;
+}
+
+/* КАРТОЧКА ПЕРСОНАЖА */
+
+.character-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 16px 12px 14px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 320px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Подсветка при наведении */
+.character-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(100, 60, 140, 0.4);
+  box-shadow: 0 8px 30px rgba(100, 60, 140, 0.15);
+}
+
+.character-card[data-gender="male"]:hover {
+  border-color: rgba(52, 152, 219, 0.5);
+  box-shadow: 0 8px 30px rgba(52, 152, 219, 0.15);
+}
+
+.character-card[data-gender="female"]:hover {
+  border-color: rgba(155, 89, 182, 0.5);
+  box-shadow: 0 8px 30px rgba(155, 89, 182, 0.15);
+}
+
+.character-card-random:hover {
+  border-color: rgba(241, 196, 15, 0.5);
+  box-shadow: 0 8px 30px rgba(241, 196, 15, 0.15);
+}
+
+/* СПРАЙТ ПЕРСОНАЖА */
+
+.character-card-sprite {
+  width: 150px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+  position: relative;
+  background: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.character-card-sprite img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  image-rendering: auto;
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+}
+
+/* КАРТОЧКА СЛУЧАЙНОГО ВЫБОРА */
+
+.character-card-sprite-random {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: 8px;
+  overflow: visible;
+}
+
+.random-dice {
+  font-size: 80px;
+  line-height: 1;
+  user-select: none;
+  transition: transform 0.3s ease;
+}
+
+/* Кубик дрыгается при наведении */
+.character-card-random:hover .random-dice {
+  animation: diceWiggle 0.5s ease forwards;
+}
+
+@keyframes diceWiggle {
+  0% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  15% {
+    transform: translateY(-6px) rotate(-8deg) scale(1.04);
+  }
+  35% {
+    transform: translateY(-12px) rotate(15deg) scale(1.06);
+  }
+  55% {
+    transform: translateY(-8px) rotate(-10deg) scale(1.04);
+  }
+  75% {
+    transform: translateY(-14px) rotate(20deg) scale(1.05);
+  }
+  90% {
+    transform: translateY(-4px) rotate(-5deg) scale(1.02);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+}
+
+/* ПОДСВЕТКА ВЫБРАННОЙ КАРТОЧКИ */
+
+.character-card.selected {
+  border-color: var(--color-text-gold) !important;
+  box-shadow: 0 0 40px rgba(241, 196, 15, 0.4),
+              0 0 80px rgba(241, 196, 15, 0.15),
+              inset 0 0 30px rgba(241, 196, 15, 0.05) !important;
+  transform: scale(1.03);
+  transition: all 0.4s ease;
+  z-index: 2;
+}
+
+/* НЕВЗРАЧНЫЕ КАРТОЧКИ */
+
+.character-card.dimmed {
+  opacity: 0.3;
+  filter: grayscale(0.8) blur(1px);
+  transform: scale(0.92);
+  pointer-events: none;
+  transition: all 0.5s ease;
+}
+
+.character-card.dimmed .character-card-sprite img,
+.character-card.dimmed .random-dice {
+  filter: grayscale(0.9) blur(1px);
+  transition: filter 0.5s ease;
+}
+
+.character-card.dimmed .character-select-btn {
+  opacity: 0.2;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+/* КНОПКИ */
+
+.character-select-btn {
+  width: 100%;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-ui, 'Comfortaa', 'Courier New', monospace);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  border: 1px solid rgba(60, 30, 80, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  background: rgba(60, 30, 100, 0.3);
+  color: var(--color-text-dark);
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.character-select-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(100, 60, 140, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.character-select-btn:hover::before {
+  opacity: 1;
+}
+
+.character-select-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(100, 60, 140, 0.08), transparent);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.character-select-btn:hover::after {
+  left: 100%;
+}
+
+.character-select-btn:hover {
+  transform: translateY(-2px);
+  color: var(--color-text-light);
+}
+
+.character-select-btn:active {
+  transform: scale(0.97);
+}
+
+.male-btn {
+  border-color: rgba(52, 152, 219, 0.25);
+  background: rgba(52, 152, 219, 0.08);
+  color: #5dade2;
+}
+
+.male-btn:hover {
+  background: rgba(52, 152, 219, 0.2);
+  border-color: rgba(52, 152, 219, 0.5);
+  box-shadow: 0 0 30px rgba(52, 152, 219, 0.1);
+}
+
+.female-btn {
+  border-color: rgba(155, 89, 182, 0.25);
+  background: rgba(155, 89, 182, 0.08);
+  color: #bb8af0;
+}
+
+.female-btn:hover {
+  background: rgba(155, 89, 182, 0.2);
+  border-color: rgba(155, 89, 182, 0.5);
+  box-shadow: 0 0 30px rgba(155, 89, 182, 0.1);
+}
+
+.random-btn {
+  border-color: rgba(241, 196, 15, 0.25);
+  background: rgba(241, 196, 15, 0.08);
+  color: #f1c40f;
+}
+
+.random-btn:hover {
+  background: rgba(241, 196, 15, 0.2);
+  border-color: rgba(241, 196, 15, 0.5);
+  box-shadow: 0 0 30px rgba(241, 196, 15, 0.1);
+}
+
+/* КНОПКА "НАЗАД" */
+
+.character-select-footer {
+  text-align: center;
+  padding-top: 14px;
+  margin-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.character-cancel-btn {
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: var(--font-ui, 'Comfortaa', 'Courier New', monospace);
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid rgba(100, 100, 140, 0.2);
+  transition: all 0.3s ease;
+  background: rgba(40, 40, 80, 0.4);
+  color: var(--color-text-dark);
+  text-align: center;
+}
+
+.character-cancel-btn:hover {
+  background: rgba(60, 60, 120, 0.5);
+  color: var(--color-text-light);
+  border-color: rgba(100, 100, 180, 0.4);
+}
+
+/* АДАПТАЦИЯ */
+
+@media (max-width: 750px) {
+  .character-select-content {
+    max-width: 600px;
+    padding: 25px 25px 20px;
+  }
+
+  .character-select-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .character-card {
+    min-height: 260px;
+    padding: 12px 10px 12px;
+  }
+
+  .character-card-sprite {
+    width: 120px;
+    height: 160px;
+  }
+
+  .character-card-sprite img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .random-dice {
+    font-size: 64px;
+  }
+}
+
+@media (max-width: 550px) {
+  .character-select-content {
+    max-width: 360px;
+    padding: 18px 16px 16px;
+  }
+
+  .character-select-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .character-select-header h2 {
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+
+  .character-card {
+    min-height: 200px;
+    padding: 10px 8px 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .character-card-sprite {
+    width: 80px;
+    height: 100px;
+    flex-shrink: 0;
+    margin-bottom: 0;
+    margin-right: 12px;
+  }
+
+  .character-card-sprite img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .character-select-btn {
+    font-size: 11px;
+    padding: 6px 12px;
+    width: auto;
+    min-width: 100px;
+  }
+
+  .random-dice {
+    font-size: 48px;
+  }
+}
+
+@media (max-width: 400px) {
+  .character-select-content {
+    padding: 12px 10px 10px;
+    border-radius: 10px;
+    max-width: 300px;
+  }
+
+  .character-select-header h2 {
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+
+  .character-card-sprite {
+    width: 60px;
+    height: 80px;
+  }
+
+  .character-card-sprite img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .character-select-btn {
+    font-size: 10px;
+    padding: 4px 10px;
+    min-width: 80px;
+  }
+
+  .random-dice {
+    font-size: 36px;
+  }
+}

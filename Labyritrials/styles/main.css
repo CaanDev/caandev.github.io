@@ -1,0 +1,99 @@
+/**
+ * Главный файл стилей
+ * Собирает все части CSS в правильном порядке
+ * 
+ * Структура:
+ *  1. Шрифты
+ *  2. Базовые стили (variables, reset, typography)
+ *  3. Анимации
+ *  4. Компоненты (loader, notification, hud, buttons)
+ *  5. Экраны (intro, menu, game)
+ *  6. Окна (characterSelect, achievements, settings, shop, bookshelf, pause, gameOver, levelUp, final)
+ *  7. Прочее (notes)
+ */
+
+/* 1. ШРИФТЫ */
+@import url('base/fonts.css');
+
+/* 2. БАЗОВЫЕ СТИЛИ */
+
+/* 2.1. Переменные и тема */
+@import url('base/variables.css');
+
+/* 2.2. Сброс и базовые стили */
+@import url('base/base.css');
+
+/* 2.3. Типографика */
+@import url('base/typography.css');
+
+/* 3. АНИМАЦИИ */
+
+@import url('animations.css');
+
+/* 4. КОМПОНЕНТЫ */
+
+/* 4.1. Загрузчик */
+@import url('components/loader.css');
+
+/* 4.2. Уведомления */
+@import url('components/notification.css');
+
+/* 4.3. Игровой HUD */
+@import url('components/hud.css');
+
+/* 4.4. Кнопки */
+@import url('components/buttons.css');
+
+/* 5. ЭКРАНЫ */
+
+/* 5.1. Заставка */
+@import url('screens/intro.css');
+
+/* 5.2. Главное меню */
+@import url('screens/menu.css');
+
+/* 5.3. Игровой экран */
+@import url('screens/game.css');
+
+/* 6. ОКНА (МОДАЛЬНЫЕ) */
+
+/* 6.1. Подтверждение */
+@import url('windows/confirm.css');
+
+/* 6.2. Выбор персонажа */
+@import url('windows/characterSelect.css');
+
+/* 6.3. Достижения */
+@import url('windows/achievements.css');
+
+/* 6.4. Настройки */
+@import url('windows/settings.css');
+
+/* 6.5. Магазин */
+@import url('windows/shop.css');
+
+/* 6.6. Инвентарь */
+@import url('windows/inventory.css');
+
+/* 6.7. Окно с информацией о предмете */
+@import url('windows/itemInfoPopup.css');
+
+/* 6.8. Библиотека */
+@import url('windows/bookshelf.css');
+
+/* 6.9. Пауза */
+@import url('windows/pause.css');
+
+/* 6.10. Смерть */
+@import url('windows/gameOver.css');
+
+/* 6.11. Переход уровня */
+@import url('windows/levelUp.css');
+
+/* 6.12. Финал */
+@import url('windows/final.css');
+
+/* 7. ПРОЧЕЕ */
+
+/* 7.1. Записки */
+@import url('notes.css');

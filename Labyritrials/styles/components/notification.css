@@ -1,0 +1,116 @@
+/**
+ * Стили для уведомлений
+ */
+
+.achievement-notification {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  background: var(--color-ui-panel);
+  background: var(--gradient-panel-gold);
+  border: 1.5px solid var(--color-border-gold);
+  border-radius: 8px;
+  padding: 10px 16px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  z-index: 3000;
+  box-shadow: 0 0 40px rgba(241, 196, 15, 0.1),
+              0 0 20px rgba(241, 196, 15, 0.05),
+              inset 0 0 30px rgba(241, 196, 15, 0.03);
+  max-width: 320px;
+  animation: notificationSlideIn 0.4s ease forwards;
+  pointer-events: none;
+}
+
+.achievement-notification.hiding {
+  animation: notificationSlideOut 0.4s ease forwards;
+}
+
+.achievement-notification .notification-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+}
+
+/* Стиль для изображений в уведомлениях */
+.achievement-notification .notification-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  image-rendering: auto;
+  display: block;
+}
+
+.achievement-notification .notification-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.achievement-notification .notification-title {
+  font-family: var(--font-ui, 'Comfortaa', 'Courier New', monospace);
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--color-text-gold);
+  letter-spacing: 1px;
+}
+
+.achievement-notification .notification-name {
+  font-family: var(--font-ui, 'Comfortaa', 'Courier New', monospace);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text-light);
+}
+
+/* АДАПТАЦИЯ */
+
+@media (max-width: 600px) {
+  .achievement-notification {
+    bottom: 20px;
+    left: 20px;
+    padding: 8px 14px;
+    max-width: 260px;
+  }
+
+  .achievement-notification .notification-icon {
+    font-size: 20px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .achievement-notification .notification-icon img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .achievement-notification .notification-name {
+    font-size: 12px;
+  }
+
+  .achievement-notification .notification-title {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 400px) {
+  .achievement-notification {
+    max-width: 220px;
+    padding: 6px 10px;
+  }
+  
+  .achievement-notification .notification-icon {
+    font-size: 18px;
+    width: 26px;
+    height: 26px;
+  }
+  
+  .achievement-notification .notification-icon img {
+    width: 22px;
+    height: 22px;
+  }
+}

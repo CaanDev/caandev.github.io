@@ -1,0 +1,131 @@
+/**
+ * Базовая типографика
+ */
+
+body,
+html {
+  font-family: var(--font-primary, 'Comfortaa', 'Courier New', monospace);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Заголовки */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading, 'Oswald', 'Comfortaa', 'Courier New', sans-serif);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 2.5em;
+  letter-spacing: 4px;
+}
+
+h2 {
+  font-size: 2em;
+  letter-spacing: 3px;
+}
+
+h3 {
+  font-size: 1.5em;
+  letter-spacing: 2px;
+}
+
+h4, h5, h6 {
+  letter-spacing: 1px;
+}
+
+/* Моноширинный текст */
+code, pre, .mono {
+  font-family: var(--font-mono, 'Courier New', monospace);
+}
+
+/* Текст с тенью для лучшей читаемости */
+.text-shadow {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.text-shadow-light {
+  text-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.text-glow {
+  text-shadow: 0 0 20px var(--color-glow-magic);
+}
+
+.text-glow-gold {
+  text-shadow: 0 0 30px var(--color-glow-gold);
+}
+
+/* Утилиты для выравнивания */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* Цвета текста */
+.text-primary {
+  color: var(--color-text-primary);
+}
+
+.text-light {
+  color: var(--color-text-light);
+}
+
+.text-dark {
+  color: var(--color-text-dark);
+}
+
+.text-gold {
+  color: var(--color-text-gold);
+}
+
+.text-red {
+  color: var(--color-text-red);
+}
+
+.text-green {
+  color: var(--color-text-green);
+}
+
+/* Дополнительные утилиты */
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.text-lowercase {
+  text-transform: lowercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+/* Веса шрифтов */
+.font-light {
+  font-weight: 300;
+}
+
+.font-regular {
+  font-weight: 400;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
