@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Фон -->
+  <rect width="64" height="64" rx="10" fill="#0a0610"/>
+  
+  <!-- Кольца портала (увеличены) -->
+  <circle cx="32" cy="32" r="28" fill="none" stroke="#8e44ad" stroke-width="2.5" opacity="0.5"/>
+  <circle cx="32" cy="32" r="20" fill="none" stroke="#ab47bc" stroke-width="2" opacity="0.35"/>
+  <circle cx="32" cy="32" r="12" fill="none" stroke="#dda0dd" stroke-width="1" opacity="0.2"/>
+  
+  <!-- Внутренняя тьма -->
+  <circle cx="32" cy="32" r="9" fill="#0a0610"/>
+  
+  <!-- Звезда строго по центру (увеличенная) -->
+  <text x="32" y="32" font-family="serif" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#f1c40f" opacity="0.9">✦</text>
+  <text x="32" y="32" font-family="serif" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#f1c40f" opacity="0.3" filter="blur(2px)">✦</text>
+  
+  <!-- 8 рун на окружности r=16 (увеличены) -->
+  <text x="32" y="16" font-family="serif" font-size="9" text-anchor="middle" dominant-baseline="central" fill="#dda0dd" opacity="0.8">ᚠ</text>
+  <text x="43" y="21" font-family="serif" font-size="9" text-anchor="middle" dominant-baseline="central" fill="#dda0dd" opacity="0.8">ᚢ</text>
+  <text x="48" y="32" font-family="serif" font-size="9" text-anchor="middle" dominant-baseline="central" fill="#dda0dd" opacity="0.8">ᚦ</text>
+  <text x="43" y="43" font-family="serif" font-size="9" text-anchor="middle" dominant-baseline="central" fill="#dda0dd" opacity="0.8">ᚨ</text>
+  <text x="32" y="48" font-family="serif" font-size="9" text-anchor="middle" dominant-baseline="central" fill="#dda0dd" opacity="0.8">ᚱ</text>
+  <text x="21" y="43" font-family="serif" font-size="9" text-anchor="middle" dominant-baseline="central" fill="#dda0dd" opacity="0.8">ᚾ</text>
+  <text x="16" y="32" font-family="serif" font-size="9" text-anchor="middle" dominant-baseline="central" fill="#dda0dd" opacity="0.8">ᚷ</text>
+  <text x="21" y="21" font-family="serif" font-size="9" text-anchor="middle" dominant-baseline="central" fill="#dda0dd" opacity="0.8">ᚹ</text>
+  
+  <!-- Свечение портала (увеличенное) -->
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#8e44ad" stroke-width="0.6" opacity="0.06"/>
+  
+  <!-- Искры (увеличенные) -->
+  <circle cx="8" cy="8" r="2" fill="#f1c40f" opacity="0.9"/>
+  <circle cx="56" cy="8" r="2" fill="#f1c40f" opacity="0.9"/>
+  <circle cx="8" cy="56" r="2" fill="#f1c40f" opacity="0.9"/>
+  <circle cx="56" cy="56" r="2" fill="#f1c40f" opacity="0.9"/>
+</svg>
