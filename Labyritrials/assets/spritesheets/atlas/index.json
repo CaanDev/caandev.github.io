@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "generated": "2026-08-26T00:00:00.000Z",
+  "description": "Global sprite atlas for Labyritrials - Main Manifest",
+  
+  "parts": {
+    "characters": {
+      "url": "characters.json",
+      "priority": "high",
+      "preload": true,
+      "description": "Character sprites: male and female animations"
+    },
+    "biomes": {
+      "url": "biomes.json",
+      "priority": "high",
+      "preload": true,
+      "description": "Biome sprites: cave, ice, sand"
+    },
+    "rooms": {
+      "url": "rooms.json",
+      "priority": "medium",
+      "preload": false,
+      "description": "Room sprites: safeRoom, shrineRoom, trapRoom, treasureRoom"
+    },
+    "bosses": {
+      "url": "bosses.json",
+      "priority": "medium",
+      "preload": false,
+      "description": "Boss arena sprites"
+    },
+    "shared": {
+      "url": "shared.json",
+      "priority": "high",
+      "preload": true,
+      "description": "Shared sprites: achievements, inventory, objects, shop, traps, ui"
+    }
+  }
+}

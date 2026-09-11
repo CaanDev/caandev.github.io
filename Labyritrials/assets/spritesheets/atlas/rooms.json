@@ -1,0 +1,253 @@
+{
+  "version": "1.0",
+  "description": "Room sprites: safeRoom, shrineRoom, trapRoom, treasureRoom",
+  
+  "sheets": {
+    "rooms/safeRoom/layout": {
+      "id": "rooms/safeRoom/layout",
+      "path": "rooms/safeRoom/layout.webp",
+      "fallback": "rooms/safeRoom/layout.png",
+      "frameSize": 150,
+      "cols": 7,
+      "rows": 1,
+      "frames": {
+        "walls": ["safeWall1", "safeWall2", "safeWall3", "safeWall4", "safeWall5", "safeWall6", "safeWall7"]
+      }
+    },
+    "rooms/safeRoom/interactive": {
+      "id": "rooms/safeRoom/interactive",
+      "path": "rooms/safeRoom/interactive.webp",
+      "fallback": "rooms/safeRoom/interactive.png",
+      "frameSize": 150,
+      "cols": 2,
+      "rows": 2,
+      "frames": {
+        "torches": ["safeTorch"],
+        "chest": ["safeChestClosed", "safeChestOpen"]
+      }
+    },
+    
+    "rooms/shrineRoom/layout": {
+      "id": "rooms/shrineRoom/layout",
+      "path": "rooms/shrineRoom/layout.webp",
+      "fallback": "rooms/shrineRoom/layout.png",
+      "frameSize": 150,
+      "cols": 9,
+      "rows": 1,
+      "frames": {
+        "walls": ["shrineWall1", "shrineWall2", "shrineWall3", "shrineWall4", "shrineWall5", "shrineWall6", "shrineWall7", "shrineWall8", "shrineWall9"]
+      }
+    },
+    "rooms/shrineRoom/interactive": {
+      "id": "rooms/shrineRoom/interactive",
+      "path": "rooms/shrineRoom/interactive.webp",
+      "fallback": "rooms/shrineRoom/interactive.png",
+      "frameSize": 150,
+      "cols": 2,
+      "rows": 4,
+      "frames": {
+        "torches": ["shrineTorch"],
+        "altarsCave": ["altarCaveActive", "altarCaveActivated"],
+        "altarsIce": ["altarIceActive", "altarIceActivated"],
+        "altarsSand": ["altarSandActive", "altarSandActivated"]
+      }
+    },
+    
+    "rooms/trapRoom/layout": {
+      "id": "rooms/trapRoom/layout",
+      "path": "rooms/trapRoom/layout.webp",
+      "fallback": "rooms/trapRoom/layout.png",
+      "frameSize": 150,
+      "cols": 7,
+      "rows": 1,
+      "frames": {
+        "walls": ["trapWall1", "trapWall2", "trapWall3", "trapWall4", "trapWall5", "trapWall6", "trapWall7"]
+      }
+    },
+    "rooms/trapRoom/interactive": {
+      "id": "rooms/trapRoom/interactive",
+      "path": "rooms/trapRoom/interactive.webp",
+      "fallback": "rooms/trapRoom/interactive.png",
+      "frameSize": 150,
+      "cols": 2,
+      "rows": 2,
+      "frames": {
+        "torches": ["trapTorch"],
+        "chest": ["trapChestClosed", "trapChestOpen"]
+      }
+    },
+    
+    "rooms/treasureRoom/layout": {
+      "id": "rooms/treasureRoom/layout",
+      "path": "rooms/treasureRoom/layout.webp",
+      "fallback": "rooms/treasureRoom/layout.png",
+      "frameSize": 150,
+      "cols": 4,
+      "rows": 3,
+      "frames": {
+        "walls": ["treasureWall1", "treasureWall2", "treasureWall3", "treasureWall4", "treasureWall5", "treasureWall6", "treasureWall7"],
+        "cracked": ["treasureCracked1", "treasureCracked2", "treasureCracked3", "treasureCracked4"]
+      }
+    },
+    "rooms/treasureRoom/interactive": {
+      "id": "rooms/treasureRoom/interactive",
+      "path": "rooms/treasureRoom/interactive.webp",
+      "fallback": "rooms/treasureRoom/interactive.png",
+      "frameSize": 150,
+      "cols": 4,
+      "rows": 2,
+      "frames": {
+        "torches": ["treasureTorch"],
+        "chest": ["treasureChestClosed", "treasureChestOpen", "treasureChestEmpty", "treasureChestMimic"]
+      }
+    },
+    "rooms/treasureRoom/loot": {
+      "id": "rooms/treasureRoom/loot",
+      "path": "rooms/treasureRoom/loot.webp",
+      "fallback": "rooms/treasureRoom/loot.png",
+      "frameSize": 150,
+      "cols": 4,
+      "rows": 3,
+      "frames": {
+        "gold": ["goldTreasure1", "goldTreasure2", "goldTreasure3", "goldTreasure4"],
+        "potions": ["potionTreasure1", "potionTreasure2", "potionTreasure3", "potionTreasure4"],
+        "artifacts": ["artifactTreasure1", "artifactTreasure2", "artifactTreasure3"]
+      }
+    }
+  },
+  
+  "sprites": {
+    "safeWall1": { "sheet": "rooms/safeRoom/layout", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "safeWall2": { "sheet": "rooms/safeRoom/layout", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "safeWall3": { "sheet": "rooms/safeRoom/layout", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "safeWall4": { "sheet": "rooms/safeRoom/layout", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "safeWall5": { "sheet": "rooms/safeRoom/layout", "x": 600, "y": 0, "w": 150, "h": 150 },
+    "safeWall6": { "sheet": "rooms/safeRoom/layout", "x": 750, "y": 0, "w": 150, "h": 150 },
+    "safeWall7": { "sheet": "rooms/safeRoom/layout", "x": 900, "y": 0, "w": 150, "h": 150 },
+    "safeTorch": { "sheet": "rooms/safeRoom/interactive", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "safeChestClosed": { "sheet": "rooms/safeRoom/interactive", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "safeChestOpen": { "sheet": "rooms/safeRoom/interactive", "x": 150, "y": 150, "w": 150, "h": 150 },
+    
+    "shrineWall1": { "sheet": "rooms/shrineRoom/layout", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "shrineWall2": { "sheet": "rooms/shrineRoom/layout", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "shrineWall3": { "sheet": "rooms/shrineRoom/layout", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "shrineWall4": { "sheet": "rooms/shrineRoom/layout", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "shrineWall5": { "sheet": "rooms/shrineRoom/layout", "x": 600, "y": 0, "w": 150, "h": 150 },
+    "shrineWall6": { "sheet": "rooms/shrineRoom/layout", "x": 750, "y": 0, "w": 150, "h": 150 },
+    "shrineWall7": { "sheet": "rooms/shrineRoom/layout", "x": 900, "y": 0, "w": 150, "h": 150 },
+    "shrineWall8": { "sheet": "rooms/shrineRoom/layout", "x": 1050, "y": 0, "w": 150, "h": 150 },
+    "shrineWall9": { "sheet": "rooms/shrineRoom/layout", "x": 1200, "y": 0, "w": 150, "h": 150 },
+    "shrineTorch": { "sheet": "rooms/shrineRoom/interactive", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "altarCaveActive": { "sheet": "rooms/shrineRoom/interactive", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "altarCaveActivated": { "sheet": "rooms/shrineRoom/interactive", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "altarIceActive": { "sheet": "rooms/shrineRoom/interactive", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "altarIceActivated": { "sheet": "rooms/shrineRoom/interactive", "x": 150, "y": 300, "w": 150, "h": 150 },
+    "altarSandActive": { "sheet": "rooms/shrineRoom/interactive", "x": 0, "y": 450, "w": 150, "h": 150 },
+    "altarSandActivated": { "sheet": "rooms/shrineRoom/interactive", "x": 150, "y": 450, "w": 150, "h": 150 },
+    
+    "trapWall1": { "sheet": "rooms/trapRoom/layout", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "trapWall2": { "sheet": "rooms/trapRoom/layout", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "trapWall3": { "sheet": "rooms/trapRoom/layout", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "trapWall4": { "sheet": "rooms/trapRoom/layout", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "trapWall5": { "sheet": "rooms/trapRoom/layout", "x": 600, "y": 0, "w": 150, "h": 150 },
+    "trapWall6": { "sheet": "rooms/trapRoom/layout", "x": 750, "y": 0, "w": 150, "h": 150 },
+    "trapWall7": { "sheet": "rooms/trapRoom/layout", "x": 900, "y": 0, "w": 150, "h": 150 },
+    "trapTorch": { "sheet": "rooms/trapRoom/interactive", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "trapChestClosed": { "sheet": "rooms/trapRoom/interactive", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "trapChestOpen": { "sheet": "rooms/trapRoom/interactive", "x": 150, "y": 150, "w": 150, "h": 150 },
+    
+    "treasureWall1": { "sheet": "rooms/treasureRoom/layout", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "treasureWall2": { "sheet": "rooms/treasureRoom/layout", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "treasureWall3": { "sheet": "rooms/treasureRoom/layout", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "treasureWall4": { "sheet": "rooms/treasureRoom/layout", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "treasureWall5": { "sheet": "rooms/treasureRoom/layout", "x": 600, "y": 0, "w": 150, "h": 150 },
+    "treasureWall6": { "sheet": "rooms/treasureRoom/layout", "x": 750, "y": 0, "w": 150, "h": 150 },
+    "treasureWall7": { "sheet": "rooms/treasureRoom/layout", "x": 900, "y": 0, "w": 150, "h": 150 },
+    "treasureCracked1": { "sheet": "rooms/treasureRoom/layout", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "treasureCracked2": { "sheet": "rooms/treasureRoom/layout", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "treasureCracked3": { "sheet": "rooms/treasureRoom/layout", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "treasureCracked4": { "sheet": "rooms/treasureRoom/layout", "x": 450, "y": 150, "w": 150, "h": 150 },
+    "treasureTorch": { "sheet": "rooms/treasureRoom/interactive", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "treasureChestClosed": { "sheet": "rooms/treasureRoom/interactive", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "treasureChestOpen": { "sheet": "rooms/treasureRoom/interactive", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "treasureChestEmpty": { "sheet": "rooms/treasureRoom/interactive", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "treasureChestMimic": { "sheet": "rooms/treasureRoom/interactive", "x": 450, "y": 150, "w": 150, "h": 150 },
+    
+    "goldTreasure1": { "sheet": "rooms/treasureRoom/loot", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "goldTreasure2": { "sheet": "rooms/treasureRoom/loot", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "goldTreasure3": { "sheet": "rooms/treasureRoom/loot", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "goldTreasure4": { "sheet": "rooms/treasureRoom/loot", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "potionTreasure1": { "sheet": "rooms/treasureRoom/loot", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "potionTreasure2": { "sheet": "rooms/treasureRoom/loot", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "potionTreasure3": { "sheet": "rooms/treasureRoom/loot", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "potionTreasure4": { "sheet": "rooms/treasureRoom/loot", "x": 450, "y": 150, "w": 150, "h": 150 },
+    "artifactTreasure1": { "sheet": "rooms/treasureRoom/loot", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "artifactTreasure2": { "sheet": "rooms/treasureRoom/loot", "x": 150, "y": 300, "w": 150, "h": 150 },
+    "artifactTreasure3": { "sheet": "rooms/treasureRoom/loot", "x": 300, "y": 300, "w": 150, "h": 150 }
+  },
+  
+  "aliases": {
+    "wall": {
+      "safeRoom": ["safeWall1", "safeWall2", "safeWall3", "safeWall4", "safeWall5", "safeWall6", "safeWall7"],
+      "shrineRoom": ["shrineWall1", "shrineWall2", "shrineWall3", "shrineWall4", "shrineWall5", "shrineWall6", "shrineWall7", "shrineWall8", "shrineWall9"],
+      "trapRoom": ["trapWall1", "trapWall2", "trapWall3", "trapWall4", "trapWall5", "trapWall6", "trapWall7"],
+      "treasureRoom": ["treasureWall1", "treasureWall2", "treasureWall3", "treasureWall4", "treasureWall5", "treasureWall6", "treasureWall7"],
+      "default": ["safeWall1"]
+    },
+    "wallCracked": {
+      "treasureRoom": ["treasureCracked1", "treasureCracked2", "treasureCracked3", "treasureCracked4"],
+      "default": ["treasureCracked1"]
+    },
+    "torch": {
+      "safeRoom": ["safeTorch"],
+      "shrineRoom": ["shrineTorch"],
+      "trapRoom": ["trapTorch"],
+      "treasureRoom": ["treasureTorch"],
+      "default": ["safeTorch"]
+    },
+    "chest": {
+      "safeRoom": ["safeChestClosed"],
+      "trapRoom": ["trapChestClosed"],
+      "treasureRoom": ["treasureChestClosed"],
+      "default": ["safeChestClosed"]
+    },
+    "chestOpen": {
+      "safeRoom": ["safeChestOpen"],
+      "trapRoom": ["trapChestOpen"],
+      "treasureRoom": ["treasureChestOpen"],
+      "default": ["safeChestOpen"]
+    },
+    "chestEmpty": {
+      "treasureRoom": ["treasureChestEmpty"],
+      "default": ["treasureChestEmpty"]
+    },
+    "chestMimic": {
+      "treasureRoom": ["treasureChestMimic"],
+      "default": ["treasureChestMimic"]
+    },
+    "altar": {
+      "cave": ["altarCaveActive"],
+      "ice": ["altarIceActive"],
+      "sand": ["altarSandActive"],
+      "default": ["altarCaveActive"]
+    },
+    "altarActivated": {
+      "cave": ["altarCaveActivated"],
+      "ice": ["altarIceActivated"],
+      "sand": ["altarSandActivated"],
+      "default": ["altarCaveActivated"]
+    },
+    "gold": {
+      "treasureRoom": ["goldTreasure1", "goldTreasure2", "goldTreasure3", "goldTreasure4"],
+      "default": ["goldTreasure1"]
+    },
+    "potion": {
+      "treasureRoom": ["potionTreasure1", "potionTreasure2", "potionTreasure3", "potionTreasure4"],
+      "default": ["potionTreasure1"]
+    },
+    "artifact": {
+      "treasureRoom": ["artifactTreasure1", "artifactTreasure2", "artifactTreasure3"],
+      "default": ["artifactTreasure1"]
+    }
+  }
+}

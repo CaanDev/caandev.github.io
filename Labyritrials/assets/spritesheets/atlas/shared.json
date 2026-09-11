@@ -1,0 +1,235 @@
+{
+  "version": "1.0",
+  "description": "Shared sprites: achievements, inventory, objects, shop, traps, ui",
+  
+  "sheets": {
+    "shared/achievements": {
+      "id": "shared/achievements",
+      "path": "shared/achievements.webp",
+      "fallback": "shared/achievements.png",
+      "frameSize": 150,
+      "cols": 11,
+      "rows": 5,
+      "frames": {
+        "combat": ["achFirstKill", "achMonsterSlayer", "achMonsterMassacre", "achMonsterLegend", "achBossHunter5", "achBossHunter10", "achBossHunter15", "achBossConqueror", "achFireMage", "achVampireLord", "achThunderer"],
+        "exploration": ["achExplorer", "achCartographer", "achTreasureHunter", "achMystic", "achDaredevil", "achAdventurer"],
+        "collection": ["achGoldFinder", "achGoldHoarder", "achGoldMillionaire", "achCollector", "achArtifactor", "achFullyEquipped", "achStoryCollector"],
+        "survival": ["achSurvivor", "achVeteran", "achLabyrinthMaster", "achIronMan"],
+        "secret": ["achSecretMeeting", "achPotionGlutton", "achDodgeMaster", "achUnlucky", "achCleaner", "achTrapMaster", "achShadow", "achMimicParanoid"]
+      }
+    },
+    "shared/inventory": {
+      "id": "shared/inventory",
+      "path": "shared/inventory.webp",
+      "fallback": "shared/inventory.png",
+      "frameSize": 150,
+      "cols": 3,
+      "rows": 4,
+      "frames": {
+        "meleeWeapons": ["invStaffDefault", "invStaffThunder", "invStaffVampire"],
+        "rangedWeapons": ["invFireball"],
+        "equipment": ["invTalismanFire", "invTalismanMimicHunter"],
+        "items": ["invMapLevel", "invMapLevelIce", "invMapLevelSand"]
+      }
+    },
+    "shared/objects": {
+      "id": "shared/objects",
+      "path": "shared/objects.webp",
+      "fallback": "shared/objects.png",
+      "frameSize": 150,
+      "cols": 2,
+      "rows": 1,
+      "frames": {
+        "objects": ["objShopStand", "objBookshelf"]
+      }
+    },
+    "shared/shop": {
+      "id": "shared/shop",
+      "path": "shared/shop.webp",
+      "fallback": "shared/shop.png",
+      "frameSize": 150,
+      "cols": 3,
+      "rows": 2,
+      "frames": {
+        "items": ["shopGoldCoin", "shopStackGold"],
+        "improvements": ["shopBoostHp", "shopBoostDmg", "shopBoostStamina"]
+      }
+    },
+    "shared/traps": {
+      "id": "shared/traps",
+      "path": "shared/traps.webp",
+      "fallback": "shared/traps.png",
+      "frameSize": 150,
+      "cols": 5,
+      "rows": 1,
+      "frames": {
+        "types": ["trapExplosion", "trapIce", "trapAcid", "trapPsionic", "trapLightning"]
+      }
+    },
+    "shared/ui": {
+      "id": "shared/ui",
+      "path": "shared/ui.webp",
+      "fallback": "shared/ui.png",
+      "frameSize": 300,
+      "cols": 8,
+      "rows": 4,
+      "frames": {
+        "minimap": ["uiMinimap", "uiMinimapIce", "uiMinimapSand"]
+      }
+    }
+  },
+  
+  "sprites": {
+    "achFirstKill": { "sheet": "shared/achievements", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "achMonsterSlayer": { "sheet": "shared/achievements", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "achMonsterMassacre": { "sheet": "shared/achievements", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "achMonsterLegend": { "sheet": "shared/achievements", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "achBossHunter5": { "sheet": "shared/achievements", "x": 600, "y": 0, "w": 150, "h": 150 },
+    "achBossHunter10": { "sheet": "shared/achievements", "x": 750, "y": 0, "w": 150, "h": 150 },
+    "achBossHunter15": { "sheet": "shared/achievements", "x": 900, "y": 0, "w": 150, "h": 150 },
+    "achBossConqueror": { "sheet": "shared/achievements", "x": 1050, "y": 0, "w": 150, "h": 150 },
+    "achFireMage": { "sheet": "shared/achievements", "x": 1200, "y": 0, "w": 150, "h": 150 },
+    "achVampireLord": { "sheet": "shared/achievements", "x": 1350, "y": 0, "w": 150, "h": 150 },
+    "achThunderer": { "sheet": "shared/achievements", "x": 1500, "y": 0, "w": 150, "h": 150 },
+    "achExplorer": { "sheet": "shared/achievements", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "achCartographer": { "sheet": "shared/achievements", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "achTreasureHunter": { "sheet": "shared/achievements", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "achMystic": { "sheet": "shared/achievements", "x": 450, "y": 150, "w": 150, "h": 150 },
+    "achDaredevil": { "sheet": "shared/achievements", "x": 600, "y": 150, "w": 150, "h": 150 },
+    "achAdventurer": { "sheet": "shared/achievements", "x": 750, "y": 150, "w": 150, "h": 150 },
+    "achGoldFinder": { "sheet": "shared/achievements", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "achGoldHoarder": { "sheet": "shared/achievements", "x": 150, "y": 300, "w": 150, "h": 150 },
+    "achGoldMillionaire": { "sheet": "shared/achievements", "x": 300, "y": 300, "w": 150, "h": 150 },
+    "achCollector": { "sheet": "shared/achievements", "x": 450, "y": 300, "w": 150, "h": 150 },
+    "achArtifactor": { "sheet": "shared/achievements", "x": 600, "y": 300, "w": 150, "h": 150 },
+    "achFullyEquipped": { "sheet": "shared/achievements", "x": 750, "y": 300, "w": 150, "h": 150 },
+    "achStoryCollector": { "sheet": "shared/achievements", "x": 900, "y": 300, "w": 150, "h": 150 },
+    "achSurvivor": { "sheet": "shared/achievements", "x": 0, "y": 450, "w": 150, "h": 150 },
+    "achVeteran": { "sheet": "shared/achievements", "x": 150, "y": 450, "w": 150, "h": 150 },
+    "achLabyrinthMaster": { "sheet": "shared/achievements", "x": 300, "y": 450, "w": 150, "h": 150 },
+    "achIronMan": { "sheet": "shared/achievements", "x": 450, "y": 450, "w": 150, "h": 150 },
+    "achSecretMeeting": { "sheet": "shared/achievements", "x": 0, "y": 600, "w": 150, "h": 150 },
+    "achPotionGlutton": { "sheet": "shared/achievements", "x": 150, "y": 600, "w": 150, "h": 150 },
+    "achDodgeMaster": { "sheet": "shared/achievements", "x": 300, "y": 600, "w": 150, "h": 150 },
+    "achUnlucky": { "sheet": "shared/achievements", "x": 450, "y": 600, "w": 150, "h": 150 },
+    "achCleaner": { "sheet": "shared/achievements", "x": 600, "y": 600, "w": 150, "h": 150 },
+    "achTrapMaster": { "sheet": "shared/achievements", "x": 750, "y": 600, "w": 150, "h": 150 },
+    "achShadow": { "sheet": "shared/achievements", "x": 900, "y": 600, "w": 150, "h": 150 },
+    "achMimicParanoid": { "sheet": "shared/achievements", "x": 1050, "y": 600, "w": 150, "h": 150 },
+    
+    "invStaffDefault": { "sheet": "shared/inventory", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "invStaffThunder": { "sheet": "shared/inventory", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "invStaffVampire": { "sheet": "shared/inventory", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "invFireball": { "sheet": "shared/inventory", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "invTalismanFire": { "sheet": "shared/inventory", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "invTalismanMimicHunter": { "sheet": "shared/inventory", "x": 150, "y": 300, "w": 150, "h": 150 },
+    "invMapLevel": { "sheet": "shared/inventory", "x": 0, "y": 450, "w": 150, "h": 150 },
+    "invMapLevelIce": { "sheet": "shared/inventory", "x": 150, "y": 450, "w": 150, "h": 150 },
+    "invMapLevelSand": { "sheet": "shared/inventory", "x": 300, "y": 450, "w": 150, "h": 150 },
+    
+    "objShopStand": { "sheet": "shared/objects", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "objBookshelf": { "sheet": "shared/objects", "x": 150, "y": 0, "w": 150, "h": 150 },
+    
+    "shopGoldCoin": { "sheet": "shared/shop", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "shopStackGold": { "sheet": "shared/shop", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "shopBoostHp": { "sheet": "shared/shop", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "shopBoostDmg": { "sheet": "shared/shop", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "shopBoostStamina": { "sheet": "shared/shop", "x": 300, "y": 150, "w": 150, "h": 150 },
+    
+    "trapExplosion": { "sheet": "shared/traps", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "trapIce": { "sheet": "shared/traps", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "trapAcid": { "sheet": "shared/traps", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "trapPsionic": { "sheet": "shared/traps", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "trapLightning": { "sheet": "shared/traps", "x": 600, "y": 0, "w": 150, "h": 150 },
+    
+    "uiMinimap": { "sheet": "shared/ui", "x": 0, "y": 0, "w": 300, "h": 300 },
+    "uiMinimapIce": { "sheet": "shared/ui", "x": 300, "y": 0, "w": 300, "h": 300 },
+    "uiMinimapSand": { "sheet": "shared/ui", "x": 600, "y": 0, "w": 300, "h": 300 }
+  },
+  
+  "aliases": {
+    "achievement": {
+      "firstKill": ["achFirstKill"],
+      "monsterSlayer": ["achMonsterSlayer"],
+      "monsterMassacre": ["achMonsterMassacre"],
+      "monsterLegend": ["achMonsterLegend"],
+      "bossHunter5": ["achBossHunter5"],
+      "bossHunter10": ["achBossHunter10"],
+      "bossHunter15": ["achBossHunter15"],
+      "bossConqueror": ["achBossConqueror"],
+      "fireMage": ["achFireMage"],
+      "vampireLord": ["achVampireLord"],
+      "thunderer": ["achThunderer"],
+      "explorer": ["achExplorer"],
+      "cartographer": ["achCartographer"],
+      "treasureHunter": ["achTreasureHunter"],
+      "mystic": ["achMystic"],
+      "daredevil": ["achDaredevil"],
+      "adventurer": ["achAdventurer"],
+      "goldFinder": ["achGoldFinder"],
+      "goldHoarder": ["achGoldHoarder"],
+      "goldMillionaire": ["achGoldMillionaire"],
+      "collector": ["achCollector"],
+      "artifactor": ["achArtifactor"],
+      "fullyEquipped": ["achFullyEquipped"],
+      "storyCollector": ["achStoryCollector"],
+      "survivor": ["achSurvivor"],
+      "veteran": ["achVeteran"],
+      "labyrinthMaster": ["achLabyrinthMaster"],
+      "ironMan": ["achIronMan"],
+      "secretMeeting": ["achSecretMeeting"],
+      "potionGlutton": ["achPotionGlutton"],
+      "dodgeMaster": ["achDodgeMaster"],
+      "unlucky": ["achUnlucky"],
+      "cleaner": ["achCleaner"],
+      "trapMaster": ["achTrapMaster"],
+      "shadow": ["achShadow"],
+      "mimicParanoid": ["achMimicParanoid"],
+      "default": ["achFirstKill"]
+    },
+    
+    "inventory": {
+      "staffDefault": ["invStaffDefault"],
+      "staffThunder": ["invStaffThunder"],
+      "staffVampire": ["invStaffVampire"],
+      "fireball": ["invFireball"],
+      "talismanFire": ["invTalismanFire"],
+      "talismanMimicHunter": ["invTalismanMimicHunter"],
+      "map": ["invMapLevel"],
+      "mapIce": ["invMapLevelIce"],
+      "mapSand": ["invMapLevelSand"],
+      "default": ["invStaffDefault"]
+    },
+    
+    "shop": {
+      "goldCoin": ["shopGoldCoin"],
+      "stackGold": ["shopStackGold"],
+      "boostHp": ["shopBoostHp"],
+      "boostDmg": ["shopBoostDmg"],
+      "boostStamina": ["shopBoostStamina"],
+      "default": ["shopGoldCoin"]
+    },
+    
+    "object": {
+      "shopStand": ["objShopStand"],
+      "bookshelf": ["objBookshelf"],
+      "default": ["objShopStand"]
+    },
+    
+    "trap": {
+      "explosion": ["trapExplosion"],
+      "ice": ["trapIce"],
+      "acid": ["trapAcid"],
+      "psionic": ["trapPsionic"],
+      "lightning": ["trapLightning"],
+      "default": ["trapExplosion"]
+    },
+    
+    "ui": {
+      "minimap": ["uiMinimap"],
+      "minimapIce": ["uiMinimapIce"],
+      "minimapSand": ["uiMinimapSand"],
+      "default": ["uiMinimap"]
+    }
+  }
+}
