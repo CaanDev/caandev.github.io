@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "description": "NPC sprites with animations",
+  
+  "sheets": {
+    "npcs/researcher-idle": {
+      "id": "npcs/researcher-idle",
+      "path": "npcs/researcher-idle.webp",
+      "fallback": "npcs/researcher-idle.png",
+      "frameSize": 256,
+      "cols": 4,
+      "rows": 2,
+      "frames": {
+        "researcherIdle": [
+          "researcher_idle_south", "researcher_idle_southwest", "researcher_idle_west", "researcher_idle_northwest",
+          "researcher_idle_north", "researcher_idle_northeast", "researcher_idle_east", "researcher_idle_southeast"
+        ]
+      }
+    },
+    "npcs/researcher-write": {
+      "id": "npcs/researcher-write",
+      "path": "npcs/researcher-write.webp",
+      "fallback": "npcs/researcher-write.png",
+      "frameSize": 256,
+      "cols": 8,
+      "rows": 1,
+      "frames": {
+        "researcherWrite": [
+          "researcher_write_south_0", "researcher_write_south_1", "researcher_write_south_2", "researcher_write_south_3",
+          "researcher_write_south_4", "researcher_write_south_5", "researcher_write_south_6", "researcher_write_south_7"
+        ]
+      }
+    }
+  },
+  
+  "sprites": {
+    "researcher_idle_south": { "sheet": "npcs/researcher-idle", "x": 0, "y": 0, "w": 256, "h": 256 },
+    "researcher_idle_southwest": { "sheet": "npcs/researcher-idle", "x": 256, "y": 0, "w": 256, "h": 256 },
+    "researcher_idle_west": { "sheet": "npcs/researcher-idle", "x": 512, "y": 0, "w": 256, "h": 256 },
+    "researcher_idle_northwest": { "sheet": "npcs/researcher-idle", "x": 768, "y": 0, "w": 256, "h": 256 },
+    "researcher_idle_north": { "sheet": "npcs/researcher-idle", "x": 0, "y": 256, "w": 256, "h": 256 },
+    "researcher_idle_northeast": { "sheet": "npcs/researcher-idle", "x": 256, "y": 256, "w": 256, "h": 256 },
+    "researcher_idle_east": { "sheet": "npcs/researcher-idle", "x": 512, "y": 256, "w": 256, "h": 256 },
+    "researcher_idle_southeast": { "sheet": "npcs/researcher-idle", "x": 768, "y": 256, "w": 256, "h": 256 },
+
+    "researcher_write_south_0": { "sheet": "npcs/researcher-write", "x": 0, "y": 0, "w": 256, "h": 256 },
+    "researcher_write_south_1": { "sheet": "npcs/researcher-write", "x": 256, "y": 0, "w": 256, "h": 256 },
+    "researcher_write_south_2": { "sheet": "npcs/researcher-write", "x": 512, "y": 0, "w": 256, "h": 256 },
+    "researcher_write_south_3": { "sheet": "npcs/researcher-write", "x": 768, "y": 0, "w": 256, "h": 256 },
+    "researcher_write_south_4": { "sheet": "npcs/researcher-write", "x": 1024, "y": 0, "w": 256, "h": 256 },
+    "researcher_write_south_5": { "sheet": "npcs/researcher-write", "x": 1280, "y": 0, "w": 256, "h": 256 },
+    "researcher_write_south_6": { "sheet": "npcs/researcher-write", "x": 1536, "y": 0, "w": 256, "h": 256 },
+    "researcher_write_south_7": { "sheet": "npcs/researcher-write", "x": 1792, "y": 0, "w": 256, "h": 256 }
+  }
+}

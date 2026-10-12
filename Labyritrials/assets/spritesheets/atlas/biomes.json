@@ -1,0 +1,316 @@
+{
+  "version": "1.0",
+  "description": "Biome sprites: cave, ice, sand",
+  
+  "sheets": {
+    "biomes/cave/layout": {
+      "id": "biomes/cave/layout",
+      "path": "biomes/cave/layout.webp",
+      "fallback": "biomes/cave/layout.png",
+      "frameSize": 150,
+      "cols": 5,
+      "rows": 5,
+      "frames": {
+        "wall": ["wallCave1", "wallCave2", "wallCave3"],
+        "cracked": ["wallCaveCracked1", "wallCaveCracked2", "wallCaveCracked3", "wallCaveCracked4", "wallCaveCracked5"],
+        "floor": ["floorCave"],
+        "stairs": ["stairsCave1", "stairsCave2"],
+        "collapsedStairs": ["collapsedStairsCave1", "collapsedStairsCave2"]
+      }
+    },
+    "biomes/cave/interactive": {
+      "id": "biomes/cave/interactive",
+      "path": "biomes/cave/interactive.webp",
+      "fallback": "biomes/cave/interactive.png",
+      "frameSize": 150,
+      "cols": 4,
+      "rows": 2,
+      "frames": {
+        "torches": ["torchCaveLvl1", "torchCaveLvl2", "torchCaveLvl3", "torchCaveLvl4"],
+        "chest": ["chestCaveClosed1", "chestCaveOpen1", "chestCaveEmpty1", "chestCaveMimic1"]
+      }
+    },
+    "biomes/cave/loot": {
+      "id": "biomes/cave/loot",
+      "path": "biomes/cave/loot.webp",
+      "fallback": "biomes/cave/loot.png",
+      "frameSize": 150,
+      "cols": 4,
+      "rows": 3,
+      "frames": {
+        "gold": ["goldCave1", "goldCave2", "goldCave3", "goldCave4"],
+        "potions": ["potionCave1", "potionCave2", "potionCave3", "potionCave4"],
+        "artifacts": ["artifactCave1", "artifactCave2", "artifactCave3"]
+      }
+    },
+    
+    "biomes/ice/layout": {
+      "id": "biomes/ice/layout",
+      "path": "biomes/ice/layout.webp",
+      "fallback": "biomes/ice/layout.png",
+      "frameSize": 150,
+      "cols": 3,
+      "rows": 5,
+      "frames": {
+        "wall": ["wallIce1", "wallIce2", "wallIce3"],
+        "cracked": ["wallIceCracked1", "wallIceCracked2"],
+        "floor": ["floorSnow", "floorSnowIce"],
+        "stairs": ["stairsIce1", "stairsIce2"],
+        "collapsedStairs": ["collapsedStairsIce1", "collapsedStairsIce2"]
+      }
+    },
+    "biomes/ice/interactive": {
+      "id": "biomes/ice/interactive",
+      "path": "biomes/ice/interactive.webp",
+      "fallback": "biomes/ice/interactive.png",
+      "frameSize": 150,
+      "cols": 4,
+      "rows": 3,
+      "frames": {
+        "torches": ["torchIceLvl6", "torchIceLvl7", "torchIceLvl8", "torchIceLvl9"],
+        "chest": ["chestIceClosed1", "chestIceOpen1", "chestIceEmpty1", "chestIceMimic1"],
+        "chest2": ["chestIceClosed2", "chestIceOpen2", "chestIceEmpty2", "chestIceMimic2"]
+      }
+    },
+    "biomes/ice/loot": {
+      "id": "biomes/ice/loot",
+      "path": "biomes/ice/loot.webp",
+      "fallback": "biomes/ice/loot.png",
+      "frameSize": 150,
+      "cols": 4,
+      "rows": 3,
+      "frames": {
+        "gold": ["goldIce1", "goldIce2", "goldIce3", "goldIce4"],
+        "potions": ["potionIce1", "potionIce2", "potionIce3", "potionIce4"],
+        "artifacts": ["artifactIce1", "artifactIce2", "artifactIce3"]
+      }
+    },
+    
+    "biomes/sand/layout": {
+      "id": "biomes/sand/layout",
+      "path": "biomes/sand/layout.webp",
+      "fallback": "biomes/sand/layout.png",
+      "frameSize": 150,
+      "cols": 2,
+      "rows": 5,
+      "frames": {
+        "wall": ["wallSand1", "wallSand2"],
+        "cracked": ["wallSandCracked1", "wallSandCracked2"],
+        "floor": ["floorSand"],
+        "stairs": ["stairsSand1", "stairsSand2"],
+        "collapsedStairs": ["collapsedStairsSand1", "collapsedStairsSand2"]
+      }
+    },
+    "biomes/sand/interactive": {
+      "id": "biomes/sand/interactive",
+      "path": "biomes/sand/interactive.webp",
+      "fallback": "biomes/sand/interactive.png",
+      "frameSize": 150,
+      "cols": 4,
+      "rows": 2,
+      "frames": {
+        "torches": ["torchSandLvl11", "torchSandLvl12", "torchSandLvl13", "torchSandLvl14"],
+        "chest": ["chestSandClosed1", "chestSandOpen1", "chestSandEmpty1", "chestSandMimic1"]
+      }
+    },
+    "biomes/sand/loot": {
+      "id": "biomes/sand/loot",
+      "path": "biomes/sand/loot.webp",
+      "fallback": "biomes/sand/loot.png",
+      "frameSize": 150,
+      "cols": 4,
+      "rows": 3,
+      "frames": {
+        "gold": ["goldSand1", "goldSand2", "goldSand3", "goldSand4"],
+        "potions": ["potionSand1", "potionSand2", "potionSand3", "potionSand4"],
+        "artifacts": ["artifactSand1", "artifactSand2", "artifactSand3"]
+      }
+    }
+  },
+  
+  "sprites": {
+    "wallCave1": { "sheet": "biomes/cave/layout", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "wallCave2": { "sheet": "biomes/cave/layout", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "wallCave3": { "sheet": "biomes/cave/layout", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "wallCaveCracked1": { "sheet": "biomes/cave/layout", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "wallCaveCracked2": { "sheet": "biomes/cave/layout", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "wallCaveCracked3": { "sheet": "biomes/cave/layout", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "wallCaveCracked4": { "sheet": "biomes/cave/layout", "x": 450, "y": 150, "w": 150, "h": 150 },
+    "wallCaveCracked5": { "sheet": "biomes/cave/layout", "x": 600, "y": 150, "w": 150, "h": 150 },
+    "floorCave": { "sheet": "biomes/cave/layout", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "stairsCave1": { "sheet": "biomes/cave/layout", "x": 0, "y": 450, "w": 150, "h": 150 },
+    "stairsCave2": { "sheet": "biomes/cave/layout", "x": 150, "y": 450, "w": 150, "h": 150 },
+    "collapsedStairsCave1": { "sheet": "biomes/cave/layout", "x": 0, "y": 600, "w": 150, "h": 150 },
+    "collapsedStairsCave2": { "sheet": "biomes/cave/layout", "x": 150, "y": 600, "w": 150, "h": 150 },
+    
+    "torchCaveLvl1": { "sheet": "biomes/cave/interactive", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "torchCaveLvl2": { "sheet": "biomes/cave/interactive", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "torchCaveLvl3": { "sheet": "biomes/cave/interactive", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "torchCaveLvl4": { "sheet": "biomes/cave/interactive", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "chestCaveClosed1": { "sheet": "biomes/cave/interactive", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "chestCaveOpen1": { "sheet": "biomes/cave/interactive", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "chestCaveEmpty1": { "sheet": "biomes/cave/interactive", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "chestCaveMimic1": { "sheet": "biomes/cave/interactive", "x": 450, "y": 150, "w": 150, "h": 150 },
+    
+    "goldCave1": { "sheet": "biomes/cave/loot", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "goldCave2": { "sheet": "biomes/cave/loot", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "goldCave3": { "sheet": "biomes/cave/loot", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "goldCave4": { "sheet": "biomes/cave/loot", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "potionCave1": { "sheet": "biomes/cave/loot", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "potionCave2": { "sheet": "biomes/cave/loot", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "potionCave3": { "sheet": "biomes/cave/loot", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "potionCave4": { "sheet": "biomes/cave/loot", "x": 450, "y": 150, "w": 150, "h": 150 },
+    "artifactCave1": { "sheet": "biomes/cave/loot", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "artifactCave2": { "sheet": "biomes/cave/loot", "x": 150, "y": 300, "w": 150, "h": 150 },
+    "artifactCave3": { "sheet": "biomes/cave/loot", "x": 300, "y": 300, "w": 150, "h": 150 },
+    
+    "wallIce1": { "sheet": "biomes/ice/layout", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "wallIce2": { "sheet": "biomes/ice/layout", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "wallIce3": { "sheet": "biomes/ice/layout", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "wallIceCracked1": { "sheet": "biomes/ice/layout", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "wallIceCracked2": { "sheet": "biomes/ice/layout", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "floorSnow": { "sheet": "biomes/ice/layout", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "floorSnowIce": { "sheet": "biomes/ice/layout", "x": 150, "y": 300, "w": 150, "h": 150 },
+    "stairsIce1": { "sheet": "biomes/ice/layout", "x": 0, "y": 450, "w": 150, "h": 150 },
+    "stairsIce2": { "sheet": "biomes/ice/layout", "x": 150, "y": 450, "w": 150, "h": 150 },
+    "collapsedStairsIce1": { "sheet": "biomes/ice/layout", "x": 0, "y": 600, "w": 150, "h": 150 },
+    "collapsedStairsIce2": { "sheet": "biomes/ice/layout", "x": 150, "y": 600, "w": 150, "h": 150 },
+    
+    "torchIceLvl6": { "sheet": "biomes/ice/interactive", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "torchIceLvl7": { "sheet": "biomes/ice/interactive", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "torchIceLvl8": { "sheet": "biomes/ice/interactive", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "torchIceLvl9": { "sheet": "biomes/ice/interactive", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "chestIceClosed1": { "sheet": "biomes/ice/interactive", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "chestIceOpen1": { "sheet": "biomes/ice/interactive", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "chestIceEmpty1": { "sheet": "biomes/ice/interactive", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "chestIceMimic1": { "sheet": "biomes/ice/interactive", "x": 450, "y": 150, "w": 150, "h": 150 },
+    "chestIceClosed2": { "sheet": "biomes/ice/interactive", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "chestIceOpen2": { "sheet": "biomes/ice/interactive", "x": 150, "y": 300, "w": 150, "h": 150 },
+    "chestIceEmpty2": { "sheet": "biomes/ice/interactive", "x": 300, "y": 300, "w": 150, "h": 150 },
+    "chestIceMimic2": { "sheet": "biomes/ice/interactive", "x": 450, "y": 300, "w": 150, "h": 150 },
+    
+    "goldIce1": { "sheet": "biomes/ice/loot", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "goldIce2": { "sheet": "biomes/ice/loot", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "goldIce3": { "sheet": "biomes/ice/loot", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "goldIce4": { "sheet": "biomes/ice/loot", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "potionIce1": { "sheet": "biomes/ice/loot", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "potionIce2": { "sheet": "biomes/ice/loot", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "potionIce3": { "sheet": "biomes/ice/loot", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "potionIce4": { "sheet": "biomes/ice/loot", "x": 450, "y": 150, "w": 150, "h": 150 },
+    "artifactIce1": { "sheet": "biomes/ice/loot", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "artifactIce2": { "sheet": "biomes/ice/loot", "x": 150, "y": 300, "w": 150, "h": 150 },
+    "artifactIce3": { "sheet": "biomes/ice/loot", "x": 300, "y": 300, "w": 150, "h": 150 },
+    
+    "wallSand1": { "sheet": "biomes/sand/layout", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "wallSand2": { "sheet": "biomes/sand/layout", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "wallSandCracked1": { "sheet": "biomes/sand/layout", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "wallSandCracked2": { "sheet": "biomes/sand/layout", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "floorSand": { "sheet": "biomes/sand/layout", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "stairsSand1": { "sheet": "biomes/sand/layout", "x": 0, "y": 450, "w": 150, "h": 150 },
+    "stairsSand2": { "sheet": "biomes/sand/layout", "x": 150, "y": 450, "w": 150, "h": 150 },
+    "collapsedStairsSand1": { "sheet": "biomes/sand/layout", "x": 0, "y": 600, "w": 150, "h": 150 },
+    "collapsedStairsSand2": { "sheet": "biomes/sand/layout", "x": 150, "y": 600, "w": 150, "h": 150 },
+    
+    "torchSandLvl11": { "sheet": "biomes/sand/interactive", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "torchSandLvl12": { "sheet": "biomes/sand/interactive", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "torchSandLvl13": { "sheet": "biomes/sand/interactive", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "torchSandLvl14": { "sheet": "biomes/sand/interactive", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "chestSandClosed1": { "sheet": "biomes/sand/interactive", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "chestSandOpen1": { "sheet": "biomes/sand/interactive", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "chestSandEmpty1": { "sheet": "biomes/sand/interactive", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "chestSandMimic1": { "sheet": "biomes/sand/interactive", "x": 450, "y": 150, "w": 150, "h": 150 },
+    
+    "goldSand1": { "sheet": "biomes/sand/loot", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "goldSand2": { "sheet": "biomes/sand/loot", "x": 150, "y": 0, "w": 150, "h": 150 },
+    "goldSand3": { "sheet": "biomes/sand/loot", "x": 300, "y": 0, "w": 150, "h": 150 },
+    "goldSand4": { "sheet": "biomes/sand/loot", "x": 450, "y": 0, "w": 150, "h": 150 },
+    "potionSand1": { "sheet": "biomes/sand/loot", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "potionSand2": { "sheet": "biomes/sand/loot", "x": 150, "y": 150, "w": 150, "h": 150 },
+    "potionSand3": { "sheet": "biomes/sand/loot", "x": 300, "y": 150, "w": 150, "h": 150 },
+    "potionSand4": { "sheet": "biomes/sand/loot", "x": 450, "y": 150, "w": 150, "h": 150 },
+    "artifactSand1": { "sheet": "biomes/sand/loot", "x": 0, "y": 300, "w": 150, "h": 150 },
+    "artifactSand2": { "sheet": "biomes/sand/loot", "x": 150, "y": 300, "w": 150, "h": 150 },
+    "artifactSand3": { "sheet": "biomes/sand/loot", "x": 300, "y": 300, "w": 150, "h": 150 }
+  },
+  
+  "aliases": {
+    "wall": {
+      "cave": ["wallCave1", "wallCave2", "wallCave3"],
+      "ice": ["wallIce1", "wallIce2", "wallIce3"],
+      "sand": ["wallSand1", "wallSand2"],
+      "default": ["wallCave1"]
+    },
+    "wallCracked": {
+      "cave": ["wallCaveCracked1", "wallCaveCracked2", "wallCaveCracked3", "wallCaveCracked4", "wallCaveCracked5"],
+      "ice": ["wallIceCracked1", "wallIceCracked2"],
+      "sand": ["wallSandCracked1", "wallSandCracked2"],
+      "default": ["wallCaveCracked1"]
+    },
+    "floor": {
+      "cave": ["floorCave"],
+      "ice": ["floorSnow", "floorSnowIce"],
+      "sand": ["floorSand"],
+      "default": ["floorCave"]
+    },
+    "stairs": {
+      "cave": ["stairsCave1", "stairsCave2"],
+      "ice": ["stairsIce1", "stairsIce2"],
+      "sand": ["stairsSand1", "stairsSand2"],
+      "default": ["stairsCave1"]
+    },
+    "collapsedStairs": {
+      "cave": ["collapsedStairsCave1", "collapsedStairsCave2"],
+      "ice": ["collapsedStairsIce1", "collapsedStairsIce2"],
+      "sand": ["collapsedStairsSand1", "collapsedStairsSand2"],
+      "default": ["collapsedStairsCave1"]
+    },
+    "torch": {
+      "cave": ["torchCaveLvl1", "torchCaveLvl2", "torchCaveLvl3", "torchCaveLvl4"],
+      "ice": ["torchIceLvl6", "torchIceLvl7", "torchIceLvl8", "torchIceLvl9"],
+      "sand": ["torchSandLvl11", "torchSandLvl12", "torchSandLvl13", "torchSandLvl14"],
+      "default": ["torchCaveLvl1"]
+    },
+    "chest": {
+      "cave": ["chestCaveClosed1"],
+      "ice": ["chestIceClosed1", "chestIceClosed2"],
+      "sand": ["chestSandClosed1"],
+      "default": ["chestCaveClosed1"]
+    },
+    "chestOpen": {
+      "cave": ["chestCaveOpen1"],
+      "ice": ["chestIceOpen1", "chestIceOpen2"],
+      "sand": ["chestSandOpen1"],
+      "default": ["chestCaveOpen1"]
+    },
+    "chestEmpty": {
+      "cave": ["chestCaveEmpty1"],
+      "ice": ["chestIceEmpty1", "chestIceEmpty2"],
+      "sand": ["chestSandEmpty1"],
+      "default": ["chestCaveEmpty1"]
+    },
+    "chestMimic": {
+      "cave": ["chestCaveMimic1"],
+      "ice": ["chestIceMimic1", "chestIceMimic2"],
+      "sand": ["chestSandMimic1"],
+      "default": ["chestCaveMimic1"]
+    },
+    "gold": {
+      "cave": ["goldCave1", "goldCave2", "goldCave3", "goldCave4"],
+      "ice": ["goldIce1", "goldIce2", "goldIce3", "goldIce4"],
+      "sand": ["goldSand1", "goldSand2", "goldSand3", "goldSand4"],
+      "default": ["goldCave1"]
+    },
+    "potion": {
+      "cave": ["potionCave1", "potionCave2", "potionCave3", "potionCave4"],
+      "ice": ["potionIce1", "potionIce2", "potionIce3", "potionIce4"],
+      "sand": ["potionSand1", "potionSand2", "potionSand3", "potionSand4"],
+      "default": ["potionCave1"]
+    },
+    "artifact": {
+      "cave": ["artifactCave1", "artifactCave2", "artifactCave3"],
+      "ice": ["artifactIce1", "artifactIce2", "artifactIce3"],
+      "sand": ["artifactSand1", "artifactSand2", "artifactSand3"],
+      "default": ["artifactCave1"]
+    }
+  }
+}

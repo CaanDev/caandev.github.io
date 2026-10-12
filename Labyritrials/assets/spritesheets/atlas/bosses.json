@@ -1,0 +1,54 @@
+{
+  "version": "1.0",
+  "description": "Boss arena sprites",
+  
+  "sheets": {
+    "bossArena/layout": {
+      "id": "bossArena/layout",
+      "path": "bossArena/layout.webp",
+      "fallback": "bossArena/layout.png",
+      "frameSize": 150,
+      "cols": 1,
+      "rows": 3,
+      "frames": {
+        "walls": ["bossWall5", "bossWall10", "bossWall15"]
+      }
+    },
+    "bossArena/interactive": {
+      "id": "bossArena/interactive",
+      "path": "bossArena/interactive.webp",
+      "fallback": "bossArena/interactive.png",
+      "frameSize": 150,
+      "cols": 1,
+      "rows": 3,
+      "frames": {
+        "torches": ["bossTorch5", "bossTorch10", "bossTorch15"]
+      }
+    }
+  },
+  
+  "sprites": {
+    "bossWall5": { "sheet": "bossArena/layout", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "bossWall10": { "sheet": "bossArena/layout", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "bossWall15": { "sheet": "bossArena/layout", "x": 0, "y": 300, "w": 150, "h": 150 },
+    
+    "bossTorch5": { "sheet": "bossArena/interactive", "x": 0, "y": 0, "w": 150, "h": 150 },
+    "bossTorch10": { "sheet": "bossArena/interactive", "x": 0, "y": 150, "w": 150, "h": 150 },
+    "bossTorch15": { "sheet": "bossArena/interactive", "x": 0, "y": 300, "w": 150, "h": 150 }
+  },
+  
+  "aliases": {
+    "wall": {
+      "boss5": ["bossWall5"],
+      "boss10": ["bossWall10"],
+      "boss15": ["bossWall15"],
+      "default": ["bossWall5"]
+    },
+    "torch": {
+      "boss5": ["bossTorch5"],
+      "boss10": ["bossTorch10"],
+      "boss15": ["bossTorch15"],
+      "default": ["bossTorch5"]
+    }
+  }
+}
