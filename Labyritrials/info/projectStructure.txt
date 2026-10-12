@@ -42,7 +42,22 @@
 │   │       ├── functions.js
 │   │       ├── index.js
 │   │       ├── player.js
-│   │       └── state.js
+│   │       ├── spriteSizes.js
+│   │       │
+│   │       └── state/
+│   │           ├── bossState.js
+│   │           ├── effectsState.js
+│   │           ├── flagsState.js
+│   │           ├── fogState.js
+│   │           ├── index.js
+│   │           ├── notesState.js
+│   │           ├── npcState.js
+│   │           ├── playerState.js
+│   │           ├── progressState.js
+│   │           ├── roomState.js
+│   │           ├── stateBase.js
+│   │           ├── uiState.js
+│   │           └── worldState.js
 │   │
 │   ├── data/
 │   │   ├── achievements.js
@@ -54,6 +69,9 @@
 │   │   ├── items.js
 │   │   ├── monsters.js
 │   │   ├── notes.js
+│   │   ├── npcDialogs.js
+│   │   ├── npcs.js
+│   │   ├── quests.js
 │   │   └── weapons.js
 │   │
 │   ├── entities/
@@ -103,6 +121,16 @@
 │   │   │           ├── special.js
 │   │   │           └── summon.js
 │   │   │
+│   │   ├── npc/
+│   │   │   ├── index.js
+│   │   │   │
+│   │   │   └── researcher/
+│   │   │       ├── index.js
+│   │   │       ├── interaction.js
+│   │   │       ├── manager.js
+│   │   │       ├── spawner.js
+│   │   │       └── utils.js
+│   │   │
 │   │   ├── objects/
 │   │   │   ├── clearRoomEffects.js
 │   │   │   ├── explosion.js
@@ -116,16 +144,28 @@
 │   │   │   │   ├── chestSpawner.js
 │   │   │   │   ├── monsterSpawner.js
 │   │   │   │   ├── runeSpawner.js
+│   │   │   │   ├── spiritCatcherSpawner.js
 │   │   │   │   ├── torchSpawner.js
-│   │   │   │   └── trapSpawner.js
+│   │   │   │   ├── trapSpawner.js
+│   │   │   │   └── wildWispSpawner.js
 │   │   │   │
-│   │   │   └── utils/
-│   │   │       ├── bloodSystem.js
-│   │   │       └── spawnUtils.js
+│   │   │   ├── utils/
+│   │   │   │   ├── bloodSystem.js
+│   │   │   │   └── spawnUtils.js
+│   │   │   │
+│   │   │   └── willOTheWisps/
+│   │   │       ├── index.js
+│   │   │       ├── wildWispsUpdater.js
+│   │   │       ├── wispsBehavior.js
+│   │   │       ├── wispsCombat.js
+│   │   │       ├── wispsData.js
+│   │   │       ├── wispsState.js
+│   │   │       └── wispsSummon.js
 │   │   │
 │   │   └── player/
 │   │       ├── animation.js
 │   │       ├── bloodTrails.js
+│   │       ├── chargeParticles.js
 │   │       ├── combat.js
 │   │       ├── effects.js
 │   │       ├── gameOver.js
@@ -136,7 +176,18 @@
 │   │       ├── movement.js
 │   │       ├── portals.js
 │   │       ├── shrines.js
-│   │       └── traps.js
+│   │       ├── traps.js
+│   │       │
+│   │       └── interactions/
+│   │           ├── bookshelf.js
+│   │           ├── config.js
+│   │           ├── helpers.js
+│   │           ├── index.js
+│   │           ├── manager.js
+│   │           ├── npcPrompts.js
+│   │           ├── shop.js
+│   │           ├── spiritCatcher.js
+│   │           └── taskBoard.js
 │   │
 │   ├── game/
 │   │   ├── finalScreen.js
@@ -162,7 +213,8 @@
 │   │   │   ├── objectCollector.js
 │   │   │   ├── playerCollector.js
 │   │   │   ├── secretRoomCollector.js
-│   │   │   └── systemCollector.js
+│   │   │   ├── systemCollector.js
+│   │   │   └── willOTheWispsCollector.js
 │   │   │
 │   │   └── restorers/
 │   │       ├── baseRestorer.js
@@ -174,7 +226,8 @@
 │   │       ├── objectRestorer.js
 │   │       ├── playerRestorer.js
 │   │       ├── secretRoomRestorer.js
-│   │       └── systemRestorer.js
+│   │       ├── systemRestorer.js
+│   │       └── willOTheWispsRestorer.js
 │   │
 │   ├── sprites/
 │   │   ├── characters/
@@ -182,6 +235,11 @@
 │   │   │   ├── playerAnimator.js
 │   │   │   ├── spriteAtlas.js
 │   │   │   └── spriteConfig.js
+│   │   │
+│   │   ├── npcs/
+│   │   │   ├── index.js
+│   │   │   ├── npcAnimator.js
+│   │   │   └── npcConfig.js
 │   │   │
 │   │   ├── achievementSprites.js
 │   │   ├── index.js
@@ -195,6 +253,20 @@
 │   │   │   ├── index.js
 │   │   │   ├── manager.js
 │   │   │   └── ui.js
+│   │   │
+│   │   ├── dialogs/
+│   │   │   ├── dialogManager.js
+│   │   │   ├── index.js
+│   │   │   ├── npcInteraction.js
+│   │   │   └── npcStates.js
+│   │   │
+│   │   ├── difficulty/
+│   │   │   ├── checkers.js
+│   │   │   ├── config.js
+│   │   │   ├── difficultyManager.js
+│   │   │   ├── index.js
+│   │   │   ├── metaStorage.js
+│   │   │   └── stressTracker.js
 │   │   │
 │   │   ├── events/
 │   │   │   ├── bonuses.js
@@ -233,6 +305,11 @@
 │   │   │   ├── particlePool.js
 │   │   │   └── potionParticles.js
 │   │   │
+│   │   ├── quests/
+│   │   │   ├── index.js
+│   │   │   ├── questManager.js
+│   │   │   └── questTracker.js
+│   │   │
 │   │   ├── rendering/
 │   │   │   ├── batchRenderer.js
 │   │   │   ├── bloodRenderer.js
@@ -241,16 +318,25 @@
 │   │   │   ├── lootRenderer.js
 │   │   │   ├── mazeRenderer.js
 │   │   │   ├── monsterRenderer.js
+│   │   │   ├── npcIndicator.js
+│   │   │   ├── npcRenderer.js
 │   │   │   ├── particleRenderer.js
 │   │   │   ├── portalRenderer.js
 │   │   │   ├── projectileRenderer.js
 │   │   │   ├── realityShiftRenderer.js
-│   │   │   ├── shopRenderer.js
 │   │   │   ├── shrineRenderer.js
 │   │   │   ├── torchRenderer.js
 │   │   │   ├── trapRenderer.js
 │   │   │   ├── uiRenderer.js
 │   │   │   ├── visibilityUtils.js
+│   │   │   │
+│   │   │   ├── interactions/
+│   │   │   │   ├── bookshelfRenderer.js
+│   │   │   │   ├── helpers.js
+│   │   │   │   ├── index.js
+│   │   │   │   ├── promptsRenderer.js
+│   │   │   │   ├── shopRenderer.js
+│   │   │   │   └── taskBoardRenderer.js
 │   │   │   │
 │   │   │   ├── maze/
 │   │   │   │   ├── background.js
@@ -267,8 +353,6 @@
 │   │   │   │   │   └── index.js
 │   │   │   │   │
 │   │   │   │   └── walls/
-│   │   │   │       ├── bookshelfRenderer.js
-│   │   │   │       ├── crackTemplates.js
 │   │   │   │       ├── index.js
 │   │   │   │       ├── noteRenderer.js
 │   │   │   │       ├── wallConfig.js
@@ -284,14 +368,20 @@
 │   │   │   │   ├── statusEffects.js
 │   │   │   │   └── trailManager.js
 │   │   │   │
-│   │   │   └── ui/
-│   │   │       ├── adaptationIndicator.js
-│   │   │       ├── bossHealthBar.js
-│   │   │       ├── eventIndicator.js
+│   │   │   ├── ui/
+│   │   │   │   ├── adaptationIndicator.js
+│   │   │   │   ├── bossHealthBar.js
+│   │   │   │   ├── eventIndicator.js
+│   │   │   │   ├── index.js
+│   │   │   │   ├── miniMap.js
+│   │   │   │   ├── roomLabel.js
+│   │   │   │   └── utils.js
+│   │   │   │
+│   │   │   └── willOTheWisps/
 │   │   │       ├── index.js
-│   │   │       ├── miniMap.js
-│   │   │       ├── roomLabel.js
-│   │   │       └── utils.js
+│   │   │       ├── wildWispsRenderer.js
+│   │   │       ├── willOTheWispsRenderer.js
+│   │   │       └── wispsSpriteCache.js
 │   │   │
 │   │   ├── ui/
 │   │   │   ├── bookshelfUI.js
@@ -302,6 +392,7 @@
 │   │   │   ├── itemInfoPopup.js
 │   │   │   ├── modalManager.js
 │   │   │   ├── statsUpdater.js
+│   │   │   ├── taskBoardUI.js
 │   │   │   │
 │   │   │   ├── inventory/
 │   │   │   │   ├── index.js
@@ -314,6 +405,7 @@
 │   │   │   │       ├── index.js
 │   │   │   │       ├── inventoryRenderer.js
 │   │   │   │       ├── itemsRenderer.js
+│   │   │   │       ├── questsRenderer.js
 │   │   │   │       ├── utils.js
 │   │   │   │       └── weaponsRenderer.js
 │   │   │   │
@@ -346,7 +438,8 @@
 │   │   ├── gameLoader.js
 │   │   ├── htmlLoader.js
 │   │   ├── index.js
-│   │   └── logger.js
+│   │   ├── logger.js
+│   │   └── screenFade.js
 │   │
 │   └── world/
 │       ├── index.js
@@ -385,6 +478,7 @@
 │   │
 │   ├── components/
 │   │   ├── buttons.css
+│   │   ├── dialog.css
 │   │   ├── hud.css
 │   │   ├── loader.css
 │   │   └── notification.css
@@ -406,11 +500,13 @@
 │       ├── levelUp.css
 │       ├── pause.css
 │       ├── settings.css
-│       └── shop.css
+│       ├── shop.css
+│       └── taskBoard.css
 │
 └── views/                                  # HTML (на уровне корня)
     ├── components/
     │   ├── confirm.html
+    │   ├── dialog.html
     │   ├── itemInfoPopup.html
     │   ├── noteWindow.html
     │   ├── notification.html
@@ -430,4 +526,5 @@
         ├── levelUp.html
         ├── pause.html
         ├── settings.html
-        └── shop.html
+        ├── shop.html
+        └── taskBoard.html

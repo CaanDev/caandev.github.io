@@ -224,11 +224,11 @@
 │   │   │   │   │   │   └── frame_000.png ... frame_008.png
 │   │   │   │   │   ├── south/
 │   │   │   │   │   │   └── frame_000.png ... frame_008.png
-│   │   │   │   │   ├── south-east
+│   │   │   │   │   ├── south-east/
 │   │   │   │   │   │   └── frame_000.png ... frame_008.png
-│   │   │   │   │   ├── south-west
+│   │   │   │   │   ├── south-west/
 │   │   │   │   │   │   └── frame_000.png ... frame_008.png
-│   │   │   │   │   └── west
+│   │   │   │   │   └── west/
 │   │   │   │   │       └── frame_000.png ... frame_008.png
 │   │   │   │   │
 │   │   │   │   └── walk/
@@ -242,11 +242,11 @@
 │   │   │   │       │   └── frame_000.png ... frame_007.png
 │   │   │   │       ├── south/
 │   │   │   │       │   └── frame_000.png ... frame_007.png
-│   │   │   │       ├── south-east
+│   │   │   │       ├── south-east/
 │   │   │   │       │   └── frame_000.png ... frame_007.png
-│   │   │   │       ├── south-west
+│   │   │   │       ├── south-west/
 │   │   │   │       │   └── frame_000.png ... frame_007.png
-│   │   │   │       └── west
+│   │   │   │       └── west/
 │   │   │   │           └── frame_000.png ... frame_007.png
 │   │   │   │
 │   │   │   └── rotations/
@@ -272,12 +272,16 @@
 │   │       │   │   │   └── frame_000.png ... frame_008.png
 │   │       │   │   ├── south/
 │   │       │   │   │   └── frame_000.png ... frame_008.png
-│   │       │   │   ├── south-east
+│   │       │   │   ├── south-east/
 │   │       │   │   │   └── frame_000.png ... frame_008.png
-│   │       │   │   ├── south-west
+│   │       │   │   ├── south-west/
 │   │       │   │   │   └── frame_000.png ... frame_008.png
-│   │       │   │   └── west
+│   │       │   │   └── west/
 │   │       │   │       └── frame_000.png ... frame_008.png
+│   │       │   │
+│   │       │   ├── waiting/
+│   │       │   │   └── south/
+│   │       │   │       └── frame_000.png ... frame_016.png
 │   │       │   │
 │   │       │   └── walk/
 │   │       │       ├── east/
@@ -290,12 +294,29 @@
 │   │       │       │   └── frame_000.png ... frame_008.png
 │   │       │       ├── south/
 │   │       │       │   └── frame_000.png ... frame_008.png
-│   │       │       ├── south-east
+│   │       │       ├── south-east/
 │   │       │       │   └── frame_000.png ... frame_008.png
-│   │       │       ├── south-west
+│   │       │       ├── south-west/
 │   │       │       │   └── frame_000.png ... frame_008.png
-│   │       │       └── west
+│   │       │       └── west/
 │   │       │           └── frame_000.png ... frame_008.png
+│   │       │
+│   │       └── rotations/
+│   │           ├── east.png
+│   │           ├── north.png
+│   │           ├── north-east.png
+│   │           ├── north-west.png
+│   │           ├── south.png
+│   │           ├── south-east.png
+│   │           ├── south-west.png
+│   │           └── west.png
+│   │
+│   ├── npcs/
+│   │   └── researcher/
+│   │       ├── animations/
+│   │       │   └── write/
+│   │       │       └── south/
+│   │       │           └── frame_000.png ... frame_007.png
 │   │       │
 │   │       └── rotations/
 │   │           ├── east.png
@@ -444,8 +465,10 @@
 │       ├── inventory/
 │       │   ├── equipment/
 │       │   │   ├── talismanFire.png
-│       │   │   └── talismanMimicHunter.png
+│       │   │   ├── talismanMimicHunter.png
+│       │   │   └── willO'TheWisps.png
 │       │   ├── items/
+│       │   │   ├── batWing.png
 │       │   │   ├── mapLevel.png
 │       │   │   ├── mapLevelIce.png
 │       │   │   └── mapLevelSand.png
@@ -457,12 +480,18 @@
 │       │
 │       ├── objects/
 │       │   ├── bookshelf.png
-│       │   └── shopStand.png
+│       │   ├── shopStand.png
+│       │   └── taskBoard.png
+│       │
+│       ├── questCategories/
+│       │   ├── collection.png
+│       │   └── exploration.png
 │       │
 │       ├── shop/
 │       │   ├── improvements/
 │       │   │   ├── boostDMG.png
 │       │   │   ├── boostHP.png
+│       │   │   ├── boostInventory.png
 │       │   │   └── boostStamina.png
 │       │   │
 │       │   ├── goldCoin.png
@@ -486,6 +515,7 @@
     │   ├── bosses.json
     │   ├── characters.json
     │   ├── index.json
+    │   ├── npcs.json
     │   ├── rooms.json
     │   └── shared.json
     │
@@ -534,8 +564,16 @@
     │       ├── attack.webp
     │       ├── idle.png
     │       ├── idle.webp
+    │       ├── waiting.png
+    │       ├── waiting.webp
     │       ├── walk.png
     │       └── walk.webp
+    │
+    ├── npcs/
+    │   ├── researcher-idle.png
+    │   ├── researcher-idle.webp
+    │   ├── researcher-write.png
+    │   └── researcher-write.webp
     │
     ├── rooms/
     │   ├── safeRoom/
@@ -571,6 +609,8 @@
         ├── inventory.webp
         ├── objects.png
         ├── objects.webp
+        ├── questCategories.png
+        ├── questCategories.webp
         ├── shop.png
         ├── shop.webp
         ├── traps.png
