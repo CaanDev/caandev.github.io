@@ -1,0 +1,285 @@
+/**
+ * Стили для окна диалога с NPC
+ */
+
+#dialog-ui {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 3500;
+  animation: fadeInPause 0.25s ease forwards;
+}
+
+.dialog-overlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.dialog-content {
+  background: var(--color-ui-panel);
+  background: var(--gradient-panel);
+  border: 1.5px solid var(--color-border-gold);
+  border-radius: 12px;
+  padding: 28px 32px 22px;
+  max-width: 600px;
+  width: 90%;
+  color: var(--color-text-primary);
+  font-family: var(--font-ui, 'Comfortaa', 'Courier New', monospace);
+  box-shadow: 0 0 80px rgba(200, 200, 100, 0.08),
+              0 0 40px rgba(0, 0, 0, 0.5);
+  animation: pauseSlideIn 0.25s ease forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.dialog-corner-tl {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 26px;
+  height: 26px;
+  border-top: 2px solid var(--color-border-gold);
+  border-left: 2px solid var(--color-border-gold);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.dialog-corner-br {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border-bottom: 2px solid var(--color-border-gold);
+  border-right: 2px solid var(--color-border-gold);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ЗАГОЛОВОК */
+
+.dialog-header {
+  text-align: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(200, 200, 100, 0.15);
+}
+
+.dialog-header h2 {
+  margin: 0;
+  color: var(--color-text-gold);
+  font-family: var(--font-title, 'Comfortaa', 'Courier New', monospace);
+  font-weight: 300;
+  font-size: 20px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(200, 200, 100, 0.15);
+}
+
+/* ТЕЛО */
+
+.dialog-body {
+  padding: 8px 0 18px 0;
+}
+
+.dialog-body p {
+  margin: 0;
+  color: var(--color-text-light);
+  font-family: var(--font-ui, 'Comfortaa', 'Courier New', monospace);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: left;
+  letter-spacing: 0.3px;
+  white-space: pre-line;
+}
+
+/* Выделение текста в диалоге */
+
+.dialog-highlight-gold {
+  display: block;
+  text-align: center;
+  color: var(--color-text-gold);
+  font-weight: 400;
+  font-family: var(--font-title, 'Comfortaa', 'Courier New', monospace);
+  font-size: 16px;
+  letter-spacing: 1px;
+  padding: 6px 0;
+  text-shadow: 0 0 20px rgba(241, 196, 15, 0.4),
+               0 0 40px rgba(241, 196, 15, 0.15);
+}
+
+/* ФУТЕР */
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 14px;
+  border-top: 1px solid rgba(200, 200, 100, 0.1);
+  min-height: 50px;
+  align-items: center;
+}
+
+.dialog-continue-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.dialog-choice-wrapper {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+}
+
+/* КНОПКИ */
+
+.dialog-btn {
+  padding: 10px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-ui, 'Comfortaa', 'Courier New', monospace);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 1px;
+  border: 1px solid rgba(200, 200, 100, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+/* Кнопка "Продолжить" */
+
+.dialog-btn-continue {
+  background: transparent;
+  border: none;
+  padding: 6px 4px;
+  color: var(--color-text-gold);
+  font-family: var(--font-ui, 'Comfortaa', 'Courier New', monospace);
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  text-shadow: 0 0 10px rgba(241, 196, 15, 0.25);
+  transition: color 0.25s ease, text-shadow 0.25s ease, letter-spacing 0.25s ease;
+  text-align: right;
+}
+
+.dialog-btn-continue:hover {
+  color: var(--color-text-light);
+  text-shadow: 0 0 14px rgba(241, 196, 15, 0.55);
+  transform: none;
+}
+
+.dialog-btn-continue:active {
+  color: var(--color-text-gold);
+  transform: none;
+}
+
+/* Кнопка "Принять" */
+
+.dialog-btn-yes {
+  background: rgba(46, 204, 113, 0.12);
+  color: var(--color-text-green);
+  border-color: rgba(46, 204, 113, 0.3);
+}
+
+.dialog-btn-yes:hover {
+  background: rgba(46, 204, 113, 0.25);
+  border-color: rgba(46, 204, 113, 0.6);
+  color: var(--color-text-light);
+  transform: translateY(-1px);
+  box-shadow: 0 0 25px rgba(46, 204, 113, 0.2);
+}
+
+.dialog-btn-yes:active {
+  transform: scale(0.97);
+}
+
+/* Кнопка "Отказаться" */
+
+.dialog-btn-no {
+  background: rgba(231, 76, 60, 0.12);
+  color: var(--color-text-red);
+  border-color: rgba(231, 76, 60, 0.3);
+}
+
+.dialog-btn-no:hover {
+  background: rgba(231, 76, 60, 0.25);
+  border-color: rgba(231, 76, 60, 0.6);
+  color: var(--color-text-light);
+  transform: translateY(-1px);
+  box-shadow: 0 0 25px rgba(231, 76, 60, 0.2);
+}
+
+.dialog-btn-no:active {
+  transform: scale(0.97);
+}
+
+/* СОСТОЯНИЕ: кнопки заблокированы (anti-spam 300мс) */
+
+.dialog-footer.locked {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* АДАПТАЦИЯ */
+
+@media (max-width: 600px) {
+  .dialog-content {
+    padding: 22px 20px 18px;
+    max-width: 95%;
+  }
+
+  .dialog-header h2 {
+    font-size: 17px;
+    letter-spacing: 1.5px;
+  }
+
+  .dialog-body p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .dialog-btn:not(.dialog-btn-continue) {
+    padding: 9px 18px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 400px) {
+  .dialog-content {
+    padding: 18px 14px 14px;
+  }
+
+  .dialog-header h2 {
+    font-size: 15px;
+  }
+
+  .dialog-body p {
+    font-size: 13px;
+  }
+
+  .dialog-btn:not(.dialog-btn-continue) {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  .dialog-choice-wrapper {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

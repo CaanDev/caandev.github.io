@@ -1,0 +1,27 @@
+<!-- Окно доски заданий -->
+<div id="taskboard-ui" style="display: none;">
+  <div class="taskboard-content">
+    <div class="taskboard-corner-tl"></div>
+    <div class="taskboard-corner-br"></div>
+    
+    <div class="taskboard-header">
+      <h2>ДОСКА ЗАДАНИЙ</h2>
+      <button id="taskboard-close-btn" class="taskboard-close-btn">✕</button>
+    </div>
+    
+    <div id="taskboard-list" class="taskboard-list">
+      <!-- Список заданий рендерится через JS -->
+    </div>
+    
+    <div id="taskboard-empty" class="taskboard-empty" style="display: none;">
+      <div class="taskboard-empty-icon">📭</div>
+      <div class="taskboard-empty-text">Нет доступных заданий</div>
+      <div class="taskboard-empty-subtext">Возвращайтесь позже - задания появятся по мере прохождения</div>
+    </div>
+    
+    <div class="taskboard-footer">
+      <span class="taskboard-hint-icon">💡</span>
+      <span class="taskboard-hint-text">Возьмите задание и выполните его. Завершить задание можно у того, кто его выдал.</span>
+    </div>
+  </div>
+</div>

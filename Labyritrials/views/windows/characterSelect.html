@@ -1,0 +1,63 @@
+<!-- Окно выбора персонажа -->
+<div id="character-select-ui" style="display: none;">
+  <div class="character-select-overlay">
+    <div class="character-select-content">
+      <div class="character-select-corner-tl"></div>
+      <div class="character-select-corner-br"></div>
+      
+      <div class="character-select-header">
+        <h2>ВЫБЕРИТЕ ГЕРОЯ</h2>
+      </div>
+      
+      <div class="character-select-grid">
+        <!-- Мужской персонаж -->
+        <div class="character-card" data-gender="male">
+          <div class="character-card-sprite" id="male-sprite-container">
+            <!-- Спрайт будет вставлен через JS -->
+          </div>
+          
+          <div class="character-card-info">
+            <div class="character-card-role">Воин-маг</div>
+            <div class="character-card-desc">
+              Сильный и выносливый.<br>
+              Специализация: тяжёлые удары.
+            </div>
+          </div>
+        </div>
+        
+        <!-- Случайный выбор -->
+        <div class="character-card character-card-random" data-gender="random">
+          <div class="character-card-sprite character-card-sprite-random" id="random-sprite-container">
+            <span class="random-dice">🎲</span>
+          </div>
+          
+          <div class="character-card-info">
+            <div class="character-card-role">Случайный герой</div>
+            <div class="character-card-desc">
+              Судьба решит за тебя
+            </div>
+          </div>
+        </div>
+        
+        <!-- Женский персонаж -->
+        <div class="character-card" data-gender="female">
+          <div class="character-card-sprite" id="female-sprite-container">
+            <!-- Спрайт будет вставлен через JS -->
+          </div>
+          
+          <div class="character-card-info">
+            <div class="character-card-role">Чародейка</div>
+            <div class="character-card-desc">
+              Быстрая и ловкая.<br>
+              Специализация: уклонение и скорость.
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="character-select-footer">
+        <button id="character-select-cancel" class="character-cancel-btn">↩ НАЗАД</button>
+      </div>
+    </div>
+  </div>
+</div>

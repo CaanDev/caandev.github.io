@@ -1,0 +1,30 @@
+<!-- Окно диалога с NPC -->
+<div id="dialog-ui" style="display: none;">
+  <div class="dialog-overlay">
+    <div class="dialog-content">
+      <div class="dialog-corner-tl"></div>
+      <div class="dialog-corner-br"></div>
+      
+      <div class="dialog-header">
+        <h2 id="dialog-speaker-name">Неизвестный</h2>
+      </div>
+      
+      <div class="dialog-body">
+        <p id="dialog-text">...</p>
+      </div>
+      
+      <div class="dialog-footer" id="dialog-footer">
+        <!-- Обычный диалог: одна кнопка -->
+        <div class="dialog-continue-wrapper" id="dialog-continue-wrapper">
+          <button id="dialog-continue-btn" class="dialog-btn dialog-btn-continue">Продолжить</button>
+        </div>
+        
+        <!-- Диалог с выбором: две кнопки -->
+        <div class="dialog-choice-wrapper" id="dialog-choice-wrapper" style="display: none;">
+          <button id="dialog-choice-yes" class="dialog-btn dialog-btn-yes">Принять</button>
+          <button id="dialog-choice-no" class="dialog-btn dialog-btn-no">Отказаться</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
